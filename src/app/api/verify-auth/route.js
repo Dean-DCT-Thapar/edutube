@@ -6,12 +6,12 @@ const WINDOWS_HOST = '192.168.29.209';
 
 export async function GET(request) {
     try {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const token = cookieStore.get('accessToken');
 
         if (!token) {
             return NextResponse.json(
-                { status: 401, message: 'No token found' },
+                { status: 401, message: 'Please login to continue' , meaning: 'No token found'},
                 { status: 401 }
             );
         }

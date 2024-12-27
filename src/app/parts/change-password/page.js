@@ -30,30 +30,44 @@ export default function ChangePassword() {
                     confirmPassword: ''
                 });
                 return;
+            }else if(formValues.newPassword.length < 8){
+                toast.error("New password must be at least 8 characters long");
+                setFormValues({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                });
+                return;
+            }else if(formValues.currentPassword === formValues.newPassword){
+                toast.error("New password and current password cannot be the same");
+                setFormValues({
+                    currentPassword: '',
+                    newPassword: '',
+                    confirmPassword: ''
+                });
+                return;
             }
 
             const response = await axios.post('/api/change-password', {
                 currentPassword: formValues.currentPassword,
                 newPassword: formValues.newPassword,
             });
-
-            if(response.data.status === 200){
-                toast.success("Password changed successfully");
-                router.push('/dashboard');
-            }else if(response.data.status === 401){
-                toast.error("Invalid current password");
-                setFormValues({ 
+            
+            toast.success(response.data.message);
+            router.push('/dashboard');
+            
+        }catch(error){
+            if(error.response){
+                toast.error(error.response.data.message);
+                setFormValues({
                     currentPassword: '',
                     newPassword: '',
                     confirmPassword: ''
                 });
             }else{
-                toast.error("There was an error changing your password");
+                toast.error(error.message);
                 router.push('/dashboard');
             }
-        }catch(error){
-            toast.error("There was an error changing your password");
-            router.push('/dashboard');
         }
     }
 
