@@ -6,20 +6,28 @@ import toast from 'react-hot-toast';
 
 export default function Dashboard() {
     const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
+
+    const [userData, setUserData] = useState(null);
 
     useEffect(() => {
-        axios.get('/api/verify-auth')
-            .then(response => {
-                if (response.data.status === 200) {
-                    setIsLoading(false);
+        const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
+
+        Promise.all([
+            axios.get('/api/verify-auth'),
+            axios.get('/api/get-user-data')
+        ])
+            .then(([authResponse, userDataResponse]) => {
+                if (authResponse.data.status === 200) {
+                    toast.dismiss(loadingToast);
+                    setUserData(userDataResponse.data);
                 } else {
-                    throw new Error(response.data.message || 'Authentication failed');
+                    throw new Error(authResponse.data.message || 'Authentication failed');
                 }
             })
             .catch((error) => {
+                toast.dismiss(loadingToast);
                 const errorMessage = error.response?.data?.message || error.message || 'Please login to continue';
-                toast.error(errorMessage);
+                toast.error(errorMessage, {id: loadingToast});
                 router.push('/login');
             });
     }, [router]);
@@ -33,19 +41,26 @@ export default function Dashboard() {
         }
     };
 
-    if (isLoading) {
-        return <div>Loading...</div>;
-    }
-
     return (
         <div>
-            <div>Dashboard Content</div>
-            <button 
-                onClick={handleLogout}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-            >
-                Logout
-            </button>
+            <div className="text-2xl font-bold mb-4">Welcome {userData?.name}</div>
+            <div>
+                <h2 className="text-2xl font-bold mb-4">Enrolled Courses</h2>
+                {userData?.courses?.map((course) => (
+                    <div key={course.course_id} className="border rounded-lg p-4 mb-4 shadow-sm">
+                        <p className="text-xl font-semibold mb-2">{course.course_name}</p>
+                        <p className="text-gray-600">Teacher: {course.teacher_name}</p>
+                    </div>
+                ))}
+            </div>
+            <div>
+                <button 
+                    onClick={handleLogout}
+                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                >
+                    Logout
+                </button>
+            </div>
         </div>
     );
 }

@@ -5,7 +5,6 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
-const WINDOWS_HOST = '192.168.29.209';
 
 
 export default function Page() {
@@ -45,6 +44,7 @@ export default function Page() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const loadingToast = toast.loading('Signing in...', {id: 'login-loading'});
     try {
         const response = await axios.post('/api/login', {
             email: formValues.email,
@@ -52,11 +52,12 @@ export default function Page() {
         });
         
         if (response.data.success) {
+            toast.success('Signed in successfully!', {id: loadingToast});
             router.push('/dashboard');
         }
     } catch (error) {
         const errorMessage = error.response?.data?.message || 'Login failed';
-        toast.error(errorMessage);
+        toast.error(errorMessage, {id: loadingToast});
         setFormValues({ email: '', password: '' });
     }
   };

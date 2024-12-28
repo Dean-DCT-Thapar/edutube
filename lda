@@ -1,0 +1,37 @@
+[33mcommit e4f95a8e7ee6c0fe34a32f6e76b92fa93141afef[m[33m ([m[1;36mHEAD -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m
+Author: aahil-khan <aahilminookhan@gmail.com>
+Date:   Sat Dec 28 02:38:00 2024 +0530
+
+    change password functionality added
+
+[33mcommit cfc10004e7b2e6555b672848b2821646e3061aa5[m
+Author: aahil-khan <aahilminookhan@gmail.com>
+Date:   Sat Dec 28 02:07:34 2024 +0530
+
+    sign in added
+
+[33mcommit d0ce5a414126863a8e70e6b86675e8eed879645b[m
+Merge: 2377708 e8a3e5b
+Author: aahil-khan <aahilminookhan@gmail.com>
+Date:   Wed Dec 25 23:29:40 2024 +0530
+
+    Merge branch 'main' of https://github.com/Dean-DCT-Thapar/edutube
+    merging with offline repo
+
+[33mcommit e8a3e5be55c21846472633c71bffd77962176d80[m
+Author: Dean-DCT-Thapar <dct.office@thapar.edu>
+Date:   Wed Dec 25 20:58:41 2024 +0530
+
+    Delete README.md
+
+[33mcommit 237770823f3c82be4041d3dc3917a4ea981b1c1b[m
+Author: aahil-khan <aahilminookhan@gmail.com>
+Date:   Wed Dec 25 20:54:17 2024 +0530
+
+    Initial commit from Create Next App
+
+[33mcommit 128c2a16dcfdbd9e017de72f2283b01c57c21cec[m
+Author: Dean-DCT-Thapar <dct.office@thapar.edu>
+Date:   Wed Dec 25 18:51:16 2024 +0530
+
+    Initial commit
