@@ -3,6 +3,14 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import React from 'react'
+import TopBar from '../component/TopBar'
+import SideBar from '../component/SideBar'
+import SkeletonCourseCard from '../component/SkeletonCourseCard'
+import SkeletonVidCard from '../component/SkeletonVidCard'
+import CurrentDate from '../component/CurrentDate'
+import Footer from '../component/Footer'
+import Card from '../component/Card'
 
 export default function Dashboard() {
     const router = useRouter();
@@ -18,14 +26,16 @@ export default function Dashboard() {
         ])
             .then(([authResponse, userDataResponse]) => {
                 if (authResponse.data.status === 200) {
-                    toast.dismiss(loadingToast);
+                    if (authResponse.data.role !== 'student') {
+                        throw new Error('Access denied. Students only.');
+                    }
+                    toast.success('Loaded successfully', { id: 'dashboard-loading' } , { duration: 100 });
                     setUserData(userDataResponse.data);
                 } else {
                     throw new Error(authResponse.data.message || 'Authentication failed');
                 }
             })
             .catch((error) => {
-                toast.dismiss(loadingToast);
                 const errorMessage = error.response?.data?.message || error.message || 'Please login to continue';
                 toast.error(errorMessage, {id: loadingToast});
                 router.push('/login');
@@ -35,32 +45,33 @@ export default function Dashboard() {
     const handleLogout = async () => {
         try {
             await fetch('/api/logout', { method: 'POST' });
+            toast.success('Logged out successfully');
             router.push('/login');
         } catch (error) {
-            console.error('Logout failed:', error);
+            toast.error('Logout failed');
         }
     };
 
     return (
         <div>
-            <div className="text-2xl font-bold mb-4">Welcome {userData?.name}</div>
-            <div>
-                <h2 className="text-2xl font-bold mb-4">Enrolled Courses</h2>
-                {userData?.courses?.map((course) => (
-                    <div key={course.course_id} className="border rounded-lg p-4 mb-4 shadow-sm">
-                        <p className="text-xl font-semibold mb-2">{course.course_name}</p>
-                        <p className="text-gray-600">Teacher: {course.teacher_name}</p>
-                    </div>
-                ))}
-            </div>
-            <div>
-                <button 
-                    onClick={handleLogout}
-                    className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
-                >
-                    Logout
-                </button>
-            </div>
+      <TopBar name="NAME ENDPOINT"/>
+      <SideBar />
+      <div className='ml-20'>
+        <div>
+          <img src='dashboardCard1.png' className='w-9/12 sm:w-11/12 sm:mx-auto sm:top-32 absolute -z-10'/>
+          <CurrentDate />
+          <p className='sm:text-sm text-xs font-montserrat sm:ml-44 ml-10 pt-5 sm:pt-0 text-white font-light sm:mt-20'>NAME ENDPOINT</p>
         </div>
+        <div className='sm:mt-32 mt-10'>
+          <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR WATCH HISTORY</p>
+          <SkeletonVidCard />
+        </div>
+        <div>
+          <p className='text-3xl font-poppins text-[#102c57] font-bold mt-10'>YOUR COURSES</p>
+          <SkeletonCourseCard />
+        </div>
+      </div>
+      <Footer />
+    </div>
     );
 }

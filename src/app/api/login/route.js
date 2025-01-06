@@ -16,7 +16,10 @@ export async function POST(request) {
 
         // Create the response
         const res = NextResponse.json(
-            { success: true },
+            { 
+                success: true,
+                role: response.data.role
+            },
             { status: 200 }
         );
 

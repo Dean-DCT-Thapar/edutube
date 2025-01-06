@@ -9,7 +9,7 @@ export default function ChangePassword() {
     const router = useRouter();
 
     const [formValues, setFormValues] = useState({
-        currentPassword: '',
+        oldPassword: '',
         newPassword: '',
         confirmPassword: ''
     });
@@ -25,7 +25,7 @@ export default function ChangePassword() {
             if(formValues.newPassword !== formValues.confirmPassword){
                 toast.error("New password and confirm password do not match");
                 setFormValues({
-                    currentPassword: '',
+                    oldPassword: '',
                     newPassword: '',
                     confirmPassword: ''
                 });
@@ -33,17 +33,23 @@ export default function ChangePassword() {
             }
 
             const response = await axios.post('/api/change-password', {
-                currentPassword: formValues.currentPassword,
-                newPassword: formValues.newPassword,
+                oldPassword: formValues.oldPassword,
+                newPassword: formValues.newPassword
+            }, {
+                headers: {
+                    'Content-Type': 'application/json'
+                }
             });
 
-            if(response.data.status === 200){
-                toast.success("Password changed successfully");
-                router.push('/dashboard');
-            }else if(response.data.status === 401){
+            
+            toast.success("Password changed successfully");
+            router.push('/dashboard');
+
+        }catch(error){
+            if(error.response.data.status === 401){
                 toast.error("Invalid current password");
-                setFormValues({ 
-                    currentPassword: '',
+                setFormValues({
+                    oldPassword: '',
                     newPassword: '',
                     confirmPassword: ''
                 });
@@ -51,9 +57,6 @@ export default function ChangePassword() {
                 toast.error("There was an error changing your password");
                 router.push('/dashboard');
             }
-        }catch(error){
-            toast.error("There was an error changing your password");
-            router.push('/dashboard');
         }
     }
 
@@ -65,14 +68,14 @@ export default function ChangePassword() {
                 <h1 className="text-black font-sans text-center font-semibold text-3xl mt-4">Change Password</h1>
                 <form className="flex flex-col mt-5" onSubmit={handleSubmit}>
                     <div className="flex flex-col">
-                        <label className="text-black font-sans w-2/3 mx-auto font-semibold text-lg">Current Password</label>
+                        <label className="text-black font-sans w-2/3 mx-auto font-semibold text-lg">Old Password</label>
                         <input
                             required
                             className="w-2/3 mx-auto bg-[#ededed] border-2 border-[#b95454] rounded-xl focus:outline-[#974545] text-black py-1 px-2"
-                            placeholder="Current Password"
+                            placeholder="Old Password"
                             type="password"
-                            name="currentPassword"
-                            value={formValues.currentPassword}
+                            name="oldPassword"
+                            value={formValues.oldPassword}
                             onChange={handleChange}
                         />
                     </div>

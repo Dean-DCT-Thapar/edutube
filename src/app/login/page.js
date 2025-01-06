@@ -17,7 +17,20 @@ export default function Page() {
       try {
         const response = await axios.get('/api/verify-auth');
         if (response.data.status === 200) {
-          router.push('/dashboard');
+          // Redirect based on role
+          switch (response.data.role) {
+            case 'student':
+              router.push('/dashboard');
+              break;
+            case 'teacher':
+              router.push('/teacher-dashboard');
+              break;
+            case 'admin':
+              router.push('/admin-dashboard');
+              break;
+            default:
+              console.error('Unknown role:', response.data.role);
+          }
         }
       } catch (error) {
         console.log("Not authenticated");
@@ -52,8 +65,21 @@ export default function Page() {
         });
         
         if (response.data.success) {
-            toast.success('Signed in successfully!', {id: loadingToast});
-            router.push('/dashboard');
+            toast.dismiss(loadingToast);
+            // Redirect based on role
+            switch (response.data.role) {
+              case 'student':
+                router.push('/dashboard');
+                break;
+              case 'teacher':
+                router.push('/teacher-dashboard');
+                break;
+              case 'admin':
+                router.push('/admin-dashboard');
+                break;
+              default:
+                toast.error('Unknown user role', {id: loadingToast});
+            }
         }
     } catch (error) {
         const errorMessage = error.response?.data?.message || 'Login failed';
