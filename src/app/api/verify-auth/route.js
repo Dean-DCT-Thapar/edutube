@@ -6,7 +6,7 @@ const WINDOWS_HOST = '172.16.133.80';
 
 export async function GET(request) {
     try {
-        const cookieStore = await cookies();
+        const cookieStore = await await cookies();
         const token = cookieStore.get('accessToken');
 
         if (!token) {
