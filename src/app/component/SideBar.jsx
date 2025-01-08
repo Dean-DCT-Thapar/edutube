@@ -9,12 +9,13 @@ import Link from 'next/link';
 
 const SideBar = () => {
   const [isOpen, setIsOpen] = useState(false)
+
   const toggleSidebar = () => {
     setIsOpen(!isOpen)
   }
   return (
     <>
-        <div className={`bg-[#102c57] h-full fixed -top-0 transition-all ${isOpen ? 'w-64' : 'w-14'}`}>
+        <div className={`bg-[#102c57] h-full fixed z-10 -top-0 transition-all ${isOpen ? 'w-64' : 'w-14'}`}>
             <button onClick={toggleSidebar}>
                 <MenuIcon fontSize='large' className='ml-3 mt-6'/>
             </button>
@@ -38,7 +39,7 @@ const SideBar = () => {
                 <Link href='/watchHistory'>
                 <div className='flex items-center'>
                   <DvrSharpIcon fontSize='large'/>
-                  <span className={`${isOpen ? 'block' : 'hidden'} ml-4 text-white font-poppins text-2xl`}>Watch History</span>
+                  <span className={`${isOpen ? 'block' : 'hidden'} ml-4 text-white font-poppins text-2xl whitespace-nowrap`}>Watch History</span>
                 </div>
                 </Link>
             </div>

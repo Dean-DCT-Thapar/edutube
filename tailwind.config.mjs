@@ -11,6 +11,20 @@ export default {
         background: "var(--background)",
         foreground: "var(--foreground)",
       },
+      fontFamily: {
+        poppins : ['Poppins', 'sans-serif'],
+        montserrat : ['Montserrat', 'sans-serif'],
+      },
+      spacing: {
+        '0.128': '0.128rem',
+      },
+      margin: {
+        '4.5' : '4.5rem',
+      },
+    },
+    borderWidth: {
+      1: "1px",
+      1.5: "1.5px",
     },
   },
   plugins: [],

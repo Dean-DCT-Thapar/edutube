@@ -10,7 +10,7 @@ const CurrentDate = () => {
     });
   
     return (
-      <div className="text-white sm:font-medium ml-10 pt-5 sm:pt-0 sm:ml-44 sm:mt-20 text-xs sm:text-lg font-montserrat">
+      <div className="text-white sm:font-medium sm:ml-[15%] ml-[13%] sm:mt-[5%] pt-[5%] sm:pt-0 text-xs sm:text-2xl font-montserrat">
         {formattedDate}
       </div>
     );
