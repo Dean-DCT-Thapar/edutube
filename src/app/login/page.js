@@ -93,7 +93,7 @@ export default function Page() {
       <img className="h-screen w-screen absolute sm:hidden block" src="hostelMphone.jpg" alt="Hostel" />
       <img className="h-screen w-screen absolute sm:block hidden" src="mHostel.jpg" alt="Hostel" />
       <div className="bg-[#ededed] shadow-2xl shadow-black opacity-95 border-black rounded-xl h-2/3 pb-8 sm:w-1/3 w-2/3 mx-auto sm:top-55 top-32 relative">
-        <img className="mx-auto w-72 relative" src="dcmsLogo.png" alt="Logo" />
+        <img className="mx-auto w-100 mb-8 relative" src="dcmsLogo.png" alt="Logo" />
         <h1 className="text-black font-sans text-center font-semibold text-3xl -mt-9">Sign In</h1>
         <form className="flex flex-col mt-5" onSubmit={handleSubmit}>
           <div className="flex flex-col">

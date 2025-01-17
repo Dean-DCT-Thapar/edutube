@@ -2,7 +2,7 @@ import { cookies } from 'next/headers';
 import axios from 'axios';
 import { NextResponse } from 'next/server';
 
-const WINDOWS_HOST = '172.16.133.80';
+const WINDOWS_HOST = '192.168.119.227';
 
 export async function GET(request) {
     try {
