@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
 
-const WINDOWS_HOST = '192.168.119.227';
 
 export async function POST(request) {
     try {
@@ -10,7 +9,7 @@ export async function POST(request) {
 
         if (token) {
             // Call backend logout endpoint
-            await axios.post(`http://${WINDOWS_HOST}:5000/logout`, {}, {
+            await axios.post(`https://still-citadel-95346-111a1dcad6bd.herokuapp.com/logout`, {}, {
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 }

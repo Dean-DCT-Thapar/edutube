@@ -10,6 +10,7 @@ import SkeletonCourseCard from '../component/SkeletonCourseCard'
 import SkeletonVidCard from '../component/SkeletonVidCard'
 import CurrentDate from '../component/CurrentDate'
 import Footer from '../component/Footer'
+import Card from '../component/Card';
 
 export default function Dashboard() {
     const router = useRouter();

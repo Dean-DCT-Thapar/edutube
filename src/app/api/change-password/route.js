@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { cookies } from 'next/headers';
 
-const WINDOWS_HOST = '192.168.119.227';
 
 export async function POST(request) {
     try {
@@ -15,7 +14,7 @@ export async function POST(request) {
 
         const body = await request.json();
 
-        const response = await axios.post(`http://${WINDOWS_HOST}:5000/change-password`, 
+        const response = await axios.post(`https://still-citadel-95346-111a1dcad6bd.herokuapp.com/change-password`, 
             {
                 oldPassword: body.oldPassword,
                 newPassword: body.newPassword,

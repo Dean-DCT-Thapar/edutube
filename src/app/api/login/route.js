@@ -2,14 +2,14 @@ import { NextResponse } from 'next/server';
 import axios from 'axios';
 import { cookies } from 'next/headers';
 
-const WINDOWS_HOST = '192.168.119.227';
+
 
 export async function POST(request) {
     try {
         const body = await request.json();
+        console.log('Request body:', body);
         
-        // Forward the request to your backend
-        const response = await axios.post(`http://${WINDOWS_HOST}:5000/login`, {
+        const response = await axios.post(`https://still-citadel-95346-111a1dcad6bd.herokuapp.com/login`, {
             email: body.email,
             password: body.password,
         });
@@ -23,12 +23,13 @@ export async function POST(request) {
             { status: 200 }
         );
 
-        // Set HTTP-only cookie with the token from your backend
-        cookies().set('accessToken', response.data.accessToken, {
+        // Await the cookies() call
+        const cookieStore = await cookies();
+        cookieStore.set('accessToken', response.data.accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'strict',
-            maxAge: 60 * 60 * 24 // 1 day
+            maxAge: 60 * 60 * 24
         });
 
         return res;

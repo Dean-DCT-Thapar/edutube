@@ -81,7 +81,7 @@ export default function Page() {
                 toast.error('Unknown user role', {id: loadingToast});
             }
         }
-    } catch (error) {
+    }catch (error) {
         const errorMessage = error.response?.data?.message || 'Login failed';
         toast.error(errorMessage, {id: loadingToast});
         setFormValues({ email: '', password: '' });

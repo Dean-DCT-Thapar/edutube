@@ -2,7 +2,6 @@ import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 import axios from 'axios';
 
-const WINDOWS_HOST = '192.168.119.227';
 
 export async function GET(request) {
     try {
@@ -16,7 +15,7 @@ export async function GET(request) {
             );
         }
 
-        const response = await axios.get(`http://${WINDOWS_HOST}:5000/verify-auth`, {
+        const response = await axios.get(`https://still-citadel-95346-111a1dcad6bd.herokuapp.com/verify-auth`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
