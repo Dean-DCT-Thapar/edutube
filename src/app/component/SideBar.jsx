@@ -26,10 +26,12 @@ const SideBar = () => {
                   <span className={`${isOpen ? 'block' : 'hidden'} ml-4 text-white font-poppins text-2xl`}>Dashboard</span>
                 </div>
                 </Link>
+                <Link href='/search'>
                 <div className='flex items-center'>
                   <SearchIcon fontSize='large' />
                   <span className={`${isOpen ? 'block' : 'hidden'} ml-4 text-white font-poppins text-2xl`}>Search</span>
                 </div>
+                </Link>
                 <Link href='/profile'>
                 <div className='flex items-center'>
                   <SettingsAccessibilityIcon fontSize='large'/>

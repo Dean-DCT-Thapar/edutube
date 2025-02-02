@@ -59,7 +59,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className='text-3xl font-poppins text-[#102c57] font-bold mt-10'>YOUR COURSES</p>
-            <SkeletonCourseCard />
+            <Card title = "Information and Communication Theory" author= "by Hem Dutt Joshi Sir"/>
           </div>
         </div>
         <Footer />
