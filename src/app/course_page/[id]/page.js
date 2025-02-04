@@ -49,9 +49,20 @@ const CoursePage = ({ params }) => {
       <L_Header />
       {loading && <LinearProgress />}
       <div className="flex">
-        {courseData && <VidSideBar course_data={courseData} course_id={courseId} />}
+        {courseData && (
+          <>
+            <VidSideBar course_data={courseData} course_id={courseId} />
+            
+            {!chapterNumber && !lectureNumber && (
+              <div className="course-overview">
+                <h1 style={{color:"black"}}>Course Overview</h1>
+                <p>{courseData.overview}</p>
+              </div>
+            )}
+          </>
+        )}
         <main className="flex-1 p-8 text-black">
-          {courseData && (
+          {courseData && chapterNumber && lectureNumber && (
             <VideoDisplay heading={courseData[parseInt(chapterNumber)-1]?.lectures[parseInt(lectureNumber)-1].lecture_title} video_code={videoCode()} />
           )}
         </main>

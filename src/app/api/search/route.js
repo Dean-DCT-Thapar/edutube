@@ -2,12 +2,15 @@
 import { NextResponse } from "next/server";
 import axios from "axios";
 
+const WINDOWS_HOST = process.env.WINDOWS_HOST;
+const MODE = process.env.MODE;
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") || "";
   const category = searchParams.get("type") || "";
 
-  const response = await axios.get(`https://still-citadel-95346-111a1dcad6bd.herokuapp.com/search`, {
+  const response = await axios.get(MODE === "production" ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/search` : `http://${WINDOWS_HOST}:5000/search`, {
     params: { keyword: query, type: category },
   });
 
@@ -23,6 +26,7 @@ export async function GET(request) {
       lecture_number: item.lecture_number,
       type: item.type
     }));
+
 
     console.log(results);
     return NextResponse.json(results);

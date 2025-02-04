@@ -59,7 +59,11 @@ export default function Dashboard() {
           </div>
           <div>
             <p className='text-3xl font-poppins text-[#102c57] font-bold mt-10'>YOUR COURSES</p>
-            <Card title = "Information and Communication Theory" author= "by Hem Dutt Joshi Sir"/>
+            <div className="flex gap-4">
+              {userData?.enrolled_courses.map((course) => (
+                <Card key={course.teacher_id} title={course.course_name} author={"by " + course.teacher_name} course_id={course.teacher_id} />
+              ))}
+            </div>
           </div>
         </div>
         <Footer />

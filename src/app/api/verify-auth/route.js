@@ -3,6 +3,9 @@ import { cookies } from 'next/headers';
 import axios from 'axios';
 
 
+const WINDOWS_HOST = process.env.WINDOWS_HOST;
+const MODE = process.env.MODE;
+
 export async function GET(request) {
     try {
         const cookieStore = await await cookies();
@@ -15,7 +18,9 @@ export async function GET(request) {
             );
         }
 
-        const response = await axios.get(`https://still-citadel-95346-111a1dcad6bd.herokuapp.com/verify-auth`, {
+        const response = await axios.get(MODE === 'production' 
+            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/verify-auth` 
+            : `http://${WINDOWS_HOST}:5000/verify-auth`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }
