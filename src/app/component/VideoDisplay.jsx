@@ -1,67 +1,75 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-import { useEffect , useRef } from 'react';
+import axios from 'axios';
 
 const VideoDisplay = (props) => {
-  const startTime = useRef(Date.now());
-  const videoRef = useRef(null);
-  const lastWatchedPosition = useRef(0);
+  const [player, setPlayer] = useState(null);
+  const containerRef = useRef(null);
+  // Stores the timestamp (in ms) when the last request was sent.
+  const lastSentRef = useRef(0);
 
-  // Track pause or video end events
-  const handlePause = () => {
-      if (videoRef.current) {
-          lastWatchedPosition.current = videoRef.current.currentTime;
-      }
+  const sendWatchHistory = async () => {
+    if (!player) return;
+    
+    // Get the current time in milliseconds.
+    const now = Date.now();
+    // If the last send was less than 5 seconds ago, skip sending.
+    if (now - lastSentRef.current < 5000) {
+      console.log("Skipping sending watch history - throttling active.");
+      return;
+    }
+    
+    // Update the last send time.
+    lastSentRef.current = now;
+    const currentTime = player.getCurrentTime();
+    const duration = player.getDuration();
+    const progress = duration ? (currentTime / duration) * 100 : 0;
+
+    if(progress === 0){
+      return;
+    }
+
+    try {
+      await axios.post('/api/watch-history', {
+        videoId: props.video_code,
+        currentTime,
+        progress,
+      });
+    } catch (error) {
+      console.error('Error sending watch history:', error);
+    }
   };
 
-  const handleSaveWatchHistory = async () => {
-      const watchDuration = Math.floor((Date.now() - startTime.current) / 1000);
-      const progress = videoRef.current
-          ? (lastWatchedPosition.current / videoRef.current.duration) * 100
-          : 0;
-
-      try {
-          await fetch('/api/watch-history', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  // Send JWT for authentication
-              },
-              body: JSON.stringify({
-                  lectureId,
-                  watchDuration,
-                  progress: isNaN(progress) ? 0 : progress,
-              }),
-          });
-      } catch (error) {
-          console.error('Error saving watch history:', error);
-      }
+  // When the user clicks anywhere, if the click is not inside the video container then send watch history.
+  const handleClickOutside = (event) => {
+    if (containerRef.current && !containerRef.current.contains(event.target)) {
+      sendWatchHistory();
+    }
   };
 
-  // Save watch history on tab close or navigation
   useEffect(() => {
-      window.addEventListener('beforeunload', handleSaveWatchHistory);
+    // Add listener for clicks (using capture phase so we catch them even before they bubble).
+    document.addEventListener('click', handleClickOutside, true);
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true);
+      // Send one final update when the component unmounts.
+      sendWatchHistory();
+    };
+  }, [player]);
 
-      return () => {
-          handleSaveWatchHistory();
-          window.removeEventListener('beforeunload', handleSaveWatchHistory);
-      };
-  }, []);
-
-  // New function to handle video end
-  const handleEnd = () => {
-      console.log('Video has ended');
-      // Additional logic can be added here
+  // Save the YouTube player instance when it's ready.
+  const onPlayerReady = (event) => {
+    setPlayer(event.target);
   };
 
   return (
-    <div className='flex flex-col gap-5'>
-        <div className='font-poppins flex flex-col gap-5'>
-            <div className='flex flex-row gap-3 text-3xl'>
-                <p className='font-semibold text-[#b42625]'>{props.heading}</p>
-            </div>
+    <div ref={containerRef} className="flex flex-col gap-5">
+      <div className="font-poppins flex flex-col gap-5">
+        <div className="flex flex-row gap-3 text-3xl">
+          <p className="font-semibold text-[#b42625]">{props.heading}</p>
         </div>
-        <YouTube 
+      </div>
+      <YouTube 
         videoId={props.video_code}
         opts={{
           height: '500',
@@ -70,10 +78,9 @@ const VideoDisplay = (props) => {
             rel: 0,
             autoplay: 0,
           },
-        }} 
-        onPause={handlePause}
-        onEnd={handleEnd}
-        />
+        }}
+        onReady={onPlayerReady}
+      />
     </div>
   );
 };
