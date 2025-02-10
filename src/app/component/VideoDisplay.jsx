@@ -40,26 +40,42 @@ const VideoDisplay = (props) => {
     }
   };
 
-  // When the user clicks anywhere, if the click is not inside the video container then send watch history.
   const handleClickOutside = (event) => {
     if (containerRef.current && !containerRef.current.contains(event.target)) {
       sendWatchHistory();
+      setLeftAtDuration(0);
     }
   };
 
   useEffect(() => {
-    // Add listener for clicks (using capture phase so we catch them even before they bubble).
     document.addEventListener('click', handleClickOutside, true);
     return () => {
       document.removeEventListener('click', handleClickOutside, true);
-      // Send one final update when the component unmounts.
       sendWatchHistory();
     };
   }, [player]);
 
+  const [leftAtDuration, setLeftAtDuration] = useState(1000);
+
+  useEffect(() => {
+    const fetchVideoProgress = async () => {
+      try {
+        const response = await axios.get(`/api/get-video-progress/${props.lec_id}`);
+        const leftAtDuration = response.data.left_at_duration;
+        console.log('Left at duration:', leftAtDuration);
+        setLeftAtDuration(leftAtDuration);
+      } catch (error) {
+        console.error('Error fetching video progress:', error);
+      }
+    };
+
+    fetchVideoProgress();
+  }, [props.lec_id]);
+
   // Save the YouTube player instance when it's ready.
   const onPlayerReady = (event) => {
     setPlayer(event.target);
+    event.target.seekTo(leftAtDuration, true);
   };
 
   return (
@@ -77,6 +93,7 @@ const VideoDisplay = (props) => {
           playerVars: {
             rel: 0,
             autoplay: 0,
+            start: leftAtDuration || 0,
           },
         }}
         onReady={onPlayerReady}

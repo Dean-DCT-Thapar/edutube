@@ -1,6 +1,6 @@
 'use client'
 
-import React, { useRef, useEffect, useState } from 'react'
+import React, { useRef, useEffect, useState, useMemo } from 'react'
 import TopBar from '../../component/TopBar'
 import SideBar from '../../component/SideBar'
 import VidSideBar from '../../component/VidSideBar'
@@ -33,16 +33,16 @@ const CoursePage = ({ params }) => {
     fetchCourseData()
   }, [courseId])
 
-  const videoCode = () => {
+  const videoDetails = useMemo(() => {
     if (courseData) {
       const chapter = courseData.find(ch => ch.chapter_number === parseInt(chapterNumber));
       if (chapter) {
         const lecture = chapter.lectures.find(lec => lec.lecture_number === parseInt(lectureNumber));
-        return lecture ? lecture.lecture_path.split('v=')[1] : null;
+        return lecture ? {id:lecture.lecture_id, title: lecture.lecture_title, code: lecture.lecture_path.split('v=')[1] } : null;
       }
     }
     return null;
-  }
+  }, [courseData, chapterNumber, lectureNumber]);
 
   return (
     <div className="min-h-screen bg-white">
@@ -62,8 +62,8 @@ const CoursePage = ({ params }) => {
           </>
         )}
         <main className="flex-1 p-8 text-black">
-          {courseData && chapterNumber && lectureNumber && (
-            <VideoDisplay heading={courseData[parseInt(chapterNumber)-1]?.lectures[parseInt(lectureNumber)-1].lecture_title} video_code={videoCode()} />
+          {videoDetails && (
+            <VideoDisplay lec_id={videoDetails.id} heading={videoDetails.title} video_code={videoDetails.code} />
           )}
         </main>
       </div>

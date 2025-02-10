@@ -136,7 +136,7 @@ const page = () => {
   };
 
   const checkOldPassword = (oldPassword) => {
-    return oldPassword === '123456';                                // old password endpoint
+    return oldPassword === '123456';
   };
 
   return (

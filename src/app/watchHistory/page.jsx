@@ -2,22 +2,32 @@
 'use client';
 
 import { useState, useEffect } from "react";
-import SkeletonCard from "../component/SkeletonCard";
 import TopBar from "../component/TopBar";
 import SideBar from "../component/SideBar";
 import Footer from "../component/Footer";
+import axios from "axios";
+import SearchCard from "../component/SearchCard";
+import Link from "next/link";
 
 export default function Videos() {
-  const [videos, setVideos] = useState(null);
+  const [results, setResults] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate data fetching
-    setTimeout(() => {
-      setVideos([
-        { id: 1, title: "Video 1" },
-        { id: 2, title: "Video 2" },
-      ]);
-    }, 3000); // Simulated delay
+
+  const fetchWatchHistory = async () => {
+    try {
+      const response = await axios.get('/api/watch-history');
+      setResults(response.data);
+    } catch (error) {
+      console.error("Error fetching watch history:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  fetchWatchHistory();
+
   }, []);
 
   return (
@@ -27,32 +37,15 @@ export default function Videos() {
     <div>
       <h1 className="text-3xl font-poppins text-[#102c57] ml-20 font-bold mb-6">WATCH HISTORY</h1>
       <div className="space-y-4">
-        {/* Show skeleton loaders or real video cards */}
-        {!videos
-          ? Array(4)
-              .fill(0)
-              .map((_, index) => <SkeletonCard key={index} />)
-          : videos.map((video) => (
-              <div
-                key={video.id}
-                className="flex space-x-4 ml-20 mb-5 p-4 border border-gray-300 rounded-lg shadow-md w-3/4 sm:w-full max-w-xl"
-              >
-                {/* Actual video thumbnail */}
-                <div className="bg-gray-100 rounded-lg w-32 h-20">
-                  <img
-                    src={`https://via.placeholder.com/150?text=Video+${video.id}`}
-                    alt={video.title}
-                    className="w-full h-full object-cover rounded-lg"
-                  />
-                </div>
-
-                {/* Actual video title */}
-                <div className="flex-1">
-                  <h2 className="text-lg font-semibold">{video.title}</h2>
-                  <p className="text-gray-500">Description goes here...</p>
-                </div>
+      {results.map((result, index) => (
+            <li key={index} style={{ marginBottom: "10px" }}>
+              <div>
+                <Link href={`/course_page/${result.teacher_id}?chapter=${result.chapter_number}&lecture=${result.lecture_number}`}>
+                    <SearchCard main_title={result.title} subtitle1={result.course_name} subtitle2={result.teacher_name} type="lecture" subtitle3={"Progress- " + result.progress_percentage + "%"}/>
+                </Link>
               </div>
-            ))}
+            </li>
+      ))}
       </div>
       <Footer />
     </div>

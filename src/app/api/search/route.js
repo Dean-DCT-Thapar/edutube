@@ -27,8 +27,6 @@ export async function GET(request) {
       type: item.type
     }));
 
-
-    console.log(results);
     return NextResponse.json(results);
 
   } else if (category === "lectures") {
@@ -43,7 +41,6 @@ export async function GET(request) {
       type : item.type
     }));
 
-    console.log(results);
     return NextResponse.json(results);
 
   } else if (category === "courses") {
@@ -55,7 +52,6 @@ export async function GET(request) {
       type : item.type
     }));
 
-    console.log(results);
     return NextResponse.json(results);
 
   } else if (category === "teachers") {
@@ -65,7 +61,6 @@ export async function GET(request) {
       type : item.type
     }));
 
-    console.log(results);
     return NextResponse.json(results);
   }
 }
