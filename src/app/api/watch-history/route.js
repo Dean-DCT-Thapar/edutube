@@ -47,7 +47,7 @@ export async function GET(request) {
         }
 
         const response = await axios.get(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history/${videoId}` 
+            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history` 
             : `http://${WINDOWS_HOST}:5000/watch-history`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
