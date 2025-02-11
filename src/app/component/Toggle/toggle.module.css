@@ -1,0 +1,25 @@
+.switch{
+    width: 97%;
+    height: 3rem;
+    background-color: #102C57;
+    margin: 2rem 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.switch button{
+    background-color: inherit;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    transition: 0.4s;
+}
+
+.switch button:hover{
+    background-color: #1a3b6d;
+}
+
+.switch button.active {
+    background-color: #1f4a8c;
+  }

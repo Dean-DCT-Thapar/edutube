@@ -12,6 +12,10 @@ import CurrentDate from '../component/CurrentDate'
 import Footer from '../component/Footer'
 import Card from '../component/Card';
 
+import Searchbar from '../component/Searchbar/searchbar.jsx';
+import Coursetoggle from '../component/Toggle/toggle.jsx';
+import Cards from '../component/Card/carousel.jsx';
+
 export default function Dashboard() {
     const router = useRouter();
 
@@ -42,6 +46,14 @@ export default function Dashboard() {
             });
     }, [router]);
 
+    const gridStyle = {
+      display: "grid",
+      gridTemplateColumns: "repeat(2, 1fr)",
+      width: "80%",
+      gap: "2rem",
+      padding: "1rem",
+    };
+
 
     return (
       <div>
@@ -53,17 +65,20 @@ export default function Dashboard() {
             <CurrentDate />
             <p className='sm:text-xl text-xs font-montserrat ml-[15%] max-w-fit text-white font-light mt-[9%]'>{userData?.name}</p>
           </div>
-          <div className='sm:mt-[15%] mt-10'>
-            <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR WATCH HISTORY</p>
-            <SkeletonVidCard />
+          <div className='sm:mt-[15%] mt-4'>
+          <Searchbar />
+          <Coursetoggle />
+            {/* <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR WATCH HISTORY</p>
+            <SkeletonVidCard /> */}
           </div>
           <div>
-            <p className='text-3xl font-poppins text-[#102c57] font-bold mt-10'>YOUR COURSES</p>
-            <div className="flex gap-4">
+            <p className='text-3xl font-poppins text-[#102c57] font-bold mt-10'>YOUR ENROLLED COURSES</p>
+            {/* <div className="flex gap-4">
               {userData?.enrolled_courses.map((course) => (
                 <Card key={course.teacher_id} title={course.course_name} author={"by " + course.teacher_name} course_id={course.teacher_id} />
               ))}
-            </div>
+            </div> */}
+            <Cards/>
           </div>
         </div>
         <Footer />
