@@ -6,14 +6,19 @@ const Cards = (props) => {
     return(
         <div className={styles.card}>
             <div className={styles.link}><OpenInNewIcon/></div>
-            <div className={styles.prof}>Hem Dutt Joshi</div>
+            <div className={styles.prof}>{props.teacher}</div>
             <div className={styles.course}>
                 <p className={styles.coursename}>{props.name}</p>
-                <p className={styles.coursecode}>UES103</p>
+                <p className={styles.coursecode}>{props.course_code}</p>
             </div>
             <div className={styles.progress}>
-                <p className={styles.prog}>11/34 Lessons Completed</p>
-                <div className={styles.progbar}></div>
+                <p className={styles.prog}>{props.completed_lessons +"/"+props.total_lessons +" Lessons Completed"}</p>
+                <div className={styles.progbar}>
+                    <div 
+                        className={styles.filled} 
+                        style={{ width: `${(props.completed_lessons / props.total_lessons) * 100}%` }} 
+                    ></div>
+                </div>
             </div>
         </div>
     );

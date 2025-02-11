@@ -1,23 +1,22 @@
 import React, {useState} from 'react'
 import styles from './toggle.module.css'
 
-const toggle = () =>{
-    const [activeTab, setActiveTab] = useState("Courses");
+const Toggle = ({ setActiveTab }) => {
     return (
         // <div className={styles.switch}>
         //     <button className={styles.tab}>Courses</button>
         //     <button className={styles.tab}>History</button>
         // </div>
         <div className={styles.switch}>
-        <button className={`${styles.tab} ${activeTab === "Courses" ? styles.active : ""}`} onClick={() => setActiveTab("Courses")}>
+        <button className={`${styles.tab} ${styles.active}`} onClick={() => { setActiveTab("Courses"); }}>
         Courses
         </button>
 
-        <button className={`${styles.tab} ${activeTab === "History" ? styles.active : ""}`} onClick={() => setActiveTab("History")}>
+        <button className={`${styles.tab}`} onClick={() => { setActiveTab("History"); }}>
         History
         </button>
     </div>
     );
 }
 
-export default toggle
+export default Toggle

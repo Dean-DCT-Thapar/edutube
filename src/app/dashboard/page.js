@@ -20,6 +20,7 @@ export default function Dashboard() {
     const router = useRouter();
 
     const [userData, setUserData] = useState(null);
+    const [activeTab, setActiveTab] = useState("Courses");
 
     useEffect(() => {
         const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
@@ -67,18 +68,20 @@ export default function Dashboard() {
           </div>
           <div className='sm:mt-[15%] mt-4'>
           <Searchbar />
-          <Coursetoggle />
-            {/* <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR WATCH HISTORY</p>
-            <SkeletonVidCard /> */}
+          <Coursetoggle setActiveTab={setActiveTab} />
           </div>
           <div>
-            <p className='text-3xl font-poppins text-[#102c57] font-bold mt-10'>YOUR ENROLLED COURSES</p>
-            {/* <div className="flex gap-4">
-              {userData?.enrolled_courses.map((course) => (
-                <Card key={course.teacher_id} title={course.course_name} author={"by " + course.teacher_name} course_id={course.teacher_id} />
-              ))}
-            </div> */}
-            <Cards/>
+            {activeTab === "Courses" ? (
+              <div>
+                <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR ENROLLED COURSES</p>
+                <Cards/>
+              </div>
+            ) : (
+              <div>
+                <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR WATCH HISTORY</p>
+                <SkeletonVidCard />
+              </div>
+            )}
           </div>
         </div>
         <Footer />
