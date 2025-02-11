@@ -4,24 +4,37 @@ import { ChevronLeft, ChevronRight } from "@mui/icons-material";
 import { height, width } from "@mui/system";
 
 const allCards = [
-  { id: 1 }, { id: 2 }, { id: 3 }, { id: 4 }, { id: 5 },
-  { id: 6 },
+  { id: 1, name: "ANALOG ELECTRONICS" }, 
+  { id: 2, name: "DIGITAL SIGNAL PROCESSING" }, 
+  { id: 3, name: "DATA STRUCTURES" }, 
+  { id: 4, name: "DATABASE MANAGEMENT SYSTEMS" }, 
+  { id: 5, name: "OBJECT ORIENTED PROGRAMMING" },
+  { id: 6, name: "WEB DEVELOPMENT" }, 
+  { id: 7, name: "MOBILE APPLICATION DEVELOPMENT" }, 
+  { id: 8, name: "NETWORK SECURITY" }, 
+  { id: 9, name: "ARTIFICIAL INTELLIGENCE" }, 
+  { id: 10, name: "MACHINE LEARNING" },
+  { id: 11, name: "CLOUD COMPUTING" }, 
+  { id: 12, name: "SOFTWARE ENGINEERING" }, 
+  { id: 13, name: "COMPUTER GRAPHICS" }, 
+  { id: 14, name: "OPERATING SYSTEMS" }, 
+  { id: 15, name: "COMPILER DESIGN" },
 ];
 
 const CardsCarousel = () => {
   const [index, setIndex] = useState(0);
 
-  const visibleCards = allCards.slice(index, index + 4);
+  const visibleCards = allCards.slice(index, index + 6);
 
   const handleNext = () => {
-    if (index + 4 < allCards.length) {
-      setIndex(index + 4);
+    if (index + 6 < allCards.length) {
+      setIndex(index + 6);
     }
   };
 
   const handlePrev = () => {
-    if (index - 4 >= 0) {
-      setIndex(index - 4);
+    if (index - 6 >= 0) {
+      setIndex(index - 6);
     }
   };
 
@@ -33,7 +46,7 @@ const CardsCarousel = () => {
 
       <div style={styles.grid}>
         {visibleCards.map((card) => (
-          <Cards key={card.id} />
+          <Cards name={card.name} key={card.id} />
         ))}
       </div>
 
@@ -54,7 +67,7 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)",
+    gridTemplateColumns: "repeat(3, 1fr)",
     gridTemplateRows: "repeat(2, 1fr)",
     gap: "3rem 2rem",
   },

@@ -1,9 +1,12 @@
 .card {
-    height: 38rem;
-    width: 38rem;
+    height: 24rem;
+    width: 24rem;
     background-color: #102C57;
+    background-image: url('/course_card.svg');
+    background-size: cover;
+    background-position: center;
     border-radius: 1rem;
-    padding: 7rem 4rem;
+    padding: 5rem 4rem;
     position: relative;
     color: white;
     display: flex;
