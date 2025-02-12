@@ -19,22 +19,23 @@ const allCards = [
   { id: 13, name: "COMPUTER GRAPHICS", teacher: "Dr. Thompson", course_code: "CG1313", lessons_watched: 7, total_lessons: 14 }, 
   { id: 14, name: "OPERATING SYSTEMS", teacher: "Prof. Garcia", course_code: "OS1414", lessons_watched: 19, total_lessons: 38 }, 
   { id: 15, name: "COMPILER DESIGN", teacher: "Dr. Martinez", course_code: "CD1515", lessons_watched: 5, total_lessons: 10 },
+  { id: 16}
 ];
 
 const CardsCarousel = () => {
   const [index, setIndex] = useState(0);
 
-  const visibleCards = allCards.slice(index, index + 6);
+  const visibleCards = allCards.slice(index, index + 4);
 
   const handleNext = () => {
-    if (index + 6 < allCards.length) {
-      setIndex(index + 6);
+    if (index + 4 < allCards.length) {
+      setIndex(index + 4);
     }
   };
 
   const handlePrev = () => {
-    if (index - 6 >= 0) {
-      setIndex(index - 6);
+    if (index - 4 >= 0) {
+      setIndex(index - 4);
     }
   };
 
@@ -67,8 +68,8 @@ const styles = {
   },
   grid: {
     display: "grid",
-    gridTemplateColumns: "repeat(3, 1fr)",
-    gridTemplateRows: "repeat(2, 1fr)",
+    gridTemplateColumns: "repeat(4, 1fr)",
+    gridTemplateRows: "1fr",
     gap: "3rem 2rem",
   },
   arrow: {

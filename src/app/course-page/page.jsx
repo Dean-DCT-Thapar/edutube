@@ -1,39 +1,27 @@
 "use client"
 
-import React, { useRef, useEffect } from 'react'
-import Header from '../component/TopBar'
-import L_SideBar from '../component/L_SideBar'
-import SideBar from '../component/SideBar'
-import Overview from '../component/L_Overview';
-import Welcome from '../component/L_Welcome';
-import Video from '../component/L_Video';
+import React from 'react'
+import Header from '../component/L_Header'
+import SideBar from '../component/VidSideBar'
+import VideoPlayer from '../component/localVideoPlayer.jsx'
 
 const page = () => {
+  const [isClient, setIsClient] = React.useState(false);
 
-    const sidebarRef = useRef();
-
-    const handleComp = (x) => {
-        console.log(x);
-        if(x === 0){
-            return <Overview />
-        }
-        else if(x === 1){
-            return <Video title={"L2.1: Examples of Uniform Convergence | Series of Function"} videoID={"9J7k1MPkR1U"} />
-        }
-        else if(x === 2){
-            return <Video title={"L2.2: Center of Mass | Concept and Examples"} videoID={"U0dGIPA_ttk"} />
-        }
-        else{
-            return <Welcome />
-        }
-    }
+  React.useEffect(() => {
+    console.log("Client mount - setting isClient to true")
+    setIsClient(true);
+  }, []);
 
   return (
     <>
-        <Header />
-        <L_SideBar ref={sidebarRef}/>
+      <Header />
+      <div style={{display:"flex"}}> 
         <SideBar />
-        <Welcome />
+        <div style={{ maxWidth: "800px", margin: "0 auto", padding: "20px" }}>
+            {isClient ? <VideoPlayer src="/videos/video1.mp4" /> : <p>Loading video...</p>}
+        </div>
+      </div>
     </>
   )
 }

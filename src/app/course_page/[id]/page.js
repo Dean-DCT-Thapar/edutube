@@ -1,8 +1,6 @@
 'use client'
 
 import React, { useRef, useEffect, useState, useMemo } from 'react'
-import TopBar from '../../component/TopBar'
-import SideBar from '../../component/SideBar'
 import VidSideBar from '../../component/VidSideBar'
 import VideoDisplay from '@/app/component/VideoDisplay'
 import L_Header from "@/app/component/L_Header"

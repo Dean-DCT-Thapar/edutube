@@ -62,9 +62,9 @@ export default function Dashboard() {
         <SideBar />
         <div className='ml-20'>
           <div>
-            <img src='dashboardCard1.png' className='w-9/12 sm:w-11/12 sm:mx-auto sm:top-32 absolute -z-10'/>
+            <img src='/dashboard_header.svg' className='w-9/12 sm:w-11/12 sm:mx-auto sm:top-32 absolute -z-10'/>
             <CurrentDate />
-            <p className='sm:text-xl text-xs font-montserrat ml-[15%] max-w-fit text-white font-light mt-[9%]'>{userData ? userData.name : "Loading..."}</p>
+            <p className='sm:text-xl text-xs font-montserrat ml-[15%] max-w-fit text-white font-light mt-[7%]'>{userData ? userData.name : "Loading..."}</p>
           </div>
           <div className='sm:mt-[15%] mt-4'>
           <Searchbar />
