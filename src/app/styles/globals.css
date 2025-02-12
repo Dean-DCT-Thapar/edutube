@@ -1,0 +1,22 @@
+.link-with-lines {
+  position: relative;
+  display: inline-block;
+}
+
+.link-with-lines::before,
+.link-with-lines::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background-color: black;
+}
+
+.link-with-lines::before {
+  top: -5px;
+}
+
+.link-with-lines::after {
+  bottom: -5px;
+}

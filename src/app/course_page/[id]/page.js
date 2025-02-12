@@ -59,7 +59,7 @@ const CoursePage = ({ params }) => {
             )}
           </>
         )}
-        <main className="flex-1 p-8 text-black">
+        <main className="flex-1 text-black">
           {videoDetails && (
             <VideoDisplay lec_id={videoDetails.id} heading={videoDetails.title} video_code={videoDetails.code} />
           )}

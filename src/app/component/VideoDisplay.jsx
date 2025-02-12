@@ -1,26 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-
 import axios from 'axios';
+import { CircularProgress } from '@mui/material';
 
 const VideoDisplay = (props) => {
   const [player, setPlayer] = useState(null);
+  const [loading, setLoading] = useState(true);
   const containerRef = useRef(null);
-  // Stores the timestamp (in ms) when the last request was sent.
   const lastSentRef = useRef(0);
 
   const sendWatchHistory = async () => {
     if (!player) return;
     
-    // Get the current time in milliseconds.
     const now = Date.now();
-    // If the last send was less than 5 seconds ago, skip sending.
     if (now - lastSentRef.current < 5000) {
       console.log("Skipping sending watch history - throttling active.");
       return;
     }
     
-    // Update the last send time.
     lastSentRef.current = now;
     const currentTime = player.getCurrentTime();
     const duration = player.getDuration();
@@ -65,6 +62,7 @@ const VideoDisplay = (props) => {
         const leftAtDuration = response.data.left_at_duration;
         console.log('Left at duration:', leftAtDuration);
         setLeftAtDuration(leftAtDuration);
+        setLoading(false);
       } catch (error) {
         console.error('Error fetching video progress:', error);
       }
@@ -73,7 +71,6 @@ const VideoDisplay = (props) => {
     fetchVideoProgress();
   }, [props.lec_id]);
 
-  // Save the YouTube player instance when it's ready.
   const onPlayerReady = (event) => {
     setPlayer(event.target);
     event.target.seekTo(leftAtDuration, true);
@@ -81,24 +78,31 @@ const VideoDisplay = (props) => {
 
   return (
     <div ref={containerRef} className="flex flex-col gap-5">
-      <div className="font-poppins flex flex-col gap-5">
-        <div className="flex flex-row gap-3 text-3xl">
-          <p className="font-semibold text-[#b42625]">{props.heading}</p>
+      {loading ? (
+        <div className="flex h-600" style={{ position: 'absolute', top: '300px', left: '500px' }}>
+          <CircularProgress />
         </div>
-      </div>
-      <YouTube 
-        videoId={props.video_code}
-        opts={{
-          height: '500',
-          width: '750',
-          playerVars: {
-            rel: 0,
-            autoplay: 0,
-            start: leftAtDuration || 0,
-          },
-        }}
-        onReady={onPlayerReady}
-      />
+      ) : (<>
+          <YouTube 
+            videoId={props.video_code}
+            opts={{
+              height: '600',
+              width: '1045',
+              playerVars: {
+                rel: 0,
+                autoplay: 0,
+                start: leftAtDuration || 0,
+              },
+            }}
+            onReady={onPlayerReady}
+          />
+        <div className="font-poppins flex pl-5 flex-col gap-5">
+          <div className="flex flex-row gap-3 text-3xl">
+            <p className="font-semibold text-[#b42625]">{props.heading}</p>
+          </div>
+        </div>
+      </>
+    )}
     </div>
   );
 };
