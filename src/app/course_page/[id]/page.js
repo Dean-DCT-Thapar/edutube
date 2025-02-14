@@ -44,7 +44,7 @@ const CoursePage = ({ params }) => {
 
   return (
     <div className="min-h-screen bg-white">
-      <L_Header />
+      <L_Header heading={courseId == 10 ? "Linear Integrated Circuits and Application" : "Information and Communication Theory"} />
       {loading && <LinearProgress />}
       <div className="flex">
         {courseData && (

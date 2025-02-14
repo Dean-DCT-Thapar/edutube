@@ -17,7 +17,7 @@ const SideBar = () => {
     <>
         <div className={`bg-[#102C57] h-full fixed z-10 -top-0 transition-all ${isOpen ? 'w-64' : 'w-16'}`}>
             <button onClick={toggleSidebar}>
-                <MenuIcon fontSize='large' className='ml-4 mt-6'/>
+                <MenuIcon fontSize='large' className='ml-4 mt-12'/>
             </button>
             <div className='flex flex-col ml-4 mt-10 justify-evenly h-1/2'>
               <Link href='/dashboard'>

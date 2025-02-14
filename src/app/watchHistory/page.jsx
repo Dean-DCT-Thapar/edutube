@@ -8,6 +8,7 @@ import Footer from "../component/Footer";
 import axios from "axios";
 import SearchCard from "../component/SearchCard";
 import Link from "next/link";
+import { CircularProgress } from '@mui/material';
 
 export default function Videos() {
   const [results, setResults] = useState([]);
@@ -32,23 +33,29 @@ export default function Videos() {
 
   return (
     <>
-    <TopBar name="NAME ENDPOINT"/>
-    <SideBar />
-    <div>
-      <h1 className="text-3xl font-poppins text-[#102c57] ml-20 font-bold mb-6">WATCH HISTORY</h1>
-      <div className="space-y-4">
-      {results.map((result, index) => (
-            <li key={index} style={{ marginBottom: "10px" }}>
-              <div>
-                <Link href={`/course_page/${result.teacher_id}?chapter=${result.chapter_number}&lecture=${result.lecture_number}`}>
-                    <SearchCard main_title={result.title} subtitle1={result.course_name} subtitle2={result.teacher_name} type="lecture" subtitle3={"Progress- " + result.progress_percentage + "%"}/>
-                </Link>
-              </div>
-            </li>
-      ))}
+      <TopBar name="NAME ENDPOINT" />
+      <SideBar />
+      <div>
+        <h1 className="text-3xl font-poppins text-[#102c57] ml-20 font-bold mb-6">WATCH HISTORY</h1>
+        {loading ? (
+          <div className="flex justify-center items-center">
+            <CircularProgress />
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {results.map((result, index) => (
+              <li key={index} style={{ marginBottom: "10px" }}>
+                <div>
+                  <Link href={`/course_page/${result.teacher_id}?chapter=${result.chapter_number}&lecture=${result.lecture_number}`}>
+                    <SearchCard main_title={result.title} subtitle1={result.course_name} subtitle2={result.teacher_name} type="lecture" subtitle3={"Progress- " + result.progress_percentage + "%"} />
+                  </Link>
+                </div>
+              </li>
+            ))}
+          </div>
+        )}
+        <Footer />
       </div>
-      <Footer />
-    </div>
     </>
   );
 }

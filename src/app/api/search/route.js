@@ -5,13 +5,13 @@ import axios from "axios";
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
 
-export async function GET(request) {
-  const { searchParams } = new URL(request.url);
-  const query = searchParams.get("q") || "";
-  const category = searchParams.get("type") || "";
+export async function POST(request) {
+  const { keyword, type: category, advancedFields } = await request.json();
 
-  const response = await axios.get(MODE === "production" ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/search` : `http://${WINDOWS_HOST}:5000/search`, {
-    params: { keyword: query, type: category },
+  const response = await axios.post(MODE === "production" ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/search` : `http://${WINDOWS_HOST}:5000/search`, {
+    keyword,
+    type: category,
+    advancedFields,
   });
 
   if (category === "") {

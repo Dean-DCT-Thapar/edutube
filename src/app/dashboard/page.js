@@ -15,12 +15,17 @@ import Card from '../component/Card';
 import Searchbar from '../component/Searchbar/searchbar.jsx';
 import Coursetoggle from '../component/Toggle/toggle.jsx';
 import Cards from '../component/Card/carousel.jsx';
+import SearchCard from '../component/SearchCard';
+import { CircularProgress } from '@mui/material';
+import Link from 'next/link';
 
 export default function Dashboard() {
     const router = useRouter();
 
     const [userData, setUserData] = useState(null);
     const [activeTab, setActiveTab] = useState("Courses");
+    const [watchHistory, setWatchHistory] = useState([]);
+    const [loadingWatchHistory, setLoadingWatchHistory] = useState(false);
 
     useEffect(() => {
         const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
@@ -47,6 +52,22 @@ export default function Dashboard() {
             });
     }, [router]);
 
+    useEffect(() => {
+        if (activeTab != "Courses") {
+            setLoadingWatchHistory(true);
+            axios.get('/api/watch-history')
+                .then((response) => {
+                    setWatchHistory(response.data);
+                })
+                .catch((error) => {
+                    console.error("Error fetching watch history:", error);
+                })
+                .finally(() => {
+                    setLoadingWatchHistory(false);
+                });
+        }
+    }, [activeTab]);
+
     const gridStyle = {
       display: "grid",
       gridTemplateColumns: "repeat(2, 1fr)",
@@ -54,7 +75,6 @@ export default function Dashboard() {
       gap: "2rem",
       padding: "1rem",
     };
-
 
     return (
       <div>
@@ -67,8 +87,8 @@ export default function Dashboard() {
             <p className='sm:text-xl text-xs font-montserrat ml-[15%] max-w-fit text-white font-light mt-[7%]'>{userData ? userData.name : "Loading..."}</p>
           </div>
           <div className='sm:mt-[15%] mt-4'>
-          <Searchbar />
-          <Coursetoggle setActiveTab={setActiveTab} />
+            <Searchbar />
+            <Coursetoggle setActiveTab={setActiveTab} />
           </div>
           <div>
             {activeTab === "Courses" ? (
@@ -79,7 +99,23 @@ export default function Dashboard() {
             ) : (
               <div>
                 <p className='text-3xl font-poppins text-[#102c57] font-bold'>YOUR WATCH HISTORY</p>
-                <SkeletonVidCard />
+                {loadingWatchHistory ? (
+                  <div className="flex justify-center items-center">
+                    <CircularProgress />
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {watchHistory.map((result, index) => (
+                      <li key={index} style={{ marginBottom: "10px" }}>
+                        <div>
+                          <Link href={`/course_page/${result.teacher_id}?chapter=${result.chapter_number}&lecture=${result.lecture_number}`}>
+                            <SearchCard main_title={result.title} subtitle1={result.course_name} subtitle2={result.teacher_name} type="lecture" subtitle3={"Progress- " + result.progress_percentage + "%"} />
+                          </Link>
+                        </div>
+                      </li>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
