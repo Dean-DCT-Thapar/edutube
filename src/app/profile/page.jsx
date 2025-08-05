@@ -51,45 +51,82 @@ const page = () => {
 };
 
   return (
-    <div>
-        <TopBar name={userData?.name}/>
+    <div className="min-h-screen flex flex-col bg-gray-50">
+      <TopBar name={userData?.name} />
+      
+      <div className="flex flex-1">
         <SideBar />
-        <div>
-        <div className='border-[#102c57] border-1.5 text-[#102c57] -z-10 font-poppins p-3 w-4/5 ml-4.5 sm:ml-24'>
-            <p className='sm:text-3xl text-xl'>Student Details</p>
-            <br/>
-            <br/>
-            <p className='font-bold'>Email Address</p>
-            <p className='text-[#b42625]'>{userData?.email}</p>        {/*email endpoint*/}
-            <br/>
-            <p className='font-bold'>Gender</p> 
-            <p>gender endpoint</p>                                                 {/*gender endpoint*/}                    
-            <br/>
-            <p className='font-bold'>Program Type</p>
-            <p>program type endpoint</p>                                            {/*program type endpoint*/}
-            <br/>
-            <p className='font-bold'>Branch Code</p>
-            <p>branch code endpoint</p>                                            {/*branch code endpoint*/}
-            <br/>
-            <p className='font-bold'>Date Of Birth</p>
-            <p>dob endpoint</p>                                            {/*dob endpoint*/}
-            <br/>
-            <p className='font-bold'>Academic Year</p>
-            <p>academic year endpoint</p>                                            {/*academic year endpoint*/}
-        </div>
-        <div className='border-[#102c57] text-[#102c57] -z-10 font-poppins p-3 w-4/5 mt-3 border-1.5 ml-4.5 sm:ml-24'>
-            <p className='sm:text-3xl text-xl'>Course Details</p>
-            <br/>
-            <br/>
-            <p className='font-bold'>Course Code</p>
-            <p>courses enrolled in</p>                          {/*endpoint for enrolled courses */}
-        </div>
-        <Link href="/confirmPassword">
-        <button className='border-[#102c57] bg-[#102c57] text-white -z-10 font-poppins p-3 w-1/2 sm:w-1/4 mt-3 border-1.5 ml-4.5 sm:ml-48'>Change Password</button>
-        </Link>
-        <button onClick={handleLogout} className='border-[#b42625] bg-[#b42625] text-white -z-10 font-poppins p-3 w-1/4 mt-3 border-1.5 ml-4 sm:ml-24 mb-5'>Log Out</button>
-        <Footer />
-        </div>
+        
+        <main className="flex-1 transition-all duration-300 ease-in-out">
+          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+            
+            {/* Student Details */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <h2 className="text-2xl lg:text-3xl font-bold text-primary-800 mb-6">Student Details</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Email Address</p>
+                  <p className="text-accent-600 font-medium">{userData?.email}</p>
+                </div>
+                
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Gender</p>
+                  <p className="text-gray-700">Gender endpoint</p>
+                </div>
+                
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Program Type</p>
+                  <p className="text-gray-700">Program type endpoint</p>
+                </div>
+                
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Branch Code</p>
+                  <p className="text-gray-700">Branch code endpoint</p>
+                </div>
+                
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Date Of Birth</p>
+                  <p className="text-gray-700">DOB endpoint</p>
+                </div>
+                
+                <div>
+                  <p className="font-semibold text-gray-900 mb-1">Academic Year</p>
+                  <p className="text-gray-700">Academic year endpoint</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Course Details */}
+            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
+              <h2 className="text-2xl lg:text-3xl font-bold text-primary-800 mb-6">Course Details</h2>
+              
+              <div>
+                <p className="font-semibold text-gray-900 mb-1">Course Code</p>
+                <p className="text-gray-700">Courses enrolled in</p>
+              </div>
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <Link href="/confirmPassword" className="flex-1">
+                <button className="w-full inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200">
+                  Change Password
+                </button>
+              </Link>
+              
+              <button 
+                onClick={handleLogout} 
+                className="flex-1 inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg bg-accent-600 text-white hover:bg-accent-500 focus:ring-2 focus:ring-accent-500 focus:outline-none transition-all duration-200"
+              >
+                Log Out
+              </button>
+            </div>
+          </div>
+        </main>
+      </div>
+      
+      <Footer />
     </div>
   )
 }
