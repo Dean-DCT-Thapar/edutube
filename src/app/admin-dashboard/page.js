@@ -45,12 +45,12 @@ export default function AdminDashboard() {
                                 stats: {
                                     users: 0,
                                     teachers: 0,
-                                    courses: 0,
+                                    courseInstances: 0,
                                     lectures: 0,
                                     enrollments: 0
                                 },
                                 recentUsers: [],
-                                recentCourses: []
+                                recentCourseInstances: []
                             }
                         });
                     }
@@ -105,7 +105,7 @@ export default function AdminDashboard() {
                 {dashboardData && (
                     <RecentActivity 
                         recentUsers={dashboardData.recentUsers}
-                        recentCourses={dashboardData.recentCourses}
+                        recentCourseInstances={dashboardData.recentCourseInstances}
                     />
                 )}
             </div>

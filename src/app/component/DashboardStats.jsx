@@ -27,8 +27,8 @@ const DashboardStats = ({ stats }) => {
             textColor: 'text-green-700'
         },
         {
-            title: 'Courses',
-            value: stats?.courses || 0,
+            title: 'Course Instances',
+            value: stats?.courseInstances || 0,
             icon: MenuBookRounded,
             color: 'bg-purple-500',
             bgColor: 'bg-purple-50',

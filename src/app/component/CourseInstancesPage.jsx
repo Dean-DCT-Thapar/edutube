@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import AdminLayout from './AdminLayout';
 import {
     AddRounded,
@@ -18,6 +18,7 @@ import {
 import toast from 'react-hot-toast';
 
 const CourseInstancesPage = () => {
+    const router = useRouter();
     const searchParams = useSearchParams();
     const templateId = searchParams?.get('template');
 
@@ -29,8 +30,7 @@ const CourseInstancesPage = () => {
     const [filters, setFilters] = useState({
         search: '',
         teacher_id: '',
-        course_template_id: templateId || '',
-        semester: ''
+        course_template_id: templateId || ''
     });
     const [showModal, setShowModal] = useState(false);
     const [editingInstance, setEditingInstance] = useState(null);
@@ -123,8 +123,7 @@ const CourseInstancesPage = () => {
         setFilters({
             search: '',
             teacher_id: '',
-            course_template_id: '',
-            semester: ''
+            course_template_id: ''
         });
     };
 
@@ -262,17 +261,6 @@ const CourseInstancesPage = () => {
                                     ))}
                                 </select>
                             </div>
-                            
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Semester</label>
-                                <input
-                                    type="text"
-                                    placeholder="e.g., Fall 2024"
-                                    value={filters.semester}
-                                    onChange={(e) => handleFilterChange('semester', e.target.value)}
-                                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                />
-                            </div>
                         </div>
                         
                         <div className="flex justify-between items-center">
@@ -294,7 +282,7 @@ const CourseInstancesPage = () => {
                                 </button>
                             </div>
                             
-                            {(filters.search || filters.teacher_id || filters.course_template_id || filters.semester) && (
+                            {(filters.search || filters.teacher_id || filters.course_template_id) && (
                                 <span className="text-sm text-gray-500">
                                     Filtered results
                                 </span>
@@ -362,10 +350,12 @@ const CourseInstancesPage = () => {
                                         <PersonRounded className="mr-2" style={{ fontSize: '16px' }} />
                                         <span>{instance.teacher?.user?.name}</span>
                                     </div>
-                                    <div className="flex items-center text-sm text-gray-600">
-                                        <CalendarTodayRounded className="mr-2" style={{ fontSize: '16px' }} />
-                                        <span>{instance.semester}</span>
-                                    </div>
+                                    {instance.instance_name && (
+                                        <div className="flex items-center text-sm text-gray-600">
+                                            <CalendarTodayRounded className="mr-2" style={{ fontSize: '16px' }} />
+                                            <span>{instance.instance_name}</span>
+                                        </div>
+                                    )}
                                 </div>
                                 
                                 <div className="flex items-center justify-between text-xs text-gray-500 mb-4">
@@ -375,7 +365,7 @@ const CourseInstancesPage = () => {
                                 
                                 <div className="flex justify-between items-center">
                                     <button
-                                        onClick={() => window.location.href = `/admin-dashboard/course-instances/${instance.id}/chapters`}
+                                        onClick={() => router.push(`/admin-dashboard/course-instances/${instance.id}/chapters`)}
                                         className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                                     >
                                         Manage Content →
@@ -507,7 +497,6 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
         course_template_id: '',
         teacher_id: '',
         instance_name: '',
-        semester: '',
         is_active: true
     });
     const [errors, setErrors] = useState({});
@@ -519,7 +508,6 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
                 course_template_id: instance.course_template_id || '',
                 teacher_id: instance.teacher_id || '',
                 instance_name: instance.instance_name || '',
-                semester: instance.semester || '',
                 is_active: instance.is_active ?? true
             });
         } else {
@@ -527,7 +515,6 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
                 course_template_id: '',
                 teacher_id: '',
                 instance_name: '',
-                semester: '',
                 is_active: true
             });
         }
@@ -543,10 +530,6 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
 
         if (!formData.teacher_id) {
             newErrors.teacher_id = 'Teacher is required';
-        }
-
-        if (!formData.semester.trim()) {
-            newErrors.semester = 'Semester is required';
         }
 
         setErrors(newErrors);
@@ -666,26 +649,6 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
                         <p className="mt-1 text-xs text-gray-500">
                             Optional identifier for multiple sections by the same teacher
                         </p>
-                    </div>
-
-                    <div>
-                        <label htmlFor="semester" className="block text-sm font-medium text-gray-700 mb-1">
-                            Semester
-                        </label>
-                        <input
-                            type="text"
-                            id="semester"
-                            name="semester"
-                            value={formData.semester}
-                            onChange={handleChange}
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                errors.semester ? 'border-red-300' : 'border-gray-300'
-                            }`}
-                            placeholder="e.g., Fall 2024, Spring 2025"
-                        />
-                        {errors.semester && (
-                            <p className="mt-1 text-sm text-red-600">{errors.semester}</p>
-                        )}
                     </div>
 
                     <div className="flex items-center">

@@ -8,7 +8,7 @@ import {
     ArrowForwardRounded
 } from '@mui/icons-material';
 
-const RecentActivity = ({ recentUsers, recentCourses }) => {
+const RecentActivity = ({ recentUsers, recentCourseInstances }) => {
     const formatDate = (dateString) => {
         return new Date(dateString).toLocaleDateString('en-US', {
             month: 'short',
@@ -82,16 +82,16 @@ const RecentActivity = ({ recentUsers, recentCourses }) => {
                 </div>
             </div>
 
-            {/* Recent Courses */}
+            {/* Recent Course Instances */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200">
                 <div className="px-6 py-4 border-b border-gray-200">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-2">
                             <MenuBookRounded className="text-gray-600" />
-                            <h3 className="text-lg font-semibold text-gray-900">Recent Courses</h3>
+                            <h3 className="text-lg font-semibold text-gray-900">Recent Course Instances</h3>
                         </div>
                         <Link 
-                            href="/admin-dashboard/courses"
+                            href="/admin-dashboard/course-instances"
                             className="text-primary-600 hover:text-primary-700 text-sm font-medium inline-flex items-center"
                         >
                             View all
@@ -100,29 +100,32 @@ const RecentActivity = ({ recentUsers, recentCourses }) => {
                     </div>
                 </div>
                 <div className="p-6">
-                    {recentCourses && recentCourses.length > 0 ? (
+                    {recentCourseInstances && recentCourseInstances.length > 0 ? (
                         <div className="space-y-4">
-                            {recentCourses.map((course) => (
-                                <div key={course.id} className="border-l-4 border-primary-500 pl-4">
+                            {recentCourseInstances.map((instance) => (
+                                <div key={instance.id} className="border-l-4 border-primary-500 pl-4">
                                     <div className="flex items-start justify-between">
                                         <div className="flex-1">
                                             <h4 className="text-sm font-medium text-gray-900 mb-1">
-                                                {course.name}
+                                                {instance.course_template?.name} ({instance.course_template?.course_code})
                                             </h4>
                                             <p className="text-xs text-gray-600 mb-2">
-                                                by {course.teacher?.user?.name || 'Unknown'}
+                                                by {instance.teacher?.user?.name || 'Unknown'}
                                             </p>
                                             <div className="flex items-center space-x-4 text-xs text-gray-500">
                                                 <span className="flex items-center">
                                                     <MenuBookRounded className="text-xs mr-1" />
-                                                    {course._count?.lectures || 0} lectures
+                                                    {instance._count?.chapters || 0} chapters
                                                 </span>
-                                                <span>{formatDate(course.created_at)}</span>
+                                                <span>{formatDate(instance.created_at)}</span>
                                             </div>
                                         </div>
-                                        <button className="ml-4 p-1 text-gray-400 hover:text-gray-600">
+                                        <Link 
+                                            href={`/admin-dashboard/course-instances/${instance.id}`}
+                                            className="ml-4 p-1 text-gray-400 hover:text-gray-600"
+                                        >
                                             <VisibilityRounded className="text-sm" />
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             ))}
@@ -130,7 +133,7 @@ const RecentActivity = ({ recentUsers, recentCourses }) => {
                     ) : (
                         <div className="text-center py-8">
                             <MenuBookRounded className="text-gray-300 text-4xl mb-2" />
-                            <p className="text-gray-500">No recent courses</p>
+                            <p className="text-gray-500">No recent course instances</p>
                         </div>
                     )}
                 </div>

@@ -32,9 +32,6 @@ const AdminLayout = ({ children, title, userName }) => {
         { name: 'Teachers', href: '/admin-dashboard/teachers', icon: SchoolRounded },
         { name: 'Course Templates', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
         { name: 'Course Instances', href: '/admin-dashboard/course-instances', icon: GroupRounded },
-        { name: 'Courses (Legacy)', href: '/admin-dashboard/courses', icon: MenuBookRounded },
-        { name: 'Chapters', href: '/admin-dashboard/chapters', icon: AutoStoriesRounded },
-        { name: 'Lectures', href: '/admin-dashboard/lectures', icon: VideoLibraryRounded },
         { name: 'Enhanced Lectures', href: '/admin-dashboard/enhanced-lectures', icon: TuneRounded },
         { name: 'Settings', href: '/admin-dashboard/settings', icon: SettingsRounded },
     ];

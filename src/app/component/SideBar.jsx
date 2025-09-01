@@ -76,10 +76,10 @@ const SideBar = () => {
       description: 'Your learning overview'
     },
     {
-      href: '/search',
+      href: '/browse',
       icon: SearchIcon,
-      label: 'Search',
-      description: 'Find courses and content'
+      label: 'Browse',
+      description: 'Browse and search courses'
     },
     {
       href: '/profile',
