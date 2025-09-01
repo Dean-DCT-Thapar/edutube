@@ -10,30 +10,53 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const SideBar = () => {
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isOpen, setIsOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
   const pathname = usePathname();
 
+
+  // Mobile detection and sidebar state sync
+
+  // Handle mobile/desktop detection and sidebar open state
   useEffect(() => {
     const checkMobile = () => {
-      setIsMobile(window.innerWidth < 1024);
-      // Always start closed, only open if user toggles
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      setIsOpen(!mobile); // Open by default on desktop, closed on mobile
     };
-
     checkMobile();
     window.addEventListener('resize', checkMobile);
     return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   // Sync sidebar state event when isOpen changes
   useEffect(() => {
-    window.dispatchEvent(new CustomEvent('sidebarState', { detail: isOpen }));
+    // defer dispatch to avoid updating during render
+    const evt = new CustomEvent('sidebarState', { detail: isOpen });
+    setTimeout(() => window.dispatchEvent(evt), 0);
   }, [isOpen]);
+
+  // Listen for toggle event from TopBar
+  useEffect(() => {
+    const handleToggle = () => {
+      setIsOpen(prev => {
+        const newState = !prev;
+        // defer dispatch to avoid setState-in-render errors
+        const evt = new CustomEvent('sidebarState', { detail: newState });
+        setTimeout(() => window.dispatchEvent(evt), 0);
+        return newState;
+      });
+    };
+    window.addEventListener('toggleSidebar', handleToggle);
+    return () => window.removeEventListener('toggleSidebar', handleToggle);
   }, []);
 
   const toggleSidebar = () => {
     setIsOpen((prev) => {
       const newState = !prev;
-      window.dispatchEvent(new CustomEvent('sidebarState', { detail: newState }));
+      // defer dispatch to avoid conflicts
+      const evt = new CustomEvent('sidebarState', { detail: newState });
+      setTimeout(() => window.dispatchEvent(evt), 0);
       return newState;
     });
   };
@@ -154,7 +177,6 @@ const SideBar = () => {
                         </div>
                       </div>
                     )}
-                    
                   </Link>
                 </li>
               );

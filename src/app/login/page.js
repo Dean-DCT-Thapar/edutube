@@ -6,6 +6,8 @@ import { SchoolRounded, LoginRounded } from '@mui/icons-material';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
+import AdminLoginHelper from '../component/AdminLoginHelper';
+import AdminDebugHelper from '../component/AdminDebugHelper';
 
 
 export default function Page() {
@@ -67,6 +69,12 @@ export default function Page() {
         
         if (response.data.success) {
             toast.dismiss(loadingToast);
+            
+            // Store admin token if user is admin
+            if (response.data.role === 'admin' && response.data.accessToken) {
+                localStorage.setItem('adminToken', response.data.accessToken);
+            }
+            
             // Redirect based on role
             switch (response.data.role) {
               case 'student':
@@ -187,6 +195,12 @@ export default function Page() {
           </p>
         </div>
       </div>
+      
+      {/* Admin Login Helper for Development */}
+      <AdminLoginHelper />
+      
+      {/* Debug Helper for Troubleshooting */}
+      <AdminDebugHelper />
     </div>
   );
 }

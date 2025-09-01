@@ -8,7 +8,7 @@ const MODE = process.env.MODE;
 
 export async function GET(request) {
     try {
-        const cookieStore = await await cookies();
+        const cookieStore = await cookies();
         const token = cookieStore.get('accessToken');
 
         if (!token) {
@@ -29,7 +29,10 @@ export async function GET(request) {
         return NextResponse.json({
             status: response.status,
             message: response.data.message,
-            role: response.data.role
+            role: response.data.role,
+            name: response.data.name,
+            email: response.data.email,
+            id: response.data.id
         });
     } catch (error) {
         return NextResponse.json(

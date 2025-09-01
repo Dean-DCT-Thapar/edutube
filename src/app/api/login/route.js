@@ -17,14 +17,18 @@ export async function POST(request) {
             password: body.password,
         });
 
-        // Create the response
-        const res = NextResponse.json(
-            { 
-                success: true,
-                role: response.data.role
-            },
-            { status: 200 }
-        );
+        // Create the response with additional data for admins
+        const responseData = { 
+            success: true,
+            role: response.data.user.role
+        };
+
+        // Include accessToken in response for admin users (needed for admin dashboard API calls)
+        if (response.data.user.role === 'admin') {
+            responseData.accessToken = response.data.accessToken;
+        }
+
+        const res = NextResponse.json(responseData, { status: 200 });
 
         // Await the cookies() call
         const cookieStore = await cookies();
