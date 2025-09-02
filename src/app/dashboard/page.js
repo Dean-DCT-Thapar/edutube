@@ -214,10 +214,10 @@ export default function Dashboard() {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                                     {userData.enrolled_courses.map((course, index) => (
                                         <Card 
-                                            key={course.teacher_id || index}
+                                            key={course.course_instance_id || index}
                                             title={course.course_name}
                                             author={course.teacher_name}
-                                            course_id={course.teacher_id}
+                                            course_id={course.course_instance_id}
                                             thumbnail={course.thumbnail}
                                             duration={course.duration}
                                             progress={course.progress}

@@ -83,7 +83,7 @@ export default function Browse() {
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Courses</h1>
-        <p className="text-gray-600">Discover and search through all available courses and lectures</p>
+        <p className="text-gray-600">Discover and preview all available courses. You can watch lectures without enrolling - enrollment just saves courses to your dashboard!</p>
       </div>
 
       {/* Search Section */}
@@ -155,38 +155,38 @@ export default function Browse() {
               <p className="text-gray-400">Try adjusting your search terms or category filter</p>
             </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
               {results.map((result, index) => (
-                <div key={index} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
+                <div key={index}>
                   {result.type === "lecture" && (
                     <Link href={`/course_page/${result.teacher_id}?chapter=${result.chapter_number}&lecture=${result.lecture_number}`}>
-                      <div className="p-4">
-                        <SearchCard 
-                          main_title={result.lecture_title} 
-                          subtitle1={result.course_name} 
-                          subtitle2={result.teacher_name} 
-                          type="lecture" 
-                          subtitle3="lecture"
-                        />
-                      </div>
+                      <SearchCard 
+                        main_title={result.lecture_title} 
+                        subtitle1={result.course_name} 
+                        subtitle2={result.teacher_name} 
+                        type="lecture" 
+                        subtitle3="lecture"
+                        duration={result.duration}
+                      />
                     </Link>
                   )}
                   {result.type === "course" && (
-                    <Link href={`/course_page/${result.teacher_id}?chapter=1&lecture=1`}>
-                      <div className="p-4">
-                        <SearchCard 
-                          main_title={result.course_name} 
-                          subtitle1={`by ${result.teacher_name}`} 
-                          type="course" 
-                          subtitle3="course"
-                        />
-                      </div>
+                    <Link href={`/course-overview/${result.course_id || result.id}`}>
+                      <SearchCard 
+                        main_title={result.course_name} 
+                        subtitle1={`by ${result.teacher_name}`} 
+                        subtitle2={result.course_code && `Course Code: ${result.course_code}`}
+                        type="course" 
+                        subtitle3="course"
+                        description={result.description}
+                      />
                     </Link>
                   )}
                   {result.type === "teacher" && (
-                    <div className="p-4">
+                    <div>
                       <SearchCard 
                         main_title={result.teacher_name} 
+                        subtitle1={result.email}
                         type="teacher" 
                         subtitle3="teacher" 
                       />
@@ -212,20 +212,25 @@ export default function Browse() {
               <p className="text-gray-400">Check back later for new courses</p>
             </div>
           ) : (
-            <div className="grid gap-4">
+            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
               {allCourses.map((course, index) => (
-                <div key={index} className="bg-white rounded-lg border border-gray-200 hover:shadow-md transition-shadow">
-                  <Link href={`/course_page/${course.teacher_id}?chapter=1&lecture=1`}>
-                    <div className="p-4">
-                      <SearchCard 
-                        main_title={course.course_name || course.name} 
-                        subtitle1={`by ${course.teacher_name}`} 
-                        type="course" 
-                        subtitle3="course"
-                      />
-                    </div>
-                  </Link>
-                </div>
+                <Link 
+                  key={course.id || index} 
+                  href={`/course-overview/${course.id}`}
+                  className="block"
+                >
+                  <SearchCard 
+                    main_title={course.course_name || course.name} 
+                    subtitle1={`by ${course.teacher_name}`} 
+                    subtitle2={course.course_code && `Course Code: ${course.course_code}`}
+                    description={course.description}
+                    type="course" 
+                    subtitle3="course"
+                    chaptersCount={course.chapter_count}
+                    lecturesCount={course.lecture_count}
+                    enrollmentCount={course.enrollment_count}
+                  />
+                </Link>
               ))}
             </div>
           )}

@@ -70,9 +70,14 @@ export default function Page() {
         if (response.data.success) {
             toast.dismiss(loadingToast);
             
-            // Store admin token if user is admin
-            if (response.data.role === 'admin' && response.data.accessToken) {
-                localStorage.setItem('adminToken', response.data.accessToken);
+            // Store appropriate token based on role
+            if (response.data.accessToken) {
+                if (response.data.role === 'admin') {
+                    localStorage.setItem('adminToken', response.data.accessToken);
+                } else {
+                    // For students and teachers
+                    localStorage.setItem('token', response.data.accessToken);
+                }
             }
             
             // Redirect based on role

@@ -126,11 +126,13 @@ export default function CourseInstanceLectures() {
             };
 
             if (editingLecture) {
-                await axios.put(`http://localhost:5000/api/admin/lectures/${editingLecture.id}`, data, {
+                // Use the with-tags endpoint for updating
+                await axios.put(`http://localhost:5000/api/admin/lectures/${editingLecture.id}/with-tags`, data, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 toast.success('Lecture updated successfully');
             } else {
+                // Create lecture with tags
                 await axios.post(`http://localhost:5000/api/admin/lectures`, data, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
@@ -261,6 +263,20 @@ export default function CourseInstanceLectures() {
                                                             {lecture.description}
                                                         </p>
                                                     )}
+                                                    {lecture.tags && lecture.tags.length > 0 && (
+                                                        <div className="mb-3">
+                                                            <div className="flex flex-wrap gap-1">
+                                                                {lecture.tags.map((tag, index) => (
+                                                                    <span
+                                                                        key={index}
+                                                                        className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                                                                    >
+                                                                        #{tag.tag}
+                                                                    </span>
+                                                                ))}
+                                                            </div>
+                                                        </div>
+                                                    )}
                                                     <div className="flex items-center space-x-4 text-sm text-gray-500">
                                                         <a
                                                             href={lecture.youtube_url}
@@ -341,13 +357,90 @@ export default function CourseInstanceLectures() {
     );
 }
 
+// Tag Input Component
+const TagInput = ({ tags, onTagsChange, placeholder }) => {
+    const [inputValue, setInputValue] = useState('');
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Enter' || e.key === ',') {
+            e.preventDefault();
+            addTag();
+        } else if (e.key === 'Backspace' && inputValue === '' && tags.length > 0) {
+            // Remove last tag if input is empty and backspace is pressed
+            removeTag(tags.length - 1);
+        }
+    };
+
+    const addTag = () => {
+        const trimmedValue = inputValue.trim().toLowerCase();
+        if (trimmedValue && !tags.includes(trimmedValue) && tags.length < 10) {
+            onTagsChange([...tags, trimmedValue]);
+            setInputValue('');
+        }
+    };
+
+    const removeTag = (indexToRemove) => {
+        onTagsChange(tags.filter((_, index) => index !== indexToRemove));
+    };
+
+    const handleInputChange = (e) => {
+        const value = e.target.value;
+        // Don't allow commas in the input, they trigger tag creation
+        if (!value.includes(',')) {
+            setInputValue(value);
+        } else {
+            // If comma is typed, add the tag
+            setInputValue(value.replace(',', ''));
+            addTag();
+        }
+    };
+
+    return (
+        <div className="w-full">
+            <div className="flex flex-wrap gap-2 p-2 border border-gray-300 rounded-lg min-h-[42px] focus-within:ring-2 focus-within:ring-primary-500 focus-within:border-primary-500">
+                {tags.map((tag, index) => (
+                    <span
+                        key={index}
+                        className="inline-flex items-center px-2 py-1 bg-primary-100 text-primary-800 text-xs font-medium rounded-full"
+                    >
+                        {tag}
+                        <button
+                            type="button"
+                            onClick={() => removeTag(index)}
+                            className="ml-1 text-primary-600 hover:text-primary-800 focus:outline-none"
+                        >
+                            ×
+                        </button>
+                    </span>
+                ))}
+                <input
+                    type="text"
+                    value={inputValue}
+                    onChange={handleInputChange}
+                    onKeyDown={handleKeyDown}
+                    onBlur={addTag}
+                    placeholder={tags.length === 0 ? placeholder : ''}
+                    className="flex-1 min-w-[120px] border-none outline-none bg-transparent"
+                    disabled={tags.length >= 10}
+                />
+            </div>
+            {tags.length >= 10 && (
+                <p className="mt-1 text-xs text-amber-600">
+                    Maximum 10 tags reached
+                </p>
+            )}
+        </div>
+    );
+};
+
 // Lecture Modal Component
 const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         title: '',
         description: '',
         youtube_url: '',
-        lecture_number: ''
+        lecture_number: '',
+        tags: []
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -358,14 +451,16 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
                 title: lecture.title || '',
                 description: lecture.description || '',
                 youtube_url: lecture.youtube_url || '',
-                lecture_number: lecture.lecture_number || ''
+                lecture_number: lecture.lecture_number || '',
+                tags: lecture.tags ? lecture.tags.map(tag => tag.tag) : []
             });
         } else {
             setFormData({
                 title: '',
                 description: '',
                 youtube_url: '',
-                lecture_number: ''
+                lecture_number: '',
+                tags: []
             });
         }
         setErrors({});
@@ -509,6 +604,20 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
                             className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
                             placeholder="Brief description of what this lecture covers..."
                         />
+                    </div>
+
+                    <div>
+                        <label htmlFor="tags" className="block text-sm font-medium text-gray-700 mb-1">
+                            Tags (Optional)
+                        </label>
+                        <TagInput
+                            tags={formData.tags}
+                            onTagsChange={(newTags) => setFormData(prev => ({ ...prev, tags: newTags }))}
+                            placeholder="Add tags to help students find this lecture..."
+                        />
+                        <p className="mt-1 text-xs text-gray-500">
+                            Press Enter or comma to add a tag. Maximum 10 tags.
+                        </p>
                     </div>
 
                     <div className="flex justify-end space-x-3 pt-4">

@@ -17,6 +17,7 @@ const LoadingCard = ({ variant = 'course' }) => {
     );
   }
 
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg animate-pulse">
       <div className="aspect-video bg-gray-200 rounded-t-lg"></div>

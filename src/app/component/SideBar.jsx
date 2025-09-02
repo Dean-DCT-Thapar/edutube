@@ -10,15 +10,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const SideBar = () => {
-  const [isOpen, setIsOpen] = useState(typeof window !== 'undefined' ? window.innerWidth >= 1024 : false);
-  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' ? window.innerWidth < 1024 : false);
+  // Use consistent initial state for SSR
+  const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true);
+  const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
 
 
-  // Mobile detection and sidebar state sync
-
-  // Handle mobile/desktop detection and sidebar open state
+  // Handle hydration and initial setup
   useEffect(() => {
+    setIsHydrated(true);
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
@@ -31,13 +32,15 @@ const SideBar = () => {
 
   // Sync sidebar state event when isOpen changes
   useEffect(() => {
+    if (!isHydrated) return;
     // defer dispatch to avoid updating during render
     const evt = new CustomEvent('sidebarState', { detail: isOpen });
     setTimeout(() => window.dispatchEvent(evt), 0);
-  }, [isOpen]);
+  }, [isOpen, isHydrated]);
 
   // Listen for toggle event from TopBar
   useEffect(() => {
+    if (!isHydrated) return;
     const handleToggle = () => {
       setIsOpen(prev => {
         const newState = !prev;
@@ -49,9 +52,10 @@ const SideBar = () => {
     };
     window.addEventListener('toggleSidebar', handleToggle);
     return () => window.removeEventListener('toggleSidebar', handleToggle);
-  }, []);
+  }, [isHydrated]);
 
   const toggleSidebar = () => {
+    if (!isHydrated) return;
     setIsOpen((prev) => {
       const newState = !prev;
       // defer dispatch to avoid conflicts
@@ -62,10 +66,9 @@ const SideBar = () => {
   };
 
   const closeSidebar = () => {
-    if (isMobile) {
-      setIsOpen(false);
-      window.dispatchEvent(new CustomEvent('sidebarState', { detail: false }));
-    }
+    if (!isHydrated || !isMobile) return;
+    setIsOpen(false);
+    window.dispatchEvent(new CustomEvent('sidebarState', { detail: false }));
   };
 
   const navItems = [
@@ -102,7 +105,7 @@ const SideBar = () => {
   return (
     <>
       {/* Mobile overlay */}
-      {isMobile && isOpen && (
+      {isHydrated && isMobile && isOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
           onClick={closeSidebar}
@@ -114,8 +117,8 @@ const SideBar = () => {
       <aside className={`
         fixed top-0 left-0 z-50 h-full bg-primary-800 text-white
         transition-all duration-300 ease-in-out
-        ${isOpen ? 'w-64' : 'w-16'}
-        ${isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0'}
+        ${isHydrated && isOpen ? 'w-64' : 'w-16'}
+        ${isHydrated && isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0'}
         lg:translate-x-0
         shadow-xl border-r border-primary-700
       `}>
@@ -127,11 +130,11 @@ const SideBar = () => {
               flex items-center justify-center w-8 h-8 rounded-lg
               hover:bg-primary-700 focus:bg-primary-700 focus:outline-none
               transition-colors duration-200
-              ${!isOpen ? 'mx-auto' : ''}
+              ${!isHydrated || !isOpen ? 'mx-auto' : ''}
             `}
-            aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
+            aria-label={isHydrated && isOpen ? 'Close sidebar' : 'Open sidebar'}
           >
-            {isOpen ? (
+            {isHydrated && isOpen ? (
               <CloseIcon className="w-5 h-5" />
             ) : (
               <MenuIcon className="w-5 h-5" />
@@ -159,9 +162,9 @@ const SideBar = () => {
                         ? 'bg-primary-700 text-white shadow-lg' 
                         : 'text-primary-200 hover:bg-primary-700 hover:text-white'
                       }
-                      ${!isOpen ? 'justify-center' : ''}
+                      ${!isHydrated || !isOpen ? 'justify-center' : ''}
                     `}
-                    title={!isOpen ? item.label : undefined}
+                    title={!isHydrated || !isOpen ? item.label : undefined}
                   >
                     <Icon className={`
                       w-5 h-5 flex-shrink-0
@@ -169,7 +172,7 @@ const SideBar = () => {
                       transition-colors duration-200
                     `} />
                     
-                    {isOpen && (
+                    {isHydrated && isOpen && (
                       <div className="ml-3 opacity-0 animate-[fadeIn_0.5s_ease-in-out_forwards]">
                         <div className="font-medium text-sm">{item.label}</div>
                         <div className="text-xs text-primary-300 group-hover:text-primary-200">
@@ -185,7 +188,7 @@ const SideBar = () => {
         </nav>
 
         {/* Footer */}
-        {isOpen && (
+        {isHydrated && isOpen && (
           <div className="p-4 border-t border-solid border-primary-700 opacity-0 animate-[fadeIn_0.5s_ease-in-out_forwards]">
             <div className="text-xs text-primary-300 text-center">
               <p>&copy; 2025 Thapar University</p>
@@ -197,8 +200,8 @@ const SideBar = () => {
 
       {/* Spacer for main content */}
       <div className={`
-        ${isOpen ? 'lg:w-64' : 'lg:w-16'} 
-        ${isMobile ? 'w-0' : 'w-16'}
+        ${isHydrated && isOpen ? 'lg:w-64' : 'lg:w-16'} 
+        ${isHydrated && isMobile ? 'w-0' : 'w-16'}
         flex-shrink-0 transition-all duration-300
       `} />
     </>

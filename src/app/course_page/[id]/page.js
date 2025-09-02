@@ -186,9 +186,14 @@ const CoursePage = ({ params }) => {
                   Back to Dashboard
                 </Link>
                 <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
-                <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
-                  {courseOverview?.title}
-                </h1>
+                <div className="flex items-center space-x-3">
+                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+                    {courseOverview?.title}
+                  </h1>
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                    Preview Mode
+                  </span>
+                </div>
               </div>
               
               {/* Mobile sidebar toggle */}
@@ -233,7 +238,7 @@ const CoursePage = ({ params }) => {
               </div>
               <div className="flex-1 min-h-0 overflow-y-auto">
                 {courseData.map((chapter) => (
-                  <div key={chapter.chapter_number} className="border-b border-gray-100">
+                  <div key={`chapter-${chapter.chapter_number}`} className="border-b border-gray-100">
                     <button
                       onClick={() => toggleChapter(chapter.chapter_number)}
                       className="w-full flex items-center justify-between p-4 text-left hover:bg-gray-50 transition-colors"
@@ -258,7 +263,7 @@ const CoursePage = ({ params }) => {
                                           parseInt(lectureNumber) === lecture.lecture_number
                           return (
                             <Link
-                              key={lecture.lecture_number}
+                              key={`lecture-${chapter.chapter_number}-${lecture.lecture_number}`}
                               href={`/course_page/${courseId}?chapter=${chapter.chapter_number}&lecture=${lecture.lecture_number}`}
                               onClick={() => setSidebarOpen(false)}
                               className={`
