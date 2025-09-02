@@ -73,7 +73,7 @@ export default function CourseInstanceLectures() {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}`, {
+            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setLectures(response.data.lectures || []);

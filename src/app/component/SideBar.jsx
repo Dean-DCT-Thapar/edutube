@@ -5,6 +5,7 @@ import HomeIcon from '@mui/icons-material/Home';
 import SearchIcon from '@mui/icons-material/Search';
 import SettingsAccessibilityIcon from '@mui/icons-material/SettingsAccessibility';
 import DvrSharpIcon from '@mui/icons-material/DvrSharp';
+import PersonIcon from '@mui/icons-material/Person';
 import CloseIcon from '@mui/icons-material/Close';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -83,6 +84,12 @@ const SideBar = () => {
       icon: SearchIcon,
       label: 'Browse',
       description: 'Browse and search courses'
+    },
+    {
+      href: '/teachers',
+      icon: PersonIcon,
+      label: 'Teachers',
+      description: 'Meet our educators'
     },
     {
       href: '/profile',

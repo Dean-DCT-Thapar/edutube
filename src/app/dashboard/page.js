@@ -74,7 +74,7 @@ export default function Dashboard() {
 
         const loadRecentActivity = async () => {
             try {
-                const response = await axios.get('/api/watch-history/recent?limit=5');
+                const response = await axios.get('/api/watch-history/recent?limit=3');
                 setRecentActivity(response.data);
             } catch (error) {
                 console.error('Error loading recent activity:', error);
@@ -277,7 +277,6 @@ export default function Dashboard() {
                                             title={course.course_name}
                                             author={course.teacher_name}
                                             course_id={course.course_instance_id}
-                                            thumbnail={course.thumbnail}
                                             duration={course.duration}
                                             progress={course.progress}
                                             enrolledCount={course.enrolled_count}

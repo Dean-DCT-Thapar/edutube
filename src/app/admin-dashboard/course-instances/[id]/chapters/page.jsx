@@ -4,13 +4,15 @@ import { useRouter, useParams } from 'next/navigation';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../../component/AdminLayout';
+import PlaylistChapterOrganizer from '../../../../component/PlaylistChapterOrganizer';
 import {
     AddRounded,
     EditRounded,
     DeleteRounded,
     PlayCircleOutlineRounded,
     BookRounded,
-    ArrowBackRounded
+    ArrowBackRounded,
+    PlaylistPlayRounded
 } from '@mui/icons-material';
 
 export default function CourseInstanceChapters() {
@@ -23,6 +25,7 @@ export default function CourseInstanceChapters() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingChapter, setEditingChapter] = useState(null);
+    const [showPlaylistImport, setShowPlaylistImport] = useState(false);
 
     useEffect(() => {
         if (instanceId) {
@@ -48,7 +51,7 @@ export default function CourseInstanceChapters() {
         try {
             setLoading(true);
             const token = localStorage.getItem('adminToken');
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/chapters`, {
+            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setChapters(response.data.chapters || []);
@@ -154,13 +157,22 @@ export default function CourseInstanceChapters() {
                             </p>
                         )}
                     </div>
-                    <button
-                        onClick={handleCreateChapter}
-                        className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                    >
-                        <AddRounded className="mr-2" />
-                        Add Chapter
-                    </button>
+                    <div className="flex space-x-3">
+                        <button
+                            onClick={() => setShowPlaylistImport(true)}
+                            className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                        >
+                            <PlaylistPlayRounded className="mr-2" />
+                            Import Playlist
+                        </button>
+                        <button
+                            onClick={handleCreateChapter}
+                            className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                        >
+                            <AddRounded className="mr-2" />
+                            Add Chapter
+                        </button>
+                    </div>
                 </div>
 
                 {/* Chapters Grid */}
@@ -221,15 +233,24 @@ export default function CourseInstanceChapters() {
                         <BookRounded className="mx-auto text-gray-400 mb-4" style={{ fontSize: '48px' }} />
                         <h3 className="text-lg font-medium text-gray-900 mb-2">No chapters yet</h3>
                         <p className="text-gray-600 mb-6">
-                            Start organizing your course content by creating the first chapter.
+                            Start organizing your course content by importing a YouTube playlist or creating chapters manually.
                         </p>
-                        <button
-                            onClick={handleCreateChapter}
-                            className="flex items-center mx-auto px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
-                        >
-                            <AddRounded className="mr-2" />
-                            Create First Chapter
-                        </button>
+                        <div className="flex flex-col sm:flex-row gap-3 justify-center">
+                            <button
+                                onClick={() => setShowPlaylistImport(true)}
+                                className="flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700"
+                            >
+                                <PlaylistPlayRounded className="mr-2" />
+                                Import from YouTube Playlist
+                            </button>
+                            <button
+                                onClick={handleCreateChapter}
+                                className="flex items-center px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700"
+                            >
+                                <AddRounded className="mr-2" />
+                                Create First Chapter
+                            </button>
+                        </div>
                     </div>
                 )}
 
@@ -240,6 +261,18 @@ export default function CourseInstanceChapters() {
                         isOpen={showModal}
                         onClose={() => setShowModal(false)}
                         onSubmit={handleSubmitChapter}
+                    />
+                )}
+
+                {/* Playlist Import Modal */}
+                {showPlaylistImport && (
+                    <PlaylistChapterOrganizer
+                        courseInstanceId={instanceId}
+                        onClose={() => setShowPlaylistImport(false)}
+                        onImportComplete={() => {
+                            setShowPlaylistImport(false);
+                            fetchChapters();
+                        }}
                     />
                 )}
             </div>

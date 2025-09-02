@@ -422,7 +422,11 @@ export default function Browse() {
             </h3>
             <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
               {results.teachers.map((teacher) => (
-                <div key={teacher.id} className="block">
+                <Link 
+                  key={teacher.id} 
+                  href={`/teacher/${teacher.id}`}
+                  className="block"
+                >
                   <SearchCard 
                     main_title={teacher.name} 
                     subtitle1={teacher.email}
@@ -430,7 +434,7 @@ export default function Browse() {
                     type="teacher" 
                     subtitle3="teacher" 
                   />
-                </div>
+                </Link>
               ))}
             </div>
           </div>

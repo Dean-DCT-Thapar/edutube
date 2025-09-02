@@ -1,16 +1,14 @@
 import React from 'react';
 import Link from 'next/link';
-import { PlayArrowRounded, PersonOutline, AccessTimeRounded } from '@mui/icons-material';
+import { PlayArrowRounded, PersonOutline, AccessTimeRounded, SchoolRounded } from '@mui/icons-material';
 
 const Card = ({ 
   title, 
   author, 
   course_id, 
-  thumbnail, 
   duration, 
   progress, 
   enrolledCount,
-  difficulty = 'Beginner',
   lastAccessed
 }) => {
   const formatDuration = (minutes) => {
@@ -47,25 +45,19 @@ const Card = ({
 
   return (
     <div className="group bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg transform hover:-translate-y-1">
-      {/* Course Thumbnail */}
+      {/* Course Graphic */}
       <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary-600 to-primary-800">
-        {thumbnail ? (
-          <img 
-            src={thumbnail} 
-            alt={`${title} thumbnail`}
-            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.nextSibling.style.display = 'flex';
-            }}
-          />
-        ) : null}
-        
-        {/* Fallback gradient background */}
-        <div className={`absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center ${thumbnail ? 'hidden' : 'flex'}`}>
+        {/* Generic course graphic */}
+        <div className="absolute inset-0 bg-gradient-to-br from-primary-600 to-primary-800 flex items-center justify-center">
           <div className="text-center text-white">
-            <PlayArrowRounded className="text-4xl mb-2 opacity-80" />
-            <p className="text-sm font-medium opacity-90">Course Preview</p>
+            <div className="mb-3">
+              <SchoolRounded className="text-5xl opacity-90" />
+            </div>
+            <div className="space-y-1">
+              <div className="w-16 h-1 bg-white bg-opacity-30 mx-auto rounded-full"></div>
+              <div className="w-12 h-1 bg-white bg-opacity-20 mx-auto rounded-full"></div>
+              <div className="w-20 h-1 bg-white bg-opacity-25 mx-auto rounded-full"></div>
+            </div>
           </div>
         </div>
 
@@ -78,13 +70,6 @@ const Card = ({
             />
           </div>
         )}
-
-        {/* Difficulty badge */}
-        <div className="absolute top-3 left-3">
-          <span className={`px-2 py-1 text-xs font-medium rounded-full ${getDifficultyColor(difficulty)}`}>
-            {difficulty}
-          </span>
-        </div>
 
         {/* Duration badge */}
         {duration && (
