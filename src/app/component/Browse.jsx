@@ -54,6 +54,7 @@ export default function Browse() {
     courseCode: '',
     teacherName: '',
     chapterName: '',
+    tags: '',
     isActive: true
   });
   const [sortBy, setSortBy] = useState('relevance');
@@ -138,7 +139,11 @@ export default function Browse() {
   const handleAdvancedSearch = async (query = searchQuery, type = searchType, 
                                     currentFilters = filters, currentSortBy = sortBy, 
                                     currentSortOrder = sortOrder, page = 1, replace = true) => {
-    if (!query.trim() && Object.values(currentFilters).every(v => !v)) {
+    // Check if we have any search criteria
+    const hasQuery = query.trim();
+    const hasFilters = currentFilters.courseCode || currentFilters.teacherName || currentFilters.chapterName || currentFilters.tags;
+    
+    if (!hasQuery && !hasFilters) {
       if (searchInitiated) {
         // Clear search and show all courses
         setSearchInitiated(false);
@@ -283,6 +288,7 @@ export default function Browse() {
       courseCode: '',
       teacherName: '',
       chapterName: '',
+      tags: '',
       isActive: true
     });
     setSortBy('relevance');
@@ -297,6 +303,7 @@ export default function Browse() {
       courseCode: '',
       teacherName: '',
       chapterName: '',
+      tags: '',
       isActive: true
     });
   };
@@ -406,6 +413,7 @@ export default function Browse() {
                     type="lecture" 
                     duration={lecture.duration}
                     watchCount={lecture.watch_count}
+                    tags={lecture.tags}
                   />
                 </Link>
               ))}
@@ -628,6 +636,17 @@ export default function Browse() {
                   value={filters.chapterName}
                   onChange={(e) => setFilters(prev => ({ ...prev, chapterName: e.target.value }))}
                   placeholder="Chapter name"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                />
+              </div>
+              
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                <input
+                  type="text"
+                  value={filters.tags}
+                  onChange={(e) => setFilters(prev => ({ ...prev, tags: e.target.value }))}
+                  placeholder="Tags (keywords)"
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
                 />
               </div>

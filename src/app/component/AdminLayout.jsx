@@ -29,10 +29,8 @@ const AdminLayout = ({ children, title, userName }) => {
     const navigation = [
         { name: 'Dashboard', href: '/admin-dashboard', icon: DashboardRounded },
         { name: 'Users', href: '/admin-dashboard/users', icon: PeopleRounded },
-        { name: 'Teachers', href: '/admin-dashboard/teachers', icon: SchoolRounded },
         { name: 'Course Templates', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
         { name: 'Course Instances', href: '/admin-dashboard/course-instances', icon: GroupRounded },
-        { name: 'Enhanced Lectures', href: '/admin-dashboard/enhanced-lectures', icon: TuneRounded },
         { name: 'Settings', href: '/admin-dashboard/settings', icon: SettingsRounded },
     ];
 

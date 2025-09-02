@@ -137,6 +137,25 @@ const SearchCard = (props) => {
               </p>
             )}
 
+            {/* Tags for lectures */}
+            {props.type === 'lecture' && props.tags && (
+              <div className="flex flex-wrap gap-1 mt-2">
+                {props.tags.split(', ').filter(tag => tag.trim()).slice(0, 5).map((tag, index) => (
+                  <span
+                    key={index}
+                    className="inline-block px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full"
+                  >
+                    #{tag.trim()}
+                  </span>
+                ))}
+                {props.tags.split(', ').filter(tag => tag.trim()).length > 5 && (
+                  <span className="text-xs text-gray-500 px-2 py-1">
+                    +{props.tags.split(', ').filter(tag => tag.trim()).length - 5} more
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Metadata row */}
             <div className="flex items-center justify-between mt-3">
               {/* Left side - type specific stats */}

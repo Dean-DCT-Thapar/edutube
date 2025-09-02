@@ -191,7 +191,7 @@ export default function Dashboard() {
                                     </div>
                                 </div>
                                 {/* Stats cards */}
-                                <div className="grid grid-cols-2 gap-4">
+                                {/* <div className="grid grid-cols-2 gap-4">
                                     {getQuickStats().map((stat, index) => {
                                         const Icon = stat.icon;
                                         return (
@@ -204,7 +204,7 @@ export default function Dashboard() {
                                             </div>
                                         );
                                     })}
-                                </div>
+                                </div> */}
                             </div>
                         </div>
                     </section>
