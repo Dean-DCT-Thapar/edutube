@@ -5,6 +5,8 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import SideBar from '../../component/SideBar';
 import TopBar from '../../component/TopBar';
+import { API_ENDPOINTS } from '@/utils/apiConfig';
+import { isAuthenticated } from '@/utils/auth';
 import {
     PlayCircleOutlineRounded,
     SchoolRounded,
@@ -13,7 +15,8 @@ import {
     BookmarkRounded,
     CheckCircleRounded,
     ArrowBackRounded,
-    PlayArrowRounded
+    PlayArrowRounded,
+    RemoveCircleOutlineRounded
 } from '@mui/icons-material';
 
 export default function CourseOverview() {
@@ -24,7 +27,9 @@ export default function CourseOverview() {
     const [course, setCourse] = useState(null);
     const [chapters, setChapters] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [courseDataLoaded, setCourseDataLoaded] = useState(false);
     const [enrolling, setEnrolling] = useState(false);
+    const [unenrolling, setUnenrolling] = useState(false);
     const [isEnrolled, setIsEnrolled] = useState(false);
 
     useEffect(() => {
@@ -36,69 +41,138 @@ export default function CourseOverview() {
 
     const fetchCourseDetails = async () => {
         try {
+            setLoading(true);
             const response = await axios.get(`/api/courses/${courseId}`);
             const courseData = response.data;
             
             if (courseData && courseData.length > 0) {
                 // Extract course info from first chapter
                 const firstChapter = courseData[0];
-                setCourse({
+                const courseInfo = {
                     id: courseId,
                     course_name: firstChapter.course_name,
                     instructor_name: firstChapter.instructor_name,
-                    course_code: firstChapter.course_code,
-                    teacher_id: firstChapter.teacher_id
-                });
+                    course_code: firstChapter.course_code
+                };
+                
+                setCourse(courseInfo);
                 setChapters(courseData);
+                setCourseDataLoaded(true);
+            } else {
+                throw new Error('No course data received');
             }
         } catch (error) {
             console.error('Error fetching course details:', error);
             toast.error('Failed to load course details');
+            setCourseDataLoaded(false);
         } finally {
             setLoading(false);
         }
     };
 
+    // Check enrollment status using standardized API
     const checkEnrollmentStatus = async () => {
         try {
-            const response = await axios.get(`/api/enrollment/check/${courseId}`);
+            // Only check if user is authenticated
+            if (!isAuthenticated()) {
+                setIsEnrolled(false);
+                return;
+            }
+
+            const response = await axios.get(API_ENDPOINTS.CHECK_ENROLLMENT(courseId));
             setIsEnrolled(response.data.isEnrolled);
         } catch (error) {
             console.error('Error checking enrollment status:', error);
-            setIsEnrolled(false);
+            // If 401, user needs to login
+            if (error.response?.status === 401) {
+                setIsEnrolled(false);
+            } else {
+                console.error('Unexpected error checking enrollment:', error);
+            }
         }
     };
 
+    // Handle enrollment with proper error handling and auth flow
     const handleEnroll = async () => {
         try {
+            // Check authentication first
+            if (!isAuthenticated()) {
+                sessionStorage.setItem('returnUrl', window.location.pathname);
+                toast.error('Please login to enroll in courses');
+                router.push('/login');
+                return;
+            }
+
+            // Ensure course data is fully loaded
+            if (!courseDataLoaded) {
+                toast.error('Course data is still loading. Please wait a moment and try again.');
+                return;
+            }
+
             setEnrolling(true);
             
-            console.log('Enrolling with:', { // Debug log
-                course_instance_id: parseInt(courseId),
-                teacher_id: course.teacher_id
-            });
-            
-            await axios.post('/api/enrollment', {
-                course_instance_id: parseInt(courseId),
-                teacher_id: course.teacher_id
+            // Only need course_instance_id - backend will handle teacher_id lookup
+            await axios.post(API_ENDPOINTS.ENROLL, {
+                course_instance_id: parseInt(courseId)
             });
 
             setIsEnrolled(true);
-            await checkEnrollmentStatus(); // Refresh enrollment status
+            await checkEnrollmentStatus(); // Refresh status
             toast.success('Successfully enrolled in course!');
+            
         } catch (error) {
             console.error('Error enrolling in course:', error);
-            console.error('Error response:', error.response?.data); // Debug log
             
+            // Handle specific error cases
             if (error.response?.status === 401) {
-                toast.error('Please login to enroll in courses');
                 sessionStorage.setItem('returnUrl', window.location.pathname);
+                toast.error('Please login to enroll in courses');
                 router.push('/login');
+            } else if (error.response?.status === 400) {
+                toast.error(error.response.data.message || 'Already enrolled in this course');
+            } else if (error.message) {
+                toast.error(error.message);
             } else {
-                toast.error(error.response?.data?.message || 'Failed to enroll in course');
+                toast.error('Failed to enroll in course. Please try again.');
             }
         } finally {
             setEnrolling(false);
+        }
+    };
+
+    // Handle unenrollment
+    const handleUnenroll = async () => {
+        try {
+            // Ensure course data is fully loaded
+            if (!courseDataLoaded) {
+                toast.error('Course data is still loading. Please wait a moment and try again.');
+                return;
+            }
+
+            setUnenrolling(true);
+            
+            await axios.delete(API_ENDPOINTS.UNENROLL, {
+                data: {
+                    course_instance_id: parseInt(courseId)
+                }
+            });
+
+            setIsEnrolled(false);
+            await checkEnrollmentStatus(); // Refresh status
+            toast.success('Successfully unenrolled from course');
+            
+        } catch (error) {
+            console.error('Error unenrolling from course:', error);
+            
+            if (error.response?.status === 401) {
+                toast.error('Authentication required');
+            } else if (error.message) {
+                toast.error(error.message);
+            } else {
+                toast.error('Failed to unenroll from course. Please try again.');
+            }
+        } finally {
+            setUnenrolling(false);
         }
     };
 
@@ -298,6 +372,30 @@ export default function CourseOverview() {
                                                 <p className="text-center text-sm text-gray-600 mb-4">
                                                     This course is saved to your dashboard
                                                 </p>
+                                                
+                                                {/* Unenroll button */}
+                                                <button
+                                                    onClick={handleUnenroll}
+                                                    disabled={unenrolling || !courseDataLoaded}
+                                                    className="w-full bg-red-600 text-white py-2 px-4 rounded-lg hover:bg-red-700 transition-colors flex items-center justify-center font-medium disabled:opacity-50 disabled:cursor-not-allowed text-sm"
+                                                >
+                                                    {unenrolling ? (
+                                                        <>
+                                                            <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                                                            Unenrolling...
+                                                        </>
+                                                    ) : !courseDataLoaded ? (
+                                                        <>
+                                                            <div className="animate-pulse h-4 w-4 bg-white/20 rounded mr-2"></div>
+                                                            Loading...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <RemoveCircleOutlineRounded className="mr-2 w-4 h-4" />
+                                                            Remove from Dashboard
+                                                        </>
+                                                    )}
+                                                </button>
                                             </div>
                                         ) : (
                                             <div className="border-t border-gray-200 pt-6">
@@ -309,13 +407,18 @@ export default function CourseOverview() {
                                                 </p>
                                                 <button
                                                     onClick={handleEnroll}
-                                                    disabled={enrolling}
-                                                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center font-medium disabled:opacity-50"
+                                                    disabled={enrolling || !courseDataLoaded}
+                                                    className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition-colors flex items-center justify-center font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                                                 >
                                                     {enrolling ? (
                                                         <>
                                                             <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
                                                             Enrolling...
+                                                        </>
+                                                    ) : !courseDataLoaded ? (
+                                                        <>
+                                                            <div className="animate-pulse h-4 w-4 bg-white/20 rounded mr-2"></div>
+                                                            Loading...
                                                         </>
                                                     ) : (
                                                         <>

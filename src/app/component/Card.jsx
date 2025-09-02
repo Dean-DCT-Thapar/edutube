@@ -11,7 +11,7 @@ const Card = ({
   progress, 
   enrolledCount,
   difficulty = 'Beginner',
-  lastAccessed 
+  lastAccessed
 }) => {
   const formatDuration = (minutes) => {
     if (!minutes) return 'N/A';
@@ -151,7 +151,7 @@ const Card = ({
       {/* Action Footer */}
       <div className="px-6 py-4 bg-gray-50">
         <Link 
-          href={`/course_page/${course_id}`}
+          href={`/course-overview/${course_id}`}
           className="w-full inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 space-x-2 group/btn"
         >
           <PlayArrowRounded className="text-lg" />
