@@ -1,102 +1,106 @@
 import { NextResponse } from 'next/server';
+import axios from 'axios';
+import { cookies } from 'next/headers';
+
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 export async function GET(request, { params }) {
     try {
-        const lectureId = parseInt(params.id);
-        
-        // Mock lecture data - replace with actual database call
-        const lecture = {
-            id: lectureId,
-            title: "Introduction to Variables",
-            description: "Learn about variables and data types",
-            chapter_name: "Getting Started",
-            chapter_number: 1,
-            lecture_number: 1,
-            youtube_url: "https://youtube.com/watch?v=example1",
-            duration: "25:30",
-            course_id: 1,
-            created_at: "2024-01-20T10:00:00Z",
-            tags: []
-        };
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('adminToken');
 
-        return NextResponse.json({
-            success: true,
-            lecture: lecture
+        if (!adminToken) {
+            return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
+        }
+
+        const lectureId = params.id;
+
+        const response = await axios.get(`${BACKEND_URL}/api/admin/lectures/${lectureId}`, {
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json'
+            }
         });
 
+        return NextResponse.json(response.data);
+
     } catch (error) {
-        console.error('Error fetching lecture:', error);
+        console.error('Admin Get Lecture API error:', error);
         return NextResponse.json(
             { 
-                success: false, 
-                message: 'Failed to fetch lecture',
-                error: error.message 
+                message: error.response?.data?.message || 'Failed to fetch lecture',
+                error: error.response?.data?.error || error.message
             },
-            { status: 500 }
+            { status: error.response?.status || 500 }
         );
     }
 }
 
 export async function PUT(request, { params }) {
     try {
-        const lectureId = parseInt(params.id);
-        const body = await request.json();
-        
-        // Mock lecture update - replace with actual database call
-        const updatedLecture = {
-            id: lectureId,
-            title: body.title,
-            description: body.description,
-            chapter_name: body.chapter_name,
-            chapter_number: body.chapter_number,
-            lecture_number: body.lecture_number,
-            youtube_url: body.youtube_url,
-            course_id: body.course_id,
-            created_at: "2024-01-20T10:00:00Z",
-            updated_at: new Date().toISOString(),
-            tags: []
-        };
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('adminToken');
 
-        return NextResponse.json({
-            success: true,
-            message: 'Lecture updated successfully',
-            lecture: updatedLecture
+        if (!adminToken) {
+            return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
+        }
+
+        const lectureId = params.id;
+        const body = await request.json();
+
+        console.log('Next.js API - Update lecture request body:', body);
+
+        const response = await axios.put(`${BACKEND_URL}/api/admin/lectures/${lectureId}`, body, {
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json'
+            }
         });
 
+        return NextResponse.json(response.data);
+
     } catch (error) {
-        console.error('Error updating lecture:', error);
+        console.error('Admin Update Lecture API error:', error);
         return NextResponse.json(
             { 
-                success: false, 
-                message: 'Failed to update lecture',
-                error: error.message 
+                message: error.response?.data?.message || 'Failed to update lecture',
+                error: error.response?.data?.error || error.message
             },
-            { status: 500 }
+            { status: error.response?.status || 500 }
         );
     }
 }
 
 export async function DELETE(request, { params }) {
     try {
-        const lectureId = parseInt(params.id);
-        
-        // Mock lecture deletion - replace with actual database call
-        console.log(`Deleting lecture with ID: ${lectureId}`);
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('adminToken');
 
-        return NextResponse.json({
-            success: true,
-            message: 'Lecture deleted successfully'
+        if (!adminToken) {
+            return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
+        }
+
+        const lectureId = params.id;
+
+        console.log('Next.js API - Delete lecture:', lectureId);
+
+        const response = await axios.delete(`${BACKEND_URL}/api/admin/lectures/${lectureId}`, {
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json'
+            }
         });
 
+        return NextResponse.json(response.data);
+
     } catch (error) {
-        console.error('Error deleting lecture:', error);
+        console.error('Admin Delete Lecture API error:', error);
         return NextResponse.json(
             { 
-                success: false, 
-                message: 'Failed to delete lecture',
-                error: error.message 
+                message: error.response?.data?.message || 'Failed to delete lecture',
+                error: error.response?.data?.error || error.message
             },
-            { status: 500 }
+            { status: error.response?.status || 500 }
         );
     }
 }

@@ -10,7 +10,8 @@ import {
     DeleteRounded,
     FilterListRounded,
     PlayCircleOutlineRounded,
-    ArrowBackRounded
+    ArrowBackRounded,
+    DragIndicatorRounded
 } from '@mui/icons-material';
 
 export default function CourseInstanceLectures() {
@@ -45,9 +46,8 @@ export default function CourseInstanceLectures() {
 
     const fetchInstanceDetails = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
             const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setInstance(response.data.instance);
         } catch (error) {
@@ -58,9 +58,8 @@ export default function CourseInstanceLectures() {
 
     const fetchChapters = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
             const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/chapters`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setChapters(response.data.chapters || []);
         } catch (error) {
@@ -72,9 +71,8 @@ export default function CourseInstanceLectures() {
     const fetchLectures = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
             const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setLectures(response.data.lectures || []);
         } catch (error) {
@@ -105,9 +103,8 @@ export default function CourseInstanceLectures() {
         }
 
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:5000/api/admin/lectures/${lectureId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.delete(`/api/admin/lectures/${lectureId}`, {
+                withCredentials: true
             });
             toast.success('Lecture deleted successfully');
             fetchLectures();
@@ -119,7 +116,6 @@ export default function CourseInstanceLectures() {
 
     const handleSubmitLecture = async (formData) => {
         try {
-            const token = localStorage.getItem('adminToken');
             const data = {
                 ...formData,
                 chapter_id: parseInt(selectedChapter)
@@ -127,14 +123,14 @@ export default function CourseInstanceLectures() {
 
             if (editingLecture) {
                 // Use the with-tags endpoint for updating
-                await axios.put(`http://localhost:5000/api/admin/lectures/${editingLecture.id}/with-tags`, data, {
-                    headers: { Authorization: `Bearer ${token}` }
+                await axios.put(`/api/admin/lectures/${editingLecture.id}/with-tags`, data, {
+                    withCredentials: true
                 });
                 toast.success('Lecture updated successfully');
             } else {
                 // Create lecture with tags
-                await axios.post(`http://localhost:5000/api/admin/lectures`, data, {
-                    headers: { Authorization: `Bearer ${token}` }
+                await axios.post(`/api/admin/lectures`, data, {
+                    withCredentials: true
                 });
                 toast.success('Lecture created successfully');
             }
@@ -145,6 +141,70 @@ export default function CourseInstanceLectures() {
             console.error('Error saving lecture:', error);
             toast.error('Failed to save lecture');
         }
+    };
+
+    // Drag and Drop functions for reordering lectures
+    const [draggedLecture, setDraggedLecture] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
+
+    const handleDragStart = (e, lecture, index) => {
+        setDraggedLecture({ lecture, index });
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        setDragOverIndex(index);
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleDrop = async (e, dropIndex) => {
+        e.preventDefault();
+        setDragOverIndex(null);
+
+        if (!draggedLecture || draggedLecture.index === dropIndex) {
+            setDraggedLecture(null);
+            return;
+        }
+
+        const reorderedLectures = [...lectures];
+        const [draggedItem] = reorderedLectures.splice(draggedLecture.index, 1);
+        reorderedLectures.splice(dropIndex, 0, draggedItem);
+
+        // Update lecture numbers based on new order
+        const updatedLectures = reorderedLectures.map((lecture, index) => ({
+            ...lecture,
+            lecture_number: index + 1
+        }));
+
+        // Optimistically update the UI
+        setLectures(updatedLectures);
+
+        try {
+            // Send reorder request to backend
+            await axios.put(`/api/admin/lectures/reorder`, {
+                chapterId: selectedChapter,
+                lectureOrders: updatedLectures.map(lecture => ({
+                    id: lecture.id,
+                    lecture_number: lecture.lecture_number
+                }))
+            }, {
+                withCredentials: true
+            });
+
+            toast.success('Lectures reordered successfully');
+        } catch (error) {
+            console.error('Error reordering lectures:', error);
+            toast.error('Failed to reorder lectures');
+            // Revert changes on error
+            fetchLectures();
+        }
+
+        setDraggedLecture(null);
     };
 
     const getYouTubeVideoId = (url) => {
@@ -228,9 +288,32 @@ export default function CourseInstanceLectures() {
                         </div>
                     ) : lectures.length > 0 ? (
                         <div className="space-y-4">
-                            {lectures.map((lecture) => (
-                                <div key={lecture.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <div className="flex items-center">
+                                    <DragIndicatorRounded className="text-blue-600 mr-2" />
+                                    <p className="text-sm text-blue-800">
+                                        <strong>Tip:</strong> Drag and drop lectures to reorder them. The lecture numbers will be automatically updated based on their position.
+                                    </p>
+                                </div>
+                            </div>
+                            {lectures.map((lecture, index) => (
+                                <div 
+                                    key={lecture.id} 
+                                    className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all cursor-move ${
+                                        dragOverIndex === index ? 'border-primary-500 bg-primary-50' : ''
+                                    }`}
+                                    draggable
+                                    onDragStart={(e) => handleDragStart(e, lecture, index)}
+                                    onDragOver={(e) => handleDragOver(e, index)}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={(e) => handleDrop(e, index)}
+                                >
                                     <div className="flex items-start space-x-4">
+                                        {/* Drag Handle */}
+                                        <div className="flex-shrink-0 flex items-center">
+                                            <DragIndicatorRounded className="text-gray-400 cursor-grab active:cursor-grabbing" />
+                                        </div>
+
                                         {/* YouTube Thumbnail */}
                                         <div className="flex-shrink-0">
                                             {getYouTubeThumbnail(lecture.youtube_url) ? (
@@ -439,7 +522,6 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
         title: '',
         description: '',
         youtube_url: '',
-        lecture_number: '',
         tags: []
     });
     const [errors, setErrors] = useState({});
@@ -451,7 +533,6 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
                 title: lecture.title || '',
                 description: lecture.description || '',
                 youtube_url: lecture.youtube_url || '',
-                lecture_number: lecture.lecture_number || '',
                 tags: lecture.tags ? lecture.tags.map(tag => tag.tag) : []
             });
         } else {
@@ -459,7 +540,6 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
                 title: '',
                 description: '',
                 youtube_url: '',
-                lecture_number: '',
                 tags: []
             });
         }
@@ -479,10 +559,6 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
             newErrors.youtube_url = 'Please enter a valid YouTube URL';
         }
 
-        if (!formData.lecture_number || formData.lecture_number < 1) {
-            newErrors.lecture_number = 'Lecture number must be a positive integer';
-        }
-
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
     };
@@ -494,10 +570,7 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
 
         setLoading(true);
         try {
-            await onSubmit({
-                ...formData,
-                lecture_number: parseInt(formData.lecture_number)
-            });
+            await onSubmit(formData);
         } catch (error) {
             console.error('Error submitting form:', error);
         } finally {
@@ -530,27 +603,6 @@ const LectureModal = ({ lecture, chapterId, isOpen, onClose, onSubmit }) => {
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="lecture_number" className="block text-sm font-medium text-gray-700 mb-1">
-                            Lecture Number
-                        </label>
-                        <input
-                            type="number"
-                            id="lecture_number"
-                            name="lecture_number"
-                            value={formData.lecture_number}
-                            onChange={handleChange}
-                            min="1"
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                errors.lecture_number ? 'border-red-300' : 'border-gray-300'
-                            }`}
-                            placeholder="1"
-                        />
-                        {errors.lecture_number && (
-                            <p className="mt-1 text-sm text-red-600">{errors.lecture_number}</p>
-                        )}
-                    </div>
-
                     <div>
                         <label htmlFor="title" className="block text-sm font-medium text-gray-700 mb-1">
                             Lecture Title

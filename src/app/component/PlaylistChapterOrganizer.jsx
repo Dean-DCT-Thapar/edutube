@@ -16,7 +16,8 @@ import {
     FolderRounded,
     VideoLibraryRounded,
     ArrowDownwardRounded,
-    SaveRounded
+    SaveRounded,
+    UndoRounded
 } from '@mui/icons-material';
 
 const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete }) => {
@@ -174,6 +175,24 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
         ));
     };
 
+    // Add all lectures from a chapter back to videos list
+    const moveAllLecturesBackToVideos = (chapterId) => {
+        const chapter = chapters.find(c => c.id === chapterId);
+        if (chapter && chapter.lectures.length > 0) {
+            const confirmMove = confirm(`Move all ${chapter.lectures.length} lectures back to the video list?`);
+            if (confirmMove) {
+                // Move all lectures back to videos
+                const lecturesAsVideos = chapter.lectures.map(lecture => lecture.video);
+                setVideos(prev => [...prev, ...lecturesAsVideos]);
+                
+                // Clear all lectures from chapter
+                setChapters(prev => prev.map(c => 
+                    c.id === chapterId ? { ...c, lectures: [] } : c
+                ));
+            }
+        }
+    };
+
     // Import lectures
     const handleImportLectures = async () => {
         if (chapters.length === 0) {
@@ -247,7 +266,22 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
     const totalLectures = chapters.reduce((sum, chapter) => sum + chapter.lectures.length, 0);
 
     return (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+        <div 
+            className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+            onClick={(e) => {
+                // Only close if clicking on the overlay, not the modal content
+                if (e.target === e.currentTarget) {
+                    if (chapters.length > 0 && totalLectures > 0) {
+                        const confirmClose = confirm('Are you sure you want to close? You will lose all organized chapters and lectures.');
+                        if (confirmClose) {
+                            onClose();
+                        }
+                    } else {
+                        onClose();
+                    }
+                }
+            }}
+        >
             <div className="bg-white rounded-lg max-w-7xl w-full max-h-[95vh] overflow-hidden flex flex-col">
                 {/* Header */}
                 <div className="flex items-center justify-between p-6 border-b border-gray-200 bg-gray-50">
@@ -261,7 +295,16 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                         </div>
                     </div>
                     <button
-                        onClick={onClose}
+                        onClick={() => {
+                            if (chapters.length > 0 || videos.length !== videos.length) {
+                                const confirmClose = confirm('Are you sure you want to close? Any unsaved changes will be lost.');
+                                if (confirmClose) {
+                                    onClose();
+                                }
+                            } else {
+                                onClose();
+                            }
+                        }}
                         className="text-gray-400 hover:text-gray-600 transition-colors"
                     >
                         <CloseRounded />
@@ -321,36 +364,52 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                             </div>
                             
                             <div className="flex-1 overflow-y-auto p-4 space-y-3">
-                                {videos.map((video, index) => (
-                                    <div
-                                        key={video.tempId}
-                                        draggable
-                                        onDragStart={(e) => handleDragStart(e, video)}
-                                        onDragEnd={handleDragEnd}
-                                        className="bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-shadow group"
-                                    >
-                                        <div className="flex items-start space-x-3">
-                                            <DragIndicatorRounded className="text-gray-400 mt-1 group-hover:text-gray-600" />
-                                            <img
-                                                src={video.thumbnail}
-                                                alt={video.title}
-                                                className="w-16 h-12 object-cover rounded flex-shrink-0"
-                                            />
-                                            <div className="flex-1 min-w-0">
-                                                <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
-                                                    {video.title}
-                                                </h4>
-                                                <div className="flex items-center text-xs text-gray-500 space-x-2">
-                                                    <span className="flex items-center">
-                                                        <AccessTimeRounded style={{ fontSize: '12px' }} className="mr-1" />
-                                                        {formatDuration(video.duration)}
-                                                    </span>
-                                                    <span>#{index + 1}</span>
+                                {videos.length === 0 ? (
+                                    <div className="text-center py-8">
+                                        <PlayCircleOutlineRounded className="mx-auto text-green-500 mb-3" style={{ fontSize: '48px' }} />
+                                        <h4 className="font-medium text-gray-900 mb-2">All videos organized!</h4>
+                                        <p className="text-sm text-gray-600 mb-4">
+                                            All playlist videos have been organized into chapters. 
+                                            You can now import them or continue editing.
+                                        </p>
+                                        <div className="text-xs text-gray-500 bg-green-50 border border-green-200 rounded-lg p-3">
+                                            💡 <strong>Tip:</strong> You can still edit chapter names, lecture names, 
+                                            or move lectures between chapters before importing. Use the <UndoRounded style={{ fontSize: '12px' }} /> 
+                                            button to move all lectures from a chapter back to this list.
+                                        </div>
+                                    </div>
+                                ) : (
+                                    videos.map((video, index) => (
+                                        <div
+                                            key={video.tempId}
+                                            draggable
+                                            onDragStart={(e) => handleDragStart(e, video)}
+                                            onDragEnd={handleDragEnd}
+                                            className="bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-shadow group"
+                                        >
+                                            <div className="flex items-start space-x-3">
+                                                <DragIndicatorRounded className="text-gray-400 mt-1 group-hover:text-gray-600" />
+                                                <img
+                                                    src={video.thumbnail}
+                                                    alt={video.title}
+                                                    className="w-16 h-12 object-cover rounded flex-shrink-0"
+                                                />
+                                                <div className="flex-1 min-w-0">
+                                                    <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
+                                                        {video.title}
+                                                    </h4>
+                                                    <div className="flex items-center text-xs text-gray-500 space-x-2">
+                                                        <span className="flex items-center">
+                                                            <AccessTimeRounded style={{ fontSize: '12px' }} className="mr-1" />
+                                                            {formatDuration(video.duration)}
+                                                        </span>
+                                                        <span>#{index + 1}</span>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
                         </div>
 
@@ -417,6 +476,15 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                                                         </span>
                                                     </div>
                                                     <div className="flex space-x-2">
+                                                        {chapter.lectures.length > 0 && (
+                                                            <button
+                                                                onClick={() => moveAllLecturesBackToVideos(chapter.id)}
+                                                                className="text-gray-400 hover:text-orange-600"
+                                                                title="Move all lectures back to video list"
+                                                            >
+                                                                <UndoRounded style={{ fontSize: '18px' }} />
+                                                            </button>
+                                                        )}
                                                         <button
                                                             onClick={() => editChapterName(chapter.id)}
                                                             className="text-gray-400 hover:text-blue-600"
@@ -503,7 +571,16 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                             </div>
                             <div className="flex space-x-3">
                                 <button
-                                    onClick={onClose}
+                                    onClick={() => {
+                                        if (chapters.length > 0 && totalLectures > 0) {
+                                            const confirmCancel = confirm('Are you sure you want to cancel? You will lose all organized chapters and lectures.');
+                                            if (confirmCancel) {
+                                                onClose();
+                                            }
+                                        } else {
+                                            onClose();
+                                        }
+                                    }}
                                     className="px-4 py-2 text-gray-600 border border-gray-300 rounded-md hover:bg-gray-50"
                                 >
                                     Cancel

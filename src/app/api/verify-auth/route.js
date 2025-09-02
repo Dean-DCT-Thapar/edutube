@@ -9,7 +9,11 @@ const MODE = process.env.MODE;
 export async function GET(request) {
     try {
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const accessToken = cookieStore.get('accessToken');
+        const adminToken = cookieStore.get('adminToken');
+        
+        // Use whichever token exists
+        const token = adminToken || accessToken;
 
         if (!token) {
             return NextResponse.json(

@@ -1,89 +1,72 @@
 import { NextResponse } from 'next/server';
+import axios from 'axios';
+import { cookies } from 'next/headers';
 
-export async function GET() {
+const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+
+export async function GET(request) {
     try {
-        // Mock lecture data - replace with actual database calls
-        const lectures = [
-            {
-                id: 1,
-                title: "Introduction to Variables",
-                description: "Learn about variables and data types",
-                chapter_name: "Getting Started",
-                chapter_number: 1,
-                lecture_number: 1,
-                youtube_url: "https://youtube.com/watch?v=example1",
-                duration: "25:30",
-                course_id: 1,
-                created_at: "2024-01-20T10:00:00Z",
-                tags: []
-            },
-            {
-                id: 2,
-                title: "Functions and Scope",
-                description: "Understanding functions in programming",
-                chapter_name: "Getting Started", 
-                chapter_number: 1,
-                lecture_number: 2,
-                youtube_url: "https://youtube.com/watch?v=example2",
-                duration: "30:45",
-                course_id: 1,
-                created_at: "2024-01-22T10:00:00Z",
-                tags: []
-            }
-        ];
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('adminToken');
 
-        return NextResponse.json({
-            success: true,
-            lectures: lectures,
-            total: lectures.length
+        if (!adminToken) {
+            return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
+        }
+
+        const url = new URL(request.url);
+        const searchParams = url.searchParams.toString();
+
+        const response = await axios.get(`${BACKEND_URL}/api/admin/lectures${searchParams ? `?${searchParams}` : ''}`, {
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json'
+            }
         });
 
+        return NextResponse.json(response.data);
+
     } catch (error) {
-        console.error('Error fetching lectures:', error);
+        console.error('Admin Lectures API error:', error);
         return NextResponse.json(
             { 
-                success: false, 
-                message: 'Failed to fetch lectures',
-                error: error.message 
+                message: error.response?.data?.message || 'Failed to fetch lectures',
+                error: error.response?.data?.error || error.message
             },
-            { status: 500 }
+            { status: error.response?.status || 500 }
         );
     }
 }
 
 export async function POST(request) {
     try {
+        const cookieStore = await cookies();
+        const adminToken = cookieStore.get('adminToken');
+
+        if (!adminToken) {
+            return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
+        }
+
         const body = await request.json();
         
-        // Mock lecture creation - replace with actual database call
-        const newLecture = {
-            id: Date.now(), // Mock ID generation
-            title: body.title,
-            description: body.description,
-            chapter_name: body.chapter_name,
-            chapter_number: body.chapter_number,
-            lecture_number: body.lecture_number,
-            youtube_url: body.youtube_url,
-            course_id: body.course_id,
-            created_at: new Date().toISOString(),
-            tags: []
-        };
+        console.log('Next.js API - Create lecture request body:', body);
 
-        return NextResponse.json({
-            success: true,
-            message: 'Lecture created successfully',
-            lecture: newLecture
+        const response = await axios.post(`${BACKEND_URL}/api/admin/lectures`, body, {
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json'
+            }
         });
 
+        return NextResponse.json(response.data);
+
     } catch (error) {
-        console.error('Error creating lecture:', error);
+        console.error('Admin Create Lecture API error:', error);
         return NextResponse.json(
             { 
-                success: false, 
-                message: 'Failed to create lecture',
-                error: error.message 
+                message: error.response?.data?.message || 'Failed to create lecture',
+                error: error.response?.data?.error || error.message
             },
-            { status: 500 }
+            { status: error.response?.status || 500 }
         );
     }
 }

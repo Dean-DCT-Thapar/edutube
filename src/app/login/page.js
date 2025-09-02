@@ -18,20 +18,13 @@ export default function Page() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const adminToken = localStorage.getItem('adminToken');
+        console.log('Login page: Checking authentication...');
+        // Check authentication using cookies via API
+        const response = await axios.get('/api/verify-auth');
         
-        if (!token && !adminToken) {
-          // No tokens found, user needs to login
-          return;
-        }
-        
-        const authToken = adminToken || token;
-        const response = await axios.get('/api/verify-auth', {
-          headers: { Authorization: `Bearer ${authToken}` }
-        });
-        
+        console.log('Login page: Auth check response:', response.data);
         if (response.data.status === 200) {
+          console.log('Login page: User already authenticated, redirecting...');
           // Check for return URL first
           const returnUrl = sessionStorage.getItem('returnUrl');
           if (returnUrl) {
@@ -56,7 +49,7 @@ export default function Page() {
           }
         }
       } catch (error) {
-        console.log("Not authenticated, clearing any invalid tokens");
+        console.log("Login page: Not authenticated, clearing any invalid tokens");
         localStorage.removeItem('token');
         localStorage.removeItem('adminToken');
       }
@@ -82,37 +75,32 @@ export default function Page() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    console.log('Login form submitted with:', { email: formValues.email, password: '***' });
     const loadingToast = toast.loading('Signing in...', {id: 'login-loading'});
     try {
+        console.log('Calling /api/login...');
         const response = await axios.post('/api/login', {
             email: formValues.email,
             password: formValues.password,
         });
         
+        console.log('Login response:', response.data);
         if (response.data.success) {
             toast.dismiss(loadingToast);
+            console.log('Login successful, user role:', response.data.role);
             
-            // Store appropriate token based on role
-            if (response.data.accessToken) {
-                if (response.data.role === 'admin') {
-                    localStorage.setItem('adminToken', response.data.accessToken);
-                } else {
-                    // For students and teachers
-                    localStorage.setItem('token', response.data.accessToken);
-                }
-            } else {
-                console.error('No accessToken in response:', response.data);
-                toast.error('Login failed - no token received');
-                return;
-            }
+            // Since we're using cookies now, we don't need to store tokens in localStorage
+            // The cookies are automatically set by the /api/login endpoint
             
             // Redirect based on return URL or role
             const returnUrl = sessionStorage.getItem('returnUrl');
             if (returnUrl) {
+                console.log('Redirecting to return URL:', returnUrl);
                 sessionStorage.removeItem('returnUrl');
                 router.push(returnUrl);
             } else {
                 // Default role-based redirect
+                console.log('Redirecting based on role:', response.data.role);
                 switch (response.data.role) {
                   case 'student':
                     router.push('/dashboard');
@@ -129,6 +117,7 @@ export default function Page() {
             }
         }
     }catch (error) {
+        console.error('Login error:', error);
         const errorMessage = error.response?.data?.message || 'Login failed';
         toast.error(errorMessage, {id: loadingToast});
         setFormValues({ email: '', password: '' });

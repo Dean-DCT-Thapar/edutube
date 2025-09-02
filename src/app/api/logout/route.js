@@ -6,8 +6,12 @@ const MODE = process.env.MODE;
 
 export async function POST(request) {
     try {
-        // Get the token from cookies
-        const token = request.cookies.get('accessToken');
+        // Get tokens from cookies
+        const accessToken = request.cookies.get('accessToken');
+        const adminToken = request.cookies.get('adminToken');
+        
+        // Use whichever token exists
+        const token = adminToken || accessToken;
 
         if (token) {
             // Call backend logout endpoint
@@ -26,8 +30,9 @@ export async function POST(request) {
             { status: 200 }
         );
 
-        // Clear the cookie
+        // Clear both cookies
         response.cookies.delete('accessToken');
+        response.cookies.delete('adminToken');
 
         return response;
     } catch (error) {

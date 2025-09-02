@@ -14,38 +14,34 @@ export default function AdminDashboard() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
+        // Prevent running multiple times
+        if (!loading) return;
+        
+        console.log('Admin dashboard useEffect running, loading:', loading);
         const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
 
-        // Get the admin token
-        const adminToken = localStorage.getItem('adminToken');
-        console.log('Admin token from localStorage:', adminToken ? 'Present' : 'Missing');
-        
-        if (!adminToken) {
-            toast.dismiss(loadingToast);
-            toast.error('Please login as admin to continue');
-            router.push('/login');
-            return;
-        }
-
-        // Verify authentication first
+        console.log('Calling /api/verify-auth with withCredentials...');
+        // Verify authentication using cookies
         axios.get('/api/verify-auth', {
-            headers: { Authorization: `Bearer ${adminToken}` }
+            withCredentials: true
         })
             .then((authResponse) => {
-                console.log('Auth response:', authResponse.data);
+                console.log('Auth response received:', authResponse.data);
                 if (authResponse.data.status === 200) {
                     if (authResponse.data.role !== 'admin') {
+                        console.error('User role is not admin:', authResponse.data.role);
                         throw new Error('Access denied. Administrators only.');
                     }
+                    console.log('Admin authentication successful');
                     setUserData(authResponse.data);
                     
-                    // Fetch dashboard stats
-                    return axios.get('http://localhost:5000/api/admin/dashboard/stats', {
-                        headers: {
-                            'Authorization': `Bearer ${adminToken}`
-                        }
+                    // Fetch dashboard stats using cookies
+                    console.log('Fetching dashboard stats...');
+                    return axios.get('/api/admin/dashboard/stats', {
+                        withCredentials: true
                     });
                 } else {
+                    console.error('Auth response status not 200:', authResponse.data);
                     throw new Error(authResponse.data.message || 'Authentication failed');
                 }
             })
@@ -55,18 +51,25 @@ export default function AdminDashboard() {
                 setLoading(false);
             })
             .catch((error) => {
-                console.error('Dashboard error:', error);
+                console.error('Dashboard error details:', {
+                    message: error.message,
+                    response: error.response?.data,
+                    status: error.response?.status,
+                    headers: error.response?.headers
+                });
                 toast.dismiss(loadingToast);
                 const errorMessage = error.response?.data?.message || error.message || 'Please login to continue';
                 toast.error(errorMessage, {id: loadingToast});
                 
                 if (error.response?.status === 401 || error.response?.status === 403) {
+                    console.log('Redirecting to login due to auth error');
                     router.push('/login');
                 } else {
+                    console.log('Setting loading to false due to non-auth error');
                     setLoading(false);
                 }
             });
-    }, [router]);
+    }, []); // Empty dependency array to run only once
 
     if (loading) {
         return (

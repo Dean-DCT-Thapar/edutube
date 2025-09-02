@@ -36,11 +36,23 @@ const AdminLayout = ({ children, title, userName }) => {
 
     const handleLogout = async () => {
         try {
-            await fetch('/api/logout', { method: 'POST' });
+            // Call the logout API to clear cookies
+            await fetch('/api/logout', { 
+                method: 'POST',
+                credentials: 'include'
+            });
+            
+            // Also clear any lingering localStorage tokens for cleanup
             localStorage.removeItem('adminToken');
+            localStorage.removeItem('token');
+            
             router.push('/login');
         } catch (error) {
             console.error('Logout failed:', error);
+            // Even if API fails, clear local storage and redirect
+            localStorage.removeItem('adminToken');
+            localStorage.removeItem('token');
+            router.push('/login');
         }
     };
 

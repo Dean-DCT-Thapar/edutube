@@ -12,7 +12,8 @@ import {
     PlayCircleOutlineRounded,
     BookRounded,
     ArrowBackRounded,
-    PlaylistPlayRounded
+    PlaylistPlayRounded,
+    DragIndicatorRounded
 } from '@mui/icons-material';
 
 export default function CourseInstanceChapters() {
@@ -36,9 +37,8 @@ export default function CourseInstanceChapters() {
 
     const fetchInstanceDetails = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
             const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setInstance(response.data.instance);
         } catch (error) {
@@ -50,9 +50,8 @@ export default function CourseInstanceChapters() {
     const fetchChapters = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
             const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
             setChapters(response.data.chapters || []);
         } catch (error) {
@@ -79,9 +78,8 @@ export default function CourseInstanceChapters() {
         }
 
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:5000/api/admin/chapters/${chapterId}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.delete(`/api/admin/chapters/${chapterId}`, {
+                withCredentials: true
             });
             toast.success('Chapter deleted successfully');
             fetchChapters();
@@ -93,20 +91,19 @@ export default function CourseInstanceChapters() {
 
     const handleSubmitChapter = async (formData) => {
         try {
-            const token = localStorage.getItem('adminToken');
             const data = {
                 ...formData,
                 course_instance_id: parseInt(instanceId)
             };
 
             if (editingChapter) {
-                await axios.put(`http://localhost:5000/api/admin/chapters/${editingChapter.id}`, data, {
-                    headers: { Authorization: `Bearer ${token}` }
+                await axios.put(`/api/admin/chapters/${editingChapter.id}`, data, {
+                    withCredentials: true
                 });
                 toast.success('Chapter updated successfully');
             } else {
-                await axios.post(`http://localhost:5000/api/admin/chapters`, data, {
-                    headers: { Authorization: `Bearer ${token}` }
+                await axios.post(`/api/admin/chapters`, data, {
+                    withCredentials: true
                 });
                 toast.success('Chapter created successfully');
             }
@@ -117,6 +114,70 @@ export default function CourseInstanceChapters() {
             console.error('Error saving chapter:', error);
             toast.error('Failed to save chapter');
         }
+    };
+
+    // Drag and Drop functions for reordering chapters
+    const [draggedChapter, setDraggedChapter] = useState(null);
+    const [dragOverIndex, setDragOverIndex] = useState(null);
+
+    const handleDragStart = (e, chapter, index) => {
+        setDraggedChapter({ chapter, index });
+        e.dataTransfer.effectAllowed = 'move';
+    };
+
+    const handleDragOver = (e, index) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        setDragOverIndex(index);
+    };
+
+    const handleDragLeave = () => {
+        setDragOverIndex(null);
+    };
+
+    const handleDrop = async (e, dropIndex) => {
+        e.preventDefault();
+        setDragOverIndex(null);
+
+        if (!draggedChapter || draggedChapter.index === dropIndex) {
+            setDraggedChapter(null);
+            return;
+        }
+
+        const reorderedChapters = [...chapters];
+        const [draggedItem] = reorderedChapters.splice(draggedChapter.index, 1);
+        reorderedChapters.splice(dropIndex, 0, draggedItem);
+
+        // Update chapter numbers based on new order
+        const updatedChapters = reorderedChapters.map((chapter, index) => ({
+            ...chapter,
+            number: index + 1
+        }));
+
+        // Optimistically update the UI
+        setChapters(updatedChapters);
+
+        try {
+            // Send reorder request to backend
+            await axios.put(`/api/admin/chapters/reorder`, {
+                courseInstanceId: instanceId,
+                chapterOrders: updatedChapters.map(chapter => ({
+                    id: chapter.id,
+                    number: chapter.number
+                }))
+            }, {
+                withCredentials: true
+            });
+
+            toast.success('Chapters reordered successfully');
+        } catch (error) {
+            console.error('Error reordering chapters:', error);
+            toast.error('Failed to reorder chapters');
+            // Revert changes on error
+            fetchChapters();
+        }
+
+        setDraggedChapter(null);
     };
 
     if (loading) {
@@ -177,11 +238,31 @@ export default function CourseInstanceChapters() {
 
                 {/* Chapters Grid */}
                 {chapters.length > 0 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                        {chapters.map((chapter) => (
-                            <div key={chapter.id} className="bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-shadow">
+                    <div className="space-y-4">
+                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                            <div className="flex items-center">
+                                <DragIndicatorRounded className="text-blue-600 mr-2" />
+                                <p className="text-sm text-blue-800">
+                                    <strong>Tip:</strong> Drag and drop chapters to reorder them. The chapter numbers will be automatically updated based on their position.
+                                </p>
+                            </div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {chapters.map((chapter, index) => (
+                            <div 
+                                key={chapter.id} 
+                                className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all cursor-move ${
+                                    dragOverIndex === index ? 'border-primary-500 bg-primary-50' : ''
+                                }`}
+                                draggable
+                                onDragStart={(e) => handleDragStart(e, chapter, index)}
+                                onDragOver={(e) => handleDragOver(e, index)}
+                                onDragLeave={handleDragLeave}
+                                onDrop={(e) => handleDrop(e, index)}
+                            >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center">
+                                        <DragIndicatorRounded className="text-gray-400 cursor-grab active:cursor-grabbing mr-2" />
                                         <BookRounded className="text-primary-600 mr-2" />
                                         <span className="text-sm font-medium text-gray-500">
                                             Chapter {chapter.number}
@@ -227,6 +308,7 @@ export default function CourseInstanceChapters() {
                                 </div>
                             </div>
                         ))}
+                        </div>
                     </div>
                 ) : (
                     <div className="text-center py-12">
@@ -284,8 +366,7 @@ export default function CourseInstanceChapters() {
 const ChapterModal = ({ chapter, isOpen, onClose, onSubmit }) => {
     const [formData, setFormData] = useState({
         name: '',
-        description: '',
-        number: ''
+        description: ''
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
@@ -294,14 +375,12 @@ const ChapterModal = ({ chapter, isOpen, onClose, onSubmit }) => {
         if (chapter) {
             setFormData({
                 name: chapter.name || '',
-                description: chapter.description || '',
-                number: chapter.number || ''
+                description: chapter.description || ''
             });
         } else {
             setFormData({
                 name: '',
-                description: '',
-                number: ''
+                description: ''
             });
         }
         setErrors({});
@@ -312,10 +391,6 @@ const ChapterModal = ({ chapter, isOpen, onClose, onSubmit }) => {
 
         if (!formData.name.trim()) {
             newErrors.name = 'Chapter name is required';
-        }
-
-        if (!formData.number || formData.number < 1) {
-            newErrors.number = 'Chapter number must be a positive integer';
         }
 
         setErrors(newErrors);
@@ -329,10 +404,7 @@ const ChapterModal = ({ chapter, isOpen, onClose, onSubmit }) => {
 
         setLoading(true);
         try {
-            await onSubmit({
-                ...formData,
-                number: parseInt(formData.number)
-            });
+            await onSubmit(formData);
         } catch (error) {
             console.error('Error submitting form:', error);
         } finally {
@@ -365,27 +437,6 @@ const ChapterModal = ({ chapter, isOpen, onClose, onSubmit }) => {
                 </h3>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
-                    <div>
-                        <label htmlFor="number" className="block text-sm font-medium text-gray-700 mb-1">
-                            Chapter Number
-                        </label>
-                        <input
-                            type="number"
-                            id="number"
-                            name="number"
-                            value={formData.number}
-                            onChange={handleChange}
-                            min="1"
-                            className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                errors.number ? 'border-red-300' : 'border-gray-300'
-                            }`}
-                            placeholder="1"
-                        />
-                        {errors.number && (
-                            <p className="mt-1 text-sm text-red-600">{errors.number}</p>
-                        )}
-                    </div>
-
                     <div>
                         <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
                             Chapter Name

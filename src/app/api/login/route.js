@@ -28,12 +28,23 @@ export async function POST(request) {
 
         // Await the cookies() call
         const cookieStore = await cookies();
-        cookieStore.set('accessToken', response.data.accessToken, {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'strict',
-            maxAge: 60 * 60 * 24
-        });
+        
+        // Set different cookies based on user role
+        if (response.data.user.role === 'admin') {
+            cookieStore.set('adminToken', response.data.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24
+            });
+        } else {
+            cookieStore.set('accessToken', response.data.accessToken, {
+                httpOnly: true,
+                secure: process.env.NODE_ENV === 'production',
+                sameSite: 'strict',
+                maxAge: 60 * 60 * 24
+            });
+        }
 
         return res;
 
