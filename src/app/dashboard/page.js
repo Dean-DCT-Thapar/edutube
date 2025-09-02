@@ -28,9 +28,18 @@ export default function Dashboard() {
             const loadingToast = toast.loading('Loading dashboard...', { id: 'dashboard-loading' });
 
             try {
+                const token = localStorage.getItem('token');
+                if (!token) {
+                    throw new Error('No authentication token found');
+                }
+
                 const [authResponse, userDataResponse] = await Promise.all([
-                    axios.get('/api/verify-auth'),
-                    axios.get('/api/get-user-data')
+                    axios.get('/api/verify-auth', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }),
+                    axios.get('/api/get-user-data', {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
                 ]);
 
                 if (authResponse.data.status === 200) {
@@ -46,7 +55,11 @@ export default function Dashboard() {
             } catch (error) {
                 const errorMessage = error.response?.data?.message || error.message || 'Please login to continue';
                 toast.error(errorMessage, { id: 'dashboard-loading' });
-                router.push('/login');
+                
+                // Avoid infinite redirect loop
+                if (window.location.pathname !== '/login') {
+                    router.push('/login');
+                }
             } finally {
                 setIsLoading(false);
             }

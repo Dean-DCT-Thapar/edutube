@@ -16,8 +16,21 @@ export default function AdminDashboard() {
     useEffect(() => {
         const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
 
+        // Get the admin token
+        const adminToken = localStorage.getItem('adminToken');
+        console.log('Admin token from localStorage:', adminToken ? 'Present' : 'Missing');
+        
+        if (!adminToken) {
+            toast.dismiss(loadingToast);
+            toast.error('Please login as admin to continue');
+            router.push('/login');
+            return;
+        }
+
         // Verify authentication first
-        axios.get('/api/verify-auth')
+        axios.get('/api/verify-auth', {
+            headers: { Authorization: `Bearer ${adminToken}` }
+        })
             .then((authResponse) => {
                 console.log('Auth response:', authResponse.data);
                 if (authResponse.data.status === 200) {
@@ -26,34 +39,12 @@ export default function AdminDashboard() {
                     }
                     setUserData(authResponse.data);
                     
-                    // Check if we have an admin token stored
-                    const adminToken = localStorage.getItem('adminToken');
-                    console.log('Admin token from localStorage:', adminToken ? 'Present' : 'Missing');
-                    
-                    // Fetch dashboard stats if we have admin token
-                    if (adminToken) {
-                        return axios.get('http://localhost:5000/api/admin/dashboard/stats', {
-                            headers: {
-                                'Authorization': `Bearer ${adminToken}`
-                            }
-                        });
-                    } else {
-                        console.warn('No admin token found, using mock data');
-                        // Return mock data for development
-                        return Promise.resolve({
-                            data: {
-                                stats: {
-                                    users: 0,
-                                    teachers: 0,
-                                    courseInstances: 0,
-                                    lectures: 0,
-                                    enrollments: 0
-                                },
-                                recentUsers: [],
-                                recentCourseInstances: []
-                            }
-                        });
-                    }
+                    // Fetch dashboard stats
+                    return axios.get('http://localhost:5000/api/admin/dashboard/stats', {
+                        headers: {
+                            'Authorization': `Bearer ${adminToken}`
+                        }
+                    });
                 } else {
                     throw new Error(authResponse.data.message || 'Authentication failed');
                 }

@@ -28,6 +28,8 @@ const CoursePage = ({ params }) => {
   const [error, setError] = useState(null)
   const [expandedChapters, setExpandedChapters] = useState({})
   const [sidebarOpen, setSidebarOpen] = useState(false)
+  const [isEnrolled, setIsEnrolled] = useState(false)
+  const [checkingEnrollment, setCheckingEnrollment] = useState(true)
   
   // Get URL parameters
   const courseId = React.use(params).id
@@ -61,9 +63,33 @@ const CoursePage = ({ params }) => {
     }
   }, [courseId, chapterNumber])
 
+  // Check enrollment status
+  const checkEnrollmentStatus = useCallback(async () => {
+    if (!courseId) return
+    
+    setCheckingEnrollment(true)
+    try {
+      const token = localStorage.getItem('token')
+      if (token) {
+        const response = await axios.get(`/api/enrollment/check/${courseId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        setIsEnrolled(response.data.isEnrolled)
+      } else {
+        setIsEnrolled(false)
+      }
+    } catch (error) {
+      console.error('Error checking enrollment:', error)
+      setIsEnrolled(false)
+    } finally {
+      setCheckingEnrollment(false)
+    }
+  }, [courseId])
+
   useEffect(() => {
     fetchCourseData()
-  }, [fetchCourseData])
+    checkEnrollmentStatus()
+  }, [fetchCourseData, checkEnrollmentStatus])
 
   // Get current video details
   const videoDetails = useMemo(() => {
@@ -190,9 +216,15 @@ const CoursePage = ({ params }) => {
                   <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
                     {courseOverview?.title}
                   </h1>
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
-                    Preview Mode
-                  </span>
+                  {!checkingEnrollment && (
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      isEnrolled 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      {isEnrolled ? 'Enrolled' : 'Preview Mode'}
+                    </span>
+                  )}
                 </div>
               </div>
               

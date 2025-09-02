@@ -10,8 +10,18 @@ export default function TeacherDashboard() {
 
     useEffect(() => {
         const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
+        
+        const token = localStorage.getItem('token');
+        if (!token) {
+            toast.dismiss(loadingToast);
+            toast.error('Please login to continue');
+            router.push('/login');
+            return;
+        }
 
-        axios.get('/api/verify-auth')
+        axios.get('/api/verify-auth', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
             .then((authResponse) => {
                 if (authResponse.data.status === 200) {
                     if (authResponse.data.role !== 'teacher') {

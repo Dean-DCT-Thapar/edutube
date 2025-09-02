@@ -17,16 +17,12 @@ export async function POST(request) {
             password: body.password,
         });
 
-        // Create the response with additional data for admins
+        // Create the response with data for all users
         const responseData = { 
             success: true,
-            role: response.data.user.role
+            role: response.data.user.role,
+            accessToken: response.data.accessToken  // Include accessToken for all users
         };
-
-        // Include accessToken in response for admin users (needed for admin dashboard API calls)
-        if (response.data.user.role === 'admin') {
-            responseData.accessToken = response.data.accessToken;
-        }
 
         const res = NextResponse.json(responseData, { status: 200 });
 

@@ -18,9 +18,29 @@ export default function Page() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get('/api/verify-auth');
+        const token = localStorage.getItem('token');
+        const adminToken = localStorage.getItem('adminToken');
+        
+        if (!token && !adminToken) {
+          // No tokens found, user needs to login
+          return;
+        }
+        
+        const authToken = adminToken || token;
+        const response = await axios.get('/api/verify-auth', {
+          headers: { Authorization: `Bearer ${authToken}` }
+        });
+        
         if (response.data.status === 200) {
-          // Redirect based on role
+          // Check for return URL first
+          const returnUrl = sessionStorage.getItem('returnUrl');
+          if (returnUrl) {
+            sessionStorage.removeItem('returnUrl');
+            router.push(returnUrl);
+            return;
+          }
+          
+          // Default role-based redirect
           switch (response.data.role) {
             case 'student':
               router.push('/dashboard');
@@ -36,7 +56,9 @@ export default function Page() {
           }
         }
       } catch (error) {
-        console.log("Not authenticated");
+        console.log("Not authenticated, clearing any invalid tokens");
+        localStorage.removeItem('token');
+        localStorage.removeItem('adminToken');
       }
     };
 
@@ -78,21 +100,32 @@ export default function Page() {
                     // For students and teachers
                     localStorage.setItem('token', response.data.accessToken);
                 }
+            } else {
+                console.error('No accessToken in response:', response.data);
+                toast.error('Login failed - no token received');
+                return;
             }
             
-            // Redirect based on role
-            switch (response.data.role) {
-              case 'student':
-                router.push('/dashboard');
-                break;
-              case 'teacher':
-                router.push('/teacher-dashboard');
-                break;
-              case 'admin':
-                router.push('/admin-dashboard');
-                break;
-              default:
-                toast.error('Unknown user role', {id: loadingToast});
+            // Redirect based on return URL or role
+            const returnUrl = sessionStorage.getItem('returnUrl');
+            if (returnUrl) {
+                sessionStorage.removeItem('returnUrl');
+                router.push(returnUrl);
+            } else {
+                // Default role-based redirect
+                switch (response.data.role) {
+                  case 'student':
+                    router.push('/dashboard');
+                    break;
+                  case 'teacher':
+                    router.push('/teacher-dashboard');
+                    break;
+                  case 'admin':
+                    router.push('/admin-dashboard');
+                    break;
+                  default:
+                    toast.error('Unknown user role', {id: loadingToast});
+                }
             }
         }
     }catch (error) {

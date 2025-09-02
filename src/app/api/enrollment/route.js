@@ -1,21 +1,23 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 export async function POST(request) {
     try {
         const body = await request.json();
-        const authHeader = request.headers.get('authorization');
+        const cookieStore = await cookies();
+        const token = cookieStore.get('accessToken');
 
-        if (!authHeader) {
+        if (!token) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });
         }
 
-        const response = await fetch(`${BACKEND_URL}/api/enrollment/enroll`, {
+        const response = await fetch(`${BACKEND_URL}/api/enrollment/enroll_course`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': authHeader,
+                'Authorization': `Bearer ${token.value}`,
             },
             body: JSON.stringify(body),
         });
@@ -39,17 +41,18 @@ export async function POST(request) {
 export async function DELETE(request) {
     try {
         const body = await request.json();
-        const authHeader = request.headers.get('authorization');
+        const cookieStore = await cookies();
+        const token = cookieStore.get('accessToken');
 
-        if (!authHeader) {
+        if (!token) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });
         }
 
-        const response = await fetch(`${BACKEND_URL}/api/enrollment/unenroll`, {
+        const response = await fetch(`${BACKEND_URL}/api/enrollment/unenroll_course`, {
             method: 'DELETE',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': authHeader,
+                'Authorization': `Bearer ${token.value}`,
             },
             body: JSON.stringify(body),
         });

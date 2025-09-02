@@ -61,46 +61,42 @@ export default function CourseOverview() {
 
     const checkEnrollmentStatus = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) return;
-
-            const response = await axios.get('/api/user/data', {
-                headers: { Authorization: `Bearer ${token}` }
-            });
-            
-            const enrolledCourses = response.data.enrolled_courses || [];
-            const enrolled = enrolledCourses.some(enrollment => 
-                enrollment.course_instance && enrollment.course_instance.id == courseId
-            );
-            setIsEnrolled(enrolled);
+            const response = await axios.get(`/api/enrollment/check/${courseId}`);
+            setIsEnrolled(response.data.isEnrolled);
         } catch (error) {
             console.error('Error checking enrollment status:', error);
+            setIsEnrolled(false);
         }
     };
 
     const handleEnroll = async () => {
         try {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                toast.error('Please login to enroll in courses');
-                router.push('/login');
-                return;
-            }
-
             setEnrolling(true);
             
-            await axios.post('/api/enroll', {
+            console.log('Enrolling with:', { // Debug log
                 course_instance_id: parseInt(courseId),
                 teacher_id: course.teacher_id
-            }, {
-                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            await axios.post('/api/enrollment', {
+                course_instance_id: parseInt(courseId),
+                teacher_id: course.teacher_id
             });
 
             setIsEnrolled(true);
+            await checkEnrollmentStatus(); // Refresh enrollment status
             toast.success('Successfully enrolled in course!');
         } catch (error) {
             console.error('Error enrolling in course:', error);
-            toast.error(error.response?.data?.message || 'Failed to enroll in course');
+            console.error('Error response:', error.response?.data); // Debug log
+            
+            if (error.response?.status === 401) {
+                toast.error('Please login to enroll in courses');
+                sessionStorage.setItem('returnUrl', window.location.pathname);
+                router.push('/login');
+            } else {
+                toast.error(error.response?.data?.message || 'Failed to enroll in course');
+            }
         } finally {
             setEnrolling(false);
         }
