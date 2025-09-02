@@ -49,9 +49,8 @@ export default function Page() {
           }
         }
       } catch (error) {
-        console.log("Login page: Not authenticated, clearing any invalid tokens");
-        localStorage.removeItem('token');
-        localStorage.removeItem('adminToken');
+        console.log("Login page: Not authenticated, staying on login page");
+        // No need to clear localStorage as we're using cookies now
       }
     };
 

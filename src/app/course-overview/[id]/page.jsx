@@ -95,8 +95,9 @@ export default function CourseOverview() {
     // Handle enrollment with proper error handling and auth flow
     const handleEnroll = async () => {
         try {
-            // Check authentication first
-            if (!isAuthenticated()) {
+            // Check authentication first - now async
+            const authenticated = await isAuthenticated();
+            if (!authenticated) {
                 sessionStorage.setItem('returnUrl', window.location.pathname);
                 toast.error('Please login to enroll in courses');
                 router.push('/login');

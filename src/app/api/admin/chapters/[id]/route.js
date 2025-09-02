@@ -1,25 +1,26 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import axios from 'axios';
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const cookieStore = await cookies();
+    const adminToken = cookieStore.get('adminToken');
     
-    // Get authorization header from the request
-    const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader) {
+    if (!adminToken) {
       return NextResponse.json(
-        { message: 'Authorization header missing' },
+        { message: 'Unauthorized' },
         { status: 401 }
       );
     }
+
+    const { id } = await params;
     
     const response = await axios.get(`${BACKEND_URL}/api/admin/chapters/${id}`, {
       headers: {
-        'Authorization': authHeader
+        'Authorization': `Bearer ${adminToken.value}`
       }
     });
     
@@ -43,21 +44,23 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
   try {
-    const { id } = params;
-    const authHeader = request.headers.get('authorization');
+    const cookieStore = await cookies();
+    const adminToken = cookieStore.get('adminToken');
     
-    if (!authHeader) {
+    if (!adminToken) {
       return NextResponse.json(
-        { message: 'Authorization header missing' },
+        { message: 'Unauthorized' },
         { status: 401 }
       );
     }
+
+    const { id } = await params;
     
     const body = await request.json();
     
     const response = await axios.put(`${BACKEND_URL}/api/admin/chapters/${id}`, body, {
       headers: {
-        'Authorization': authHeader,
+        'Authorization': `Bearer ${adminToken.value}`,
         'Content-Type': 'application/json'
       }
     });
@@ -82,19 +85,21 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
   try {
-    const { id } = params;
-    const authHeader = request.headers.get('authorization');
+    const cookieStore = await cookies();
+    const adminToken = cookieStore.get('adminToken');
     
-    if (!authHeader) {
+    if (!adminToken) {
       return NextResponse.json(
-        { message: 'Authorization header missing' },
+        { message: 'Unauthorized' },
         { status: 401 }
       );
     }
+
+    const { id } = await params;
     
     const response = await axios.delete(`${BACKEND_URL}/api/admin/chapters/${id}`, {
       headers: {
-        'Authorization': authHeader
+        'Authorization': `Bearer ${adminToken.value}`
       }
     });
     

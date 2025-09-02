@@ -1,19 +1,44 @@
 'use client'
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TopBar from './component/TopBar';
 import Footer from './component/Footer';
+import axios from 'axios';
 
 export default function Page() {
   const router = useRouter();
+  const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
-    // Check authentication status (replace with your actual logic)
-    const isLoggedIn = typeof window !== 'undefined' && localStorage.getItem('token');
-    if (isLoggedIn) {
-      router.replace('/dashboard');
-    }
+    // Check authentication status using cookie-based auth
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get('/api/verify-auth');
+        if (response.data.status === 200) {
+          // User is authenticated, redirect to dashboard
+          router.replace('/dashboard');
+        }
+      } catch (error) {
+        // User is not authenticated, show landing page
+        setIsChecking(false);
+      }
+    };
+
+    checkAuth();
   }, [router]);
+
+  // Show loading spinner while checking authentication
+  if (isChecking) {
+    return (
+      <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary-50 to-blue-100">
+        <TopBar />
+        <main className="flex-1 flex flex-col items-center justify-center px-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-700"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </main>
+      </div>
+    );
+  }
 
   // Show a beautiful landing splash while redirecting
   return (

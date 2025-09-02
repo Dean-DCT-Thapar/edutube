@@ -32,18 +32,10 @@ export default function Dashboard() {
             const loadingToast = toast.loading('Loading dashboard...', { id: 'dashboard-loading' });
 
             try {
-                const token = localStorage.getItem('token');
-                if (!token) {
-                    throw new Error('No authentication token found');
-                }
-
+                // Use cookie-based authentication - no need to pass token
                 const [authResponse, userDataResponse] = await Promise.all([
-                    axios.get('/api/verify-auth', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    }),
-                    axios.get('/api/get-user-data', {
-                        headers: { Authorization: `Bearer ${token}` }
-                    })
+                    axios.get('/api/verify-auth'),
+                    axios.get('/api/get-user-data')
                 ]);
 
                 if (authResponse.data.status === 200) {

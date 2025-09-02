@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function DELETE(request, { params }) {
     try {
-        const { id, tagId } = params;
+        const { id, tagId } = await params;
 
         // Remove specific tag from lecture
         const response = await fetch(`http://localhost:5000/api/admin/lectures/${id}/tags/${tagId}`, {

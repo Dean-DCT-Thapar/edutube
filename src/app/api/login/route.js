@@ -1,6 +1,5 @@
 import { NextResponse } from 'next/server';
 import axios from 'axios';
-import { cookies } from 'next/headers';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
@@ -25,20 +24,17 @@ export async function POST(request) {
         };
 
         const res = NextResponse.json(responseData, { status: 200 });
-
-        // Await the cookies() call
-        const cookieStore = await cookies();
         
         // Set different cookies based on user role
         if (response.data.user.role === 'admin') {
-            cookieStore.set('adminToken', response.data.accessToken, {
+            res.cookies.set('adminToken', response.data.accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
                 maxAge: 60 * 60 * 24
             });
         } else {
-            cookieStore.set('accessToken', response.data.accessToken, {
+            res.cookies.set('accessToken', response.data.accessToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',

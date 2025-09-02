@@ -2,75 +2,59 @@
  * Authentication Utility - Centralized auth management
  * 
  * ARCHITECTURE:
- * - Frontend API routes (/api/*) use httpOnly cookies for security
- * - Client-side components use localStorage for direct backend calls
- * - Admin operations may need both patterns
+ * - All authentication now uses httpOnly cookies for security
+ * - Frontend API routes (/api/*) handle cookie authentication
+ * - Direct backend calls are discouraged - use frontend API routes instead
  */
 
 import axios from 'axios';
 
 // Auth patterns enum
 export const AUTH_PATTERNS = {
-  COOKIE_BASED: 'cookie', // For Next.js API routes
-  TOKEN_BASED: 'token'    // For direct backend calls
+  COOKIE_BASED: 'cookie', // For all API routes (recommended)
+  DEPRECATED: 'deprecated' // Old token-based approach (being phased out)
 };
 
 /**
- * Get authentication method for different API patterns
+ * Get authentication method - now always cookie-based
  */
 export const getAuthMethod = (apiPath) => {
-  // Frontend API routes use cookies
-  if (apiPath.startsWith('/api/')) {
-    return AUTH_PATTERNS.COOKIE_BASED;
-  }
-  // Direct backend calls use tokens
-  if (apiPath.startsWith('http://localhost:5000/')) {
-    return AUTH_PATTERNS.TOKEN_BASED;
-  }
-  // Default to cookie-based for frontend routes
+  // All routes now use cookie-based authentication
   return AUTH_PATTERNS.COOKIE_BASED;
 };
 
 /**
- * Make authenticated API call with correct auth pattern
+ * Make authenticated API call with cookie-based authentication
  */
 export const authenticatedRequest = async (config) => {
-  const authMethod = getAuthMethod(config.url);
-  
-  if (authMethod === AUTH_PATTERNS.TOKEN_BASED) {
-    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
-    if (token) {
-      config.headers = config.headers || {};
-      config.headers.Authorization = `Bearer ${token}`;
-    }
-  }
-  // Cookie-based requests don't need headers (automatic)
-  
+  // All requests now use cookies automatically - no manual headers needed
   return axios(config);
 };
 
 /**
- * Check if user is authenticated
+ * Check if user is authenticated using API call
  */
-export const isAuthenticated = () => {
-  // Check both localStorage and cookies via API call
-  const hasToken = !!(localStorage.getItem('token') || localStorage.getItem('adminToken'));
-  return hasToken;
+export const isAuthenticated = async () => {
+  try {
+    const response = await axios.get('/api/verify-auth');
+    return response.data.status === 200;
+  } catch (error) {
+    return false;
+  }
 };
 
 /**
- * Get user role from stored token
+ * Get user role from API
  */
-export const getUserRole = () => {
+export const getUserRole = async () => {
   try {
-    const token = localStorage.getItem('token') || localStorage.getItem('adminToken');
-    if (!token) return null;
-    
-    // Decode JWT to get role (basic decode, not verification)
-    const payload = JSON.parse(atob(token.split('.')[1]));
-    return payload.role;
+    const response = await axios.get('/api/verify-auth');
+    if (response.data.status === 200) {
+      return response.data.role;
+    }
+    return null;
   } catch (error) {
-    console.error('Error decoding token:', error);
+    console.error('Error getting user role:', error);
     return null;
   }
 };
@@ -78,8 +62,11 @@ export const getUserRole = () => {
 /**
  * Clear all authentication data
  */
-export const clearAuth = () => {
-  localStorage.removeItem('token');
-  localStorage.removeItem('adminToken');
-  // Note: httpOnly cookies are cleared by logout API
+export const clearAuth = async () => {
+  try {
+    // Call logout API to clear httpOnly cookies
+    await axios.post('/api/logout');
+  } catch (error) {
+    console.error('Error during logout:', error);
+  }
 };

@@ -1,7 +1,7 @@
 import React from 'react'
-import TopBar from '../component/TopBar'
-import SideBar from '../component/SideBar'
-import Footer from '../component/Footer'
+import TopBar from '../../component/TopBar'
+import SideBar from '../../component/SideBar'
+import Footer from '../../component/Footer'
 import Link from 'next/link'
 
 const page = () => {

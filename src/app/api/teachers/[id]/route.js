@@ -5,7 +5,7 @@ const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
 
 export async function GET(request, { params }) {
   try {
-    const { id } = params;
+    const { id } = await params;
     
     const response = await axios.get(`${BACKEND_URL}/api/teachers/${id}`);
     

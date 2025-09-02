@@ -13,9 +13,7 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
         }
 
-        const { id } = await params;
-
-        const lectureId = id;
+        const lectureId = params.id;
         const body = await request.json();
 
         console.log('Next.js API - Update lecture with tags request body:', body);

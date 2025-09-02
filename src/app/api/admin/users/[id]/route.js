@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 export async function GET(request, { params }) {
     try {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const adminToken = cookieStore.get('adminToken');
         
         if (!adminToken) {
@@ -11,7 +11,7 @@ export async function GET(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { id } = params;
+        const { id } = await params;
         
         console.log('Fetching user:', id);
         
@@ -39,7 +39,7 @@ export async function GET(request, { params }) {
 
 export async function PUT(request, { params }) {
     try {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const adminToken = cookieStore.get('adminToken');
         
         if (!adminToken) {
@@ -47,7 +47,7 @@ export async function PUT(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { id } = params;
+        const { id } = await params;
         const body = await request.json();
         
         console.log('Updating user:', id, body);
@@ -77,7 +77,7 @@ export async function PUT(request, { params }) {
 
 export async function DELETE(request, { params }) {
     try {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const adminToken = cookieStore.get('adminToken');
         
         if (!adminToken) {
@@ -85,7 +85,7 @@ export async function DELETE(request, { params }) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        const { id } = params;
+        const { id } = await params;
         
         console.log('Deleting user:', id);
         

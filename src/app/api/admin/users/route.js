@@ -3,7 +3,7 @@ import { cookies } from 'next/headers';
 
 export async function GET(request) {
     try {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const adminToken = cookieStore.get('adminToken');
         
         if (!adminToken) {
@@ -40,7 +40,7 @@ export async function GET(request) {
 
 export async function POST(request) {
     try {
-        const cookieStore = cookies();
+        const cookieStore = await cookies();
         const adminToken = cookieStore.get('adminToken');
         
         if (!adminToken) {

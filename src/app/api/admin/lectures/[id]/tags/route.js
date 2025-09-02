@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 
 export async function POST(request, { params }) {
     try {
-        const { id } = params;
+        const { id } = await params;
         const { tags } = await request.json();
 
         if (!tags || !Array.isArray(tags)) {
@@ -39,7 +39,7 @@ export async function POST(request, { params }) {
 
 export async function GET(request, { params }) {
     try {
-        const { id } = params;
+        const { id } = await params;
 
         // Mock response - replace with actual database call
         const mockTags = [

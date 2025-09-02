@@ -70,13 +70,9 @@ export default function Browse() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const token = localStorage.getItem('token');
-        if (token) {
-          const response = await axios.get('/api/verify-auth', {
-            headers: { Authorization: `Bearer ${token}` }
-          });
-          setUserRole(response.data.role);
-        }
+        // Use cookie-based authentication
+        const response = await axios.get('/api/verify-auth');
+        setUserRole(response.data.role);
       } catch (error) {
         console.error('Auth error:', error);
         setUserRole('guest'); // Allow browsing as guest
@@ -164,34 +160,35 @@ export default function Browse() {
     setSearchInitiated(true);
 
     try {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        // For guest users, fall back to basic search
-        return handleBasicSearch(query, type);
-      }
+      // Use cookie-based authentication - try advanced search first, fall back to basic search for guests
+      try {
+        const response = await axios.post('/api/advanced-search', {
+          query: query.trim(),
+          type,
+          page,
+          limit: 12,
+          filters: currentFilters,
+          sortBy: currentSortBy,
+          sortOrder: currentSortOrder
+        });
 
-      const response = await axios.post('/api/advanced-search', {
-        query: query.trim(),
-        type,
-        page,
-        limit: 12,
-        filters: currentFilters,
-        sortBy: currentSortBy,
-        sortOrder: currentSortOrder
-      }, {
-        headers: { Authorization: `Bearer ${token}` }
-      });
-
-      if (replace || page === 1) {
-        setResults(response.data);
-      } else {
-        // Append results for pagination
-        setResults(prev => ({
-          ...response.data,
-          teachers: [...prev.teachers, ...response.data.teachers],
-          courses: [...prev.courses, ...response.data.courses],
-          lectures: [...prev.lectures, ...response.data.lectures]
-        }));
+        if (replace || page === 1) {
+          setResults(response.data);
+        } else {
+          // Append results for pagination
+          setResults(prev => ({
+            ...response.data,
+            teachers: [...prev.teachers, ...response.data.teachers],
+            courses: [...prev.courses, ...response.data.courses],
+            lectures: [...prev.lectures, ...response.data.lectures]
+          }));
+        }
+      } catch (authError) {
+        if (authError.response?.status === 401) {
+          // For guest users or authentication issues, fall back to basic search
+          return handleBasicSearch(query, type);
+        }
+        throw authError; // Re-throw non-auth errors
       }
 
       setShowSuggestions(false);

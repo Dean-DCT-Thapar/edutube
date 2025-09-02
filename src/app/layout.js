@@ -15,6 +15,19 @@ export default function RootLayout({ children }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="true" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              // Suppress YouTube postMessage errors in development
+              window.addEventListener('error', function(e) {
+                if (e.message && e.message.includes('postMessage') && e.message.includes('youtube.com')) {
+                  e.preventDefault();
+                  return false;
+                }
+              });
+            `,
+          }}
+        />
       </head>
       <body className="antialiased bg-gray-50 text-gray-900">
         <div id="root" className="page-layout">
