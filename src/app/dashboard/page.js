@@ -11,17 +11,21 @@ import SkeletonVidCard from '../component/SkeletonVidCard';
 import CurrentDate from '../component/CurrentDate';
 import Footer from '../component/Footer';
 import Card from '../component/Card';
+import RecentActivityCard from '../component/RecentActivityCard';
 import { 
   TrendingUpRounded, 
   SchoolRounded, 
   PlayCircleOutlineRounded,
-  AccessTimeRounded 
+  AccessTimeRounded,
+  VideoLibraryRounded
 } from '@mui/icons-material';
 
 export default function Dashboard() {
     const router = useRouter();
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [recentActivity, setRecentActivity] = useState([]);
+    const [activityLoading, setActivityLoading] = useState(true);
 
     useEffect(() => {
         const loadData = async () => {
@@ -49,6 +53,9 @@ export default function Dashboard() {
                     
                     setUserData(userDataResponse.data);
                     toast.success('Welcome back!', { id: 'dashboard-loading' });
+                    
+                    // Load recent activity
+                    loadRecentActivity();
                 } else {
                     throw new Error('Authentication failed');
                 }
@@ -62,6 +69,18 @@ export default function Dashboard() {
                 }
             } finally {
                 setIsLoading(false);
+            }
+        };
+
+        const loadRecentActivity = async () => {
+            try {
+                const response = await axios.get('/api/watch-history/recent?limit=5');
+                setRecentActivity(response.data);
+            } catch (error) {
+                console.error('Error loading recent activity:', error);
+                // Don't show error toast for this as it's not critical
+            } finally {
+                setActivityLoading(false);
             }
         };
 
@@ -204,11 +223,38 @@ export default function Dashboard() {
                                 </button>
                             </div>
                             
-                            <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg border border-gray-200">
-                                <div className="px-6 py-4">
-                                    <SkeletonVidCard />
+                            {activityLoading ? (
+                                /* Loading State */
+                                <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg border border-gray-200">
+                                    <div className="px-6 py-4">
+                                        <SkeletonVidCard />
+                                    </div>
                                 </div>
-                            </div>
+                            ) : recentActivity.length > 0 ? (
+                                /* Recent Activity Cards */
+                                <div className="space-y-3">
+                                    {recentActivity.map((activity, index) => (
+                                        <RecentActivityCard key={activity.id || index} activity={activity} />
+                                    ))}
+                                </div>
+                            ) : (
+                                /* Empty State */
+                                <div className="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                                    <div className="px-6 py-12 text-center">
+                                        <VideoLibraryRounded className="text-4xl text-gray-400 mb-4 mx-auto" />
+                                        <h3 className="text-lg font-semibold text-gray-900 mb-2">No Recent Activity</h3>
+                                        <p className="text-gray-600 mb-6">
+                                            Start watching lectures to see your recent activity here.
+                                        </p>
+                                        <button 
+                                            onClick={() => router.push('/search')}
+                                            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200"
+                                        >
+                                            Browse Courses
+                                        </button>
+                                    </div>
+                                </div>
+                            )}
                         </section>
 
                         {/* Your Courses */}

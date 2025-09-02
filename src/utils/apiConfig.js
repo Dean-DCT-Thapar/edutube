@@ -35,6 +35,17 @@ export const API_ENDPOINTS = {
   // User data
   GET_USER_DATA: '/api/get-user-data',
   
+  // Watch History
+  WATCH_HISTORY: '/api/watch-history',
+  RECENT_ACTIVITY: '/api/watch-history/recent',
+  UPDATE_PROGRESS: '/api/watch-history/progress',
+  GET_VIDEO_PROGRESS: (lectureId) => `/api/watch-history/getVideoProgress/${lectureId}`,
+  
+  // Search
+  SEARCH: '/api/search',                    // Legacy search
+  ADVANCED_SEARCH: '/api/advanced-search', // New advanced search
+  QUICK_SEARCH: '/api/quick-search',       // Autocomplete suggestions
+  
   // Backend direct endpoints (for reference)
   BACKEND: {
     LOGIN: '/login',

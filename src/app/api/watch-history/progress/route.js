@@ -5,11 +5,10 @@ import { NextResponse } from 'next/server';
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
 
-export async function GET(request) {
+// Update watch progress
+export async function PUT(request) {
     try {
-        const { searchParams } = new URL(request.url);
-        const limit = searchParams.get('limit') || 5;
-        
+        const body = await request.json();
         const cookieStore = await cookies();
         const token = cookieStore.get('accessToken');
 
@@ -17,16 +16,21 @@ export async function GET(request) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const response = await axios.get(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history/recent?limit=${limit}` 
-            : `http://${WINDOWS_HOST}:5000/watch-history/recent?limit=${limit}`, {
+        const response = await axios.post(MODE === 'production' 
+            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history` 
+            : `http://${WINDOWS_HOST}:5000/watch-history`, {
+                lecture_id: body.lecture_id,
+                progress: body.progress
+            }, {
             headers: {
-                Authorization: `Bearer ${token.value}`
+                Authorization: `Bearer ${token.value}`,
+                'Content-Type': 'application/json'
             }
         });
 
         return NextResponse.json(response.data);
     } catch (error) {
+        console.error('Update watch progress error:', error);
         return NextResponse.json(
             { status: 500, message: error.message || 'Internal server error' },
             { status: 500 }

@@ -42,23 +42,74 @@ export default function WatchHistory() {
 
   const formatDate = (dateString) => {
     if (!dateString) return 'Recently watched';
+    
     const date = new Date(dateString);
     const now = new Date();
     const diffTime = Math.abs(now - date);
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    const diffMinutes = Math.floor(diffTime / (1000 * 60));
+    const diffHours = Math.floor(diffTime / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
     
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.ceil(diffDays / 7)} weeks ago`;
-    return date.toLocaleDateString();
+    // Just now (within 2 minutes)
+    if (diffMinutes < 2) return 'Just now';
+    
+    // Minutes ago (2-59 minutes)
+    if (diffMinutes < 60) return `${diffMinutes} mins ago`;
+    
+    // Hours ago (1-23 hours)
+    if (diffHours < 24) return `${diffHours} ${diffHours === 1 ? 'hour' : 'hours'} ago`;
+    
+    // Check if it's today, yesterday, or older
+    const today = new Date();
+    const yesterday = new Date(today);
+    yesterday.setDate(yesterday.getDate() - 1);
+    
+    // Reset time to start of day for comparison
+    const dateOnly = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const todayOnly = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const yesterdayOnly = new Date(yesterday.getFullYear(), yesterday.getMonth(), yesterday.getDate());
+    
+    if (dateOnly.getTime() === todayOnly.getTime()) {
+      return 'Today';
+    } else if (dateOnly.getTime() === yesterdayOnly.getTime()) {
+      return 'Yesterday';
+    } else if (diffDays < 7) {
+      return `${diffDays} days ago`;
+    } else if (diffDays < 30) {
+      return `${Math.ceil(diffDays / 7)} weeks ago`;
+    } else {
+      // Show actual date for older entries
+      return date.toLocaleDateString('en-US', { 
+        month: 'short', 
+        day: 'numeric',
+        year: date.getFullYear() !== today.getFullYear() ? 'numeric' : undefined
+      });
+    }
   };
 
   const WatchHistoryCard = ({ video, index }) => {
     const progress = formatProgress(video.progress_percentage || 0);
     
+    // Extract YouTube video ID from URL
+    const getYouTubeVideoId = (url) => {
+      if (!url) return null;
+      const regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#&?]*).*/;
+      const match = url.match(regExp);
+      return (match && match[7].length === 11) ? match[7] : null;
+    };
+
+    // Generate YouTube thumbnail URL
+    const getYouTubeThumbnail = (url, quality = 'hqdefault') => {
+      const videoId = getYouTubeVideoId(url);
+      if (!videoId) return null;
+      return `https://img.youtube.com/vi/${videoId}/${quality}.jpg`;
+    };
+
+    const thumbnailUrl = getYouTubeThumbnail(video.youtube_url);
+    
     return (
       <Link 
-        href={`/course_page/${video.teacher_id}?chapter=${video.chapter_number}&lecture=${video.lecture_number}`}
+        href={`/course_page/${video.course_instance_id}?chapter=${video.chapter_number}&lecture=${video.lecture_number}`}
         className="group block"
       >
         <div className="bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:border-primary-200 hover:-translate-y-1">
@@ -66,7 +117,23 @@ export default function WatchHistory() {
             {/* Video Thumbnail */}
             <div className="relative sm:w-80 sm:flex-shrink-0">
               <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
-                <VideoLibraryRounded className="text-4xl text-gray-400" />
+                {thumbnailUrl ? (
+                  <img 
+                    src={thumbnailUrl}
+                    alt={video.lecture_title}
+                    className="w-full h-full object-cover"
+                    onError={(e) => {
+                      // Fallback to icon if thumbnail fails to load
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                
+                {/* Fallback icon */}
+                <div className={`absolute inset-0 flex items-center justify-center ${thumbnailUrl ? 'hidden' : 'flex'}`}>
+                  <VideoLibraryRounded className="text-4xl text-gray-400" />
+                </div>
                 
                 {/* Play Button Overlay */}
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
@@ -100,7 +167,7 @@ export default function WatchHistory() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate group-hover:text-primary-700 transition-colors">
-                    {video.title}
+                    {video.lecture_title}
                   </h3>
                   
                   <div className="space-y-2">
