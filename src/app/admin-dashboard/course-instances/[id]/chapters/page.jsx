@@ -35,22 +35,20 @@ export default function CourseInstanceChapters() {
         }
     }, [instanceId]);
 
-    const fetchInstanceDetails = async () => {
-        try {
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}`, {
-                withCredentials: true
-            });
-            setInstance(response.data.instance);
-        } catch (error) {
-            console.error('Error fetching instance:', error);
-            toast.error('Failed to load course instance details');
-        }
-    };
-
-    const fetchChapters = async () => {
+        const fetchInstanceDetails = async () => {
+            try {
+                const response = await axios.get(`/api/admin/course-instances/${instanceId}`, {
+                    withCredentials: true
+                });
+                setInstance(response.data.instance);
+            } catch (error) {
+                console.error('Error fetching instance:', error);
+                toast.error('Failed to load course instance details');
+            }
+        };    const fetchChapters = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
+            const response = await axios.get(`/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
                 withCredentials: true
             });
             setChapters(response.data.chapters || []);

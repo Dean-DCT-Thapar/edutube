@@ -30,7 +30,6 @@ const UsersPage = () => {
     const fetchUsers = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
             const params = new URLSearchParams();
             
             Object.entries(filters).forEach(([key, value]) => {
@@ -39,8 +38,8 @@ const UsersPage = () => {
                 }
             });
 
-            const response = await axios.get(`http://localhost:5000/api/admin/users?${params}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await axios.get(`/api/admin/users?${params}`, {
+                withCredentials: true
             });
 
             setUsers(response.data.users);
@@ -58,9 +57,8 @@ const UsersPage = () => {
 
     const handleCreateUser = async (userData) => {
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.post('http://localhost:5000/api/admin/users', userData, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.post('/api/admin/users', userData, {
+                withCredentials: true
             });
             toast.success('User created successfully');
             setShowUserModal(false);
@@ -72,9 +70,8 @@ const UsersPage = () => {
 
     const handleUpdateUser = async (userData) => {
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.put(`http://localhost:5000/api/admin/users/${editingUser.id}`, userData, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.put(`/api/admin/users/${editingUser.id}`, userData, {
+                withCredentials: true
             });
             toast.success('User updated successfully');
             setShowUserModal(false);
@@ -87,9 +84,8 @@ const UsersPage = () => {
 
     const handleDeleteUser = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:5000/api/admin/users/${deletingUser.id}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.delete(`/api/admin/users/${deletingUser.id}`, {
+                withCredentials: true
             });
             toast.success('User deleted successfully');
             setShowDeleteDialog(false);

@@ -74,9 +74,8 @@ const SettingsPage = () => {
 
         setLoading(prev => ({ ...prev, profile: true }));
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.put(`http://localhost:5000/api/admin/users/${userData.id}`, profileData, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.put(`/api/admin/users/${userData.id}`, profileData, {
+                withCredentials: true
             });
             toast.success('Profile updated successfully');
             setErrors({});

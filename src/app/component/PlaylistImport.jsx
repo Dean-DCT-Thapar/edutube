@@ -33,11 +33,10 @@ const PlaylistImport = ({ courseInstanceId, onClose, onImportComplete }) => {
 
         setLoading(true);
         try {
-            const token = localStorage.getItem('adminToken');
-            const response = await axios.post('http://localhost:5000/api/admin/youtube/fetch-playlist', {
+            const response = await axios.post('/api/admin/youtube/fetch-playlist', {
                 playlistUrl: playlistUrl.trim()
             }, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
 
             if (response.data.success) {
@@ -141,13 +140,12 @@ const PlaylistImport = ({ courseInstanceId, onClose, onImportComplete }) => {
                 chapterNumber++;
             });
 
-            const token = localStorage.getItem('adminToken');
             console.log(lectureData);
-            const response = await axios.post('http://localhost:5000/api/admin/youtube/bulk-import-lectures', {
+            const response = await axios.post('/api/admin/youtube/bulk-import-lectures', {
                 courseInstanceId: courseInstanceId,
                 lectureData: lectureData
             }, {
-                headers: { Authorization: `Bearer ${token}` }
+                withCredentials: true
             });
 
 

@@ -13,9 +13,9 @@ export async function GET(request, { params }) {
 
         const { id } = params;
         
-        console.log('Fetching user:', id);
+        console.log('Fetching course template:', id);
         
-        const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/course-templates/${id}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -25,14 +25,14 @@ export async function GET(request, { params }) {
 
         if (!response.ok) {
             console.error('Backend response not ok:', response.status, response.statusText);
-            return NextResponse.json({ error: 'Failed to fetch user' }, { status: response.status });
+            return NextResponse.json({ error: 'Failed to fetch course template' }, { status: response.status });
         }
 
         const data = await response.json();
         return NextResponse.json(data);
         
     } catch (error) {
-        console.error('Error in user API route:', error);
+        console.error('Error in course-template API route:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -50,9 +50,9 @@ export async function PUT(request, { params }) {
         const { id } = params;
         const body = await request.json();
         
-        console.log('Updating user:', id, body);
+        console.log('Updating course template:', id, body);
         
-        const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/course-templates/${id}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -63,14 +63,14 @@ export async function PUT(request, { params }) {
 
         if (!response.ok) {
             console.error('Backend response not ok:', response.status, response.statusText);
-            return NextResponse.json({ error: 'Failed to update user' }, { status: response.status });
+            return NextResponse.json({ error: 'Failed to update course template' }, { status: response.status });
         }
 
         const data = await response.json();
         return NextResponse.json(data);
         
     } catch (error) {
-        console.error('Error in user API route:', error);
+        console.error('Error in course-template API route:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -87,9 +87,9 @@ export async function DELETE(request, { params }) {
 
         const { id } = params;
         
-        console.log('Deleting user:', id);
+        console.log('Deleting course template:', id);
         
-        const response = await fetch(`http://localhost:5000/api/admin/users/${id}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/course-templates/${id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -99,14 +99,14 @@ export async function DELETE(request, { params }) {
 
         if (!response.ok) {
             console.error('Backend response not ok:', response.status, response.statusText);
-            return NextResponse.json({ error: 'Failed to delete user' }, { status: response.status });
+            return NextResponse.json({ error: 'Failed to delete course template' }, { status: response.status });
         }
 
         const data = await response.json();
         return NextResponse.json(data);
         
     } catch (error) {
-        console.error('Error in user API route:', error);
+        console.error('Error in course-template API route:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

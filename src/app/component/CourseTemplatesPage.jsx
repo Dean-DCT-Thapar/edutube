@@ -26,7 +26,6 @@ const CourseTemplatesPage = () => {
     const fetchTemplates = async (page = 1, search = '') => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: '10'
@@ -36,8 +35,8 @@ const CourseTemplatesPage = () => {
                 params.append('search', search);
             }
 
-            const response = await fetch(`http://localhost:5000/api/admin/course-templates?${params}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch(`/api/admin/course-templates?${params}`, {
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -81,19 +80,18 @@ const CourseTemplatesPage = () => {
 
     const handleSubmit = async (formData) => {
         try {
-            const token = localStorage.getItem('adminToken');
             const url = editingTemplate 
-                ? `http://localhost:5000/api/admin/course-templates/${editingTemplate.id}`
-                : 'http://localhost:5000/api/admin/course-templates';
+                ? `/api/admin/course-templates/${editingTemplate.id}`
+                : '/api/admin/course-templates';
             
             const method = editingTemplate ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method,
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(formData)
             });
 
@@ -112,10 +110,9 @@ const CourseTemplatesPage = () => {
 
     const confirmDelete = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            const response = await fetch(`http://localhost:5000/api/admin/course-templates/${deletingTemplate.id}`, {
+            const response = await fetch(`/api/admin/course-templates/${deletingTemplate.id}`, {
                 method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
+                credentials: 'include'
             });
 
             if (response.ok) {

@@ -26,7 +26,6 @@ const TeachersPage = () => {
     const fetchTeachers = async () => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
             const params = new URLSearchParams();
             
             Object.entries(filters).forEach(([key, value]) => {
@@ -35,8 +34,8 @@ const TeachersPage = () => {
                 }
             });
 
-            const response = await axios.get(`http://localhost:5000/api/admin/teachers?${params}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await axios.get(`/api/admin/teachers?${params}`, {
+                withCredentials: true
             });
 
             setTeachers(response.data.teachers);
@@ -50,9 +49,8 @@ const TeachersPage = () => {
 
     const fetchStudents = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            const response = await axios.get('http://localhost:5000/api/admin/students/dropdown', {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await axios.get('/api/admin/students/dropdown', {
+                withCredentials: true
             });
             setStudents(response.data);
         } catch (error) {
@@ -70,9 +68,8 @@ const TeachersPage = () => {
 
     const handleCreateTeacher = async (data) => {
         try {
-            const token = localStorage.getItem('adminToken');
-            await axios.post('http://localhost:5000/api/admin/teachers', data, {
-                headers: { Authorization: `Bearer ${token}` }
+            await axios.post('/api/admin/teachers', data, {
+                withCredentials: true
             });
             toast.success('Teacher created successfully');
             setShowTeacherModal(false);

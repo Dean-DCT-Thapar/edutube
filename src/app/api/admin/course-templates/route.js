@@ -14,9 +14,9 @@ export async function GET(request) {
         const { searchParams } = new URL(request.url);
         const queryString = searchParams.toString();
         
-        console.log('Fetching teachers with params:', queryString);
+        console.log('Fetching course templates with params:', queryString);
         
-        const response = await fetch(`http://localhost:5000/api/admin/teachers${queryString ? `?${queryString}` : ''}`, {
+        const response = await fetch(`http://localhost:5000/api/admin/course-templates${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -26,14 +26,14 @@ export async function GET(request) {
 
         if (!response.ok) {
             console.error('Backend response not ok:', response.status, response.statusText);
-            return NextResponse.json({ error: 'Failed to fetch teachers' }, { status: response.status });
+            return NextResponse.json({ error: 'Failed to fetch course templates' }, { status: response.status });
         }
 
         const data = await response.json();
         return NextResponse.json(data);
         
     } catch (error) {
-        console.error('Error in teachers API route:', error);
+        console.error('Error in course-templates API route:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }
@@ -50,9 +50,9 @@ export async function POST(request) {
 
         const body = await request.json();
         
-        console.log('Creating teacher:', body);
+        console.log('Creating course template:', body);
         
-        const response = await fetch('http://localhost:5000/api/admin/teachers', {
+        const response = await fetch('http://localhost:5000/api/admin/course-templates', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -63,14 +63,14 @@ export async function POST(request) {
 
         if (!response.ok) {
             console.error('Backend response not ok:', response.status, response.statusText);
-            return NextResponse.json({ error: 'Failed to create teacher' }, { status: response.status });
+            return NextResponse.json({ error: 'Failed to create course template' }, { status: response.status });
         }
 
         const data = await response.json();
         return NextResponse.json(data);
         
     } catch (error) {
-        console.error('Error in teachers API route:', error);
+        console.error('Error in course-templates API route:', error);
         return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
 }

@@ -46,7 +46,7 @@ export default function CourseInstanceLectures() {
 
     const fetchInstanceDetails = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}`, {
+            const response = await axios.get(`/api/admin/course-instances/${instanceId}`, {
                 withCredentials: true
             });
             setInstance(response.data.instance);
@@ -58,7 +58,7 @@ export default function CourseInstanceLectures() {
 
     const fetchChapters = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/chapters`, {
+            const response = await axios.get(`/api/admin/course-instances/${instanceId}/chapters`, {
                 withCredentials: true
             });
             setChapters(response.data.chapters || []);
@@ -71,7 +71,7 @@ export default function CourseInstanceLectures() {
     const fetchLectures = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`http://localhost:5000/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
+            const response = await axios.get(`/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
                 withCredentials: true
             });
             setLectures(response.data.lectures || []);

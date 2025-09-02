@@ -1,0 +1,39 @@
+import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+
+export async function GET(request) {
+    try {
+        const cookieStore = cookies();
+        const adminToken = cookieStore.get('adminToken');
+        
+        if (!adminToken) {
+            console.log('No admin token found in cookies');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const queryString = searchParams.toString();
+        
+        console.log('Fetching students dropdown with params:', queryString);
+        
+        const response = await fetch(`http://localhost:5000/api/admin/students/dropdown${queryString ? `?${queryString}` : ''}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error('Backend response not ok:', response.status, response.statusText);
+            return NextResponse.json({ error: 'Failed to fetch students dropdown' }, { status: response.status });
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+        
+    } catch (error) {
+        console.error('Error in students dropdown API route:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+    }
+}

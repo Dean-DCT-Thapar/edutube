@@ -40,7 +40,6 @@ const CourseInstancesPage = () => {
     const fetchInstances = async (page = 1) => {
         try {
             setLoading(true);
-            const token = localStorage.getItem('adminToken');
             const params = new URLSearchParams({
                 page: page.toString(),
                 limit: '10'
@@ -50,8 +49,8 @@ const CourseInstancesPage = () => {
                 if (value) params.append(key, value);
             });
 
-            const response = await fetch(`http://localhost:5000/api/admin/course-instances?${params}`, {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch(`/api/admin/course-instances?${params}`, {
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -71,9 +70,8 @@ const CourseInstancesPage = () => {
 
     const fetchCourseTemplates = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            const response = await fetch('http://localhost:5000/api/admin/course-templates/dropdown', {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch('/api/admin/course-templates/dropdown', {
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -87,9 +85,8 @@ const CourseInstancesPage = () => {
 
     const fetchTeachers = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            const response = await fetch('http://localhost:5000/api/admin/teachers?limit=100', {
-                headers: { Authorization: `Bearer ${token}` }
+            const response = await fetch('/api/admin/teachers?limit=100', {
+                credentials: 'include'
             });
 
             if (response.ok) {
@@ -144,19 +141,18 @@ const CourseInstancesPage = () => {
 
     const handleSubmit = async (formData) => {
         try {
-            const token = localStorage.getItem('adminToken');
             const url = editingInstance 
-                ? `http://localhost:5000/api/admin/course-instances/${editingInstance.id}`
-                : 'http://localhost:5000/api/admin/course-instances';
+                ? `/api/admin/course-instances/${editingInstance.id}`
+                : '/api/admin/course-instances';
             
             const method = editingInstance ? 'PUT' : 'POST';
 
             const response = await fetch(url, {
                 method,
                 headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`
+                    'Content-Type': 'application/json'
                 },
+                credentials: 'include',
                 body: JSON.stringify(formData)
             });
 
@@ -175,10 +171,9 @@ const CourseInstancesPage = () => {
 
     const confirmDelete = async () => {
         try {
-            const token = localStorage.getItem('adminToken');
-            const response = await fetch(`http://localhost:5000/api/admin/course-instances/${deletingInstance.id}`, {
+            const response = await fetch(`/api/admin/course-instances/${deletingInstance.id}`, {
                 method: 'DELETE',
-                headers: { Authorization: `Bearer ${token}` }
+                credentials: 'include'
             });
 
             if (response.ok) {

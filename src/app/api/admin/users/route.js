@@ -1,89 +1,76 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
-
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+import { cookies } from 'next/headers';
 
 export async function GET(request) {
-  try {
-    const { searchParams } = new URL(request.url);
-    const page = searchParams.get('page') || '1';
-    const limit = searchParams.get('limit') || '10';
-    const search = searchParams.get('search') || '';
-    
-    // Get authorization header from the request
-    const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: 'Authorization header missing' },
-        { status: 401 }
-      );
+    try {
+        const cookieStore = cookies();
+        const adminToken = cookieStore.get('adminToken');
+        
+        if (!adminToken) {
+            console.log('No admin token found in cookies');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const { searchParams } = new URL(request.url);
+        const queryString = searchParams.toString();
+        
+        console.log('Fetching users with params:', queryString);
+        
+        const response = await fetch(`http://localhost:5000/api/admin/users${queryString ? `?${queryString}` : ''}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            console.error('Backend response not ok:', response.status, response.statusText);
+            return NextResponse.json({ error: 'Failed to fetch users' }, { status: response.status });
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+        
+    } catch (error) {
+        console.error('Error in users API route:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-    
-    const queryParams = new URLSearchParams({
-      page,
-      limit,
-      ...(search && { search })
-    });
-    
-    const response = await axios.get(`${BACKEND_URL}/api/admin/users?${queryParams}`, {
-      headers: {
-        'Authorization': authHeader
-      }
-    });
-    
-    return NextResponse.json(response.data);
-  } catch (error) {
-    console.error('Admin Users API error:', error);
-    
-    if (error.response) {
-      return NextResponse.json(
-        { message: error.response.data.message || 'Failed to fetch users' },
-        { status: error.response.status }
-      );
-    }
-    
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
-  }
 }
 
 export async function POST(request) {
-  try {
-    const authHeader = request.headers.get('authorization');
-    
-    if (!authHeader) {
-      return NextResponse.json(
-        { message: 'Authorization header missing' },
-        { status: 401 }
-      );
+    try {
+        const cookieStore = cookies();
+        const adminToken = cookieStore.get('adminToken');
+        
+        if (!adminToken) {
+            console.log('No admin token found in cookies');
+            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+        }
+
+        const body = await request.json();
+        
+        console.log('Creating user:', body);
+        
+        const response = await fetch('http://localhost:5000/api/admin/users', {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${adminToken.value}`,
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(body),
+        });
+
+        if (!response.ok) {
+            console.error('Backend response not ok:', response.status, response.statusText);
+            return NextResponse.json({ error: 'Failed to create user' }, { status: response.status });
+        }
+
+        const data = await response.json();
+        return NextResponse.json(data);
+        
+    } catch (error) {
+        console.error('Error in users API route:', error);
+        return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
     }
-    
-    const body = await request.json();
-    
-    const response = await axios.post(`${BACKEND_URL}/api/admin/users`, body, {
-      headers: {
-        'Authorization': authHeader,
-        'Content-Type': 'application/json'
-      }
-    });
-    
-    return NextResponse.json(response.data);
-  } catch (error) {
-    console.error('Admin Create User API error:', error);
-    
-    if (error.response) {
-      return NextResponse.json(
-        { message: error.response.data.message || 'Failed to create user' },
-        { status: error.response.status }
-      );
-    }
-    
-    return NextResponse.json(
-      { message: 'Internal server error' },
-      { status: 500 }
-    );
-  }
 }
