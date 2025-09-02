@@ -97,16 +97,6 @@ const page = () => {
               </div>
             </div>
 
-            {/* Course Details */}
-            <div className="bg-white rounded-lg shadow-md border border-gray-200 p-6">
-              <h2 className="text-2xl lg:text-3xl font-bold text-primary-800 mb-6">Course Details</h2>
-              
-              <div>
-                <p className="font-semibold text-gray-900 mb-1">Course Code</p>
-                <p className="text-gray-700">Courses enrolled in</p>
-              </div>
-            </div>
-
             {/* Action Buttons */}
             <div className="flex flex-col sm:flex-row gap-4">
               <Link href="/confirmPassword" className="flex-1">

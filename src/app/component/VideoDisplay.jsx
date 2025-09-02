@@ -225,23 +225,20 @@ const VideoDisplay = (props) => {
   };
 
   return (
-    <div ref={containerRef} className="flex flex-col gap-5">
-      <div className="font-poppins flex flex-col gap-5">
-        <div className="flex flex-row gap-3 text-3xl">
-          <p className="font-semibold text-[#b42625]">{props.heading || 'Video Lecture'}</p>
-        </div>
-      </div>
-      <div className="relative">
+    <div ref={containerRef} className="w-full h-full">
+      <div className="w-full h-full">
         {props.video_code ? (
           <YouTube 
-            key={`video-${props.video_code}-${props.lec_id || 'no-id'}`} // More unique key
+            key={`video-${props.video_code}-${props.lec_id || 'no-id'}`}
             videoId={props.video_code}
             opts={{
-              height: '500',
-              width: '750',
+              height: '100%',
+              width: '100%',
               playerVars: {
                 rel: 0,
                 autoplay: 0,
+                modestbranding: 1,
+                controls: 1,
               },
             }}
             onReady={onPlayerReady}
@@ -251,9 +248,14 @@ const VideoDisplay = (props) => {
             onStateChange={(event) => {
               console.log('YouTube player state changed:', event.data);
             }}
+            style={{
+              width: '100%',
+              height: '100%'
+            }}
+            className="w-full h-full"
           />
         ) : (
-          <div className="w-[750px] h-[500px] bg-gray-200 flex items-center justify-center">
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
             <p className="text-gray-600">No video available</p>
           </div>
         )}
