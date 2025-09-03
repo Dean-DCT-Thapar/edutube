@@ -289,7 +289,7 @@ export default function WatchHistory() {
                     Browse Courses
                   </Link>
                   <Link 
-                    href="/search"
+                    href="/browse"
                     className="inline-flex items-center justify-center px-6 py-3 text-base font-medium rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-50 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200"
                   >
                     Search Content

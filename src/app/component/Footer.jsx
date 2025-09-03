@@ -14,7 +14,7 @@ const Footer = () => {
   const footerLinks = {
     platform: [
       { label: 'Dashboard', href: '/dashboard' },
-      { label: 'Search Courses', href: '/search' },
+      { label: 'Search Courses', href: '/browse' },
       { label: 'Watch History', href: '/watchHistory' },
       { label: 'Profile', href: '/profile' },
     ],

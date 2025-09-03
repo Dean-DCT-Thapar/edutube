@@ -169,7 +169,7 @@ export default function Dashboard() {
                                     {/* Quick actions */}
                                     <div className="flex flex-wrap gap-3 pt-4">
                                         <button 
-                                            onClick={() => router.push('/search')}
+                                            onClick={() => router.push('/browse')}
                                             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-accent-600 text-white hover:bg-accent-500 focus:ring-2 focus:ring-accent-500 focus:outline-none transition-all duration-200"
                                         >
                                             Explore Courses
@@ -239,7 +239,7 @@ export default function Dashboard() {
                                             Start watching lectures to see your recent activity here.
                                         </p>
                                         <button 
-                                            onClick={() => router.push('/search')}
+                                            onClick={() => router.push('/browse')}
                                             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200"
                                         >
                                             Browse Courses
@@ -254,7 +254,7 @@ export default function Dashboard() {
                             <div className="flex items-center justify-between mb-6">
                                 <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Your Courses</h2>
                                 <button 
-                                    onClick={() => router.push('/search')}
+                                    onClick={() => router.push('/browse')}
                                     className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200"
                                 >
                                     Browse More
@@ -286,7 +286,7 @@ export default function Dashboard() {
                                             Start your learning journey by enrolling in your first course!
                                         </p>
                                         <button 
-                                            onClick={() => router.push('/search')}
+                                            onClick={() => router.push('/browse')}
                                             className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200"
                                         >
                                             Explore Courses
@@ -296,10 +296,11 @@ export default function Dashboard() {
                             )}
                         </section>
                     </div>
+                    
+                    {/* Footer - Inside main content area */}
+                    <Footer />
                 </main>
             </div>
-
-            <Footer />
         </div>
     );
 }

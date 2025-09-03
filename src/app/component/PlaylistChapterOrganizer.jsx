@@ -28,6 +28,8 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
     const [importing, setImporting] = useState(false);
     const [draggedVideo, setDraggedVideo] = useState(null);
     const [dragOverTarget, setDragOverTarget] = useState(null);
+    const [selectedVideos, setSelectedVideos] = useState(new Set());
+    const [selectAllMode, setSelectAllMode] = useState(false);
 
     // Fetch playlist videos
     const handleFetchPlaylist = async () => {
@@ -112,6 +114,59 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                 } : c
             ));
         }
+    };
+
+    // Selection handlers
+    const toggleVideoSelection = (videoId) => {
+        setSelectedVideos(prev => {
+            const newSet = new Set(prev);
+            if (newSet.has(videoId)) {
+                newSet.delete(videoId);
+            } else {
+                newSet.add(videoId);
+            }
+            return newSet;
+        });
+    };
+
+    const toggleSelectAll = () => {
+        if (selectedVideos.size === videos.length) {
+            setSelectedVideos(new Set());
+        } else {
+            setSelectedVideos(new Set(videos.map(v => v.tempId)));
+        }
+    };
+
+    const moveSelectedVideosToChapter = (chapterId) => {
+        if (selectedVideos.size === 0) {
+            toast.error('No videos selected');
+            return;
+        }
+
+        const selectedVideoObjects = videos.filter(v => selectedVideos.has(v.tempId));
+        
+        // Create lectures from selected videos
+        const newLectures = selectedVideoObjects.map(video => ({
+            id: `lecture-${Date.now()}-${Math.random()}`,
+            name: video.title || `Lecture ${Date.now()}`,
+            video: video
+        }));
+
+        // Add to chapter
+        setChapters(prev => prev.map(c => 
+            c.id === chapterId ? {
+                ...c,
+                lectures: [...c.lectures, ...newLectures]
+            } : c
+        ));
+
+        // Remove from videos list
+        setVideos(prev => prev.filter(v => !selectedVideos.has(v.tempId)));
+        
+        // Clear selection
+        setSelectedVideos(new Set());
+        
+        toast.success(`Moved ${selectedVideoObjects.length} videos to chapter`);
     };
 
     // Drag and drop handlers
@@ -347,7 +402,7 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                         {/* Left Sidebar - Playlist Videos */}
                         <div className="w-80 border-r border-gray-200 bg-gray-50 flex flex-col">
                             <div className="p-4 border-b border-gray-200">
-                                <div className="flex items-center justify-between">
+                                <div className="flex items-center justify-between mb-2">
                                     <h3 className="font-semibold text-gray-900 flex items-center">
                                         <VideoLibraryRounded className="mr-2 text-primary-600" />
                                         Playlist Videos
@@ -356,8 +411,34 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                                         {videos.length}
                                     </span>
                                 </div>
-                                <p className="text-xs text-gray-600 mt-1">
-                                    Drag videos to chapters to organize them
+                                
+                                {/* Selection Controls */}
+                                {videos.length > 0 && (
+                                    <div className="flex items-center justify-between text-xs">
+                                        <label className="flex items-center space-x-2 cursor-pointer">
+                                            <input
+                                                type="checkbox"
+                                                checked={selectedVideos.size === videos.length && videos.length > 0}
+                                                onChange={toggleSelectAll}
+                                                className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                                            />
+                                            <span className="text-gray-600">
+                                                Select All ({selectedVideos.size}/{videos.length})
+                                            </span>
+                                        </label>
+                                        {selectedVideos.size > 0 && (
+                                            <button
+                                                onClick={() => setSelectedVideos(new Set())}
+                                                className="text-gray-500 hover:text-gray-700"
+                                            >
+                                                Clear
+                                            </button>
+                                        )}
+                                    </div>
+                                )}
+                                
+                                <p className="text-xs text-gray-600 mt-2">
+                                    Drag videos or use checkboxes to select multiple
                                 </p>
                             </div>
                             
@@ -380,28 +461,40 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                                     videos.map((video, index) => (
                                         <div
                                             key={video.tempId}
-                                            draggable
-                                            onDragStart={(e) => handleDragStart(e, video)}
-                                            onDragEnd={handleDragEnd}
-                                            className="bg-white border border-gray-200 rounded-lg p-3 cursor-move hover:shadow-md transition-shadow group"
+                                            className={`bg-white border rounded-lg p-3 hover:shadow-md transition-shadow group ${
+                                                selectedVideos.has(video.tempId) ? 'border-primary-500 bg-primary-50' : 'border-gray-200'
+                                            }`}
                                         >
                                             <div className="flex items-start space-x-3">
-                                                <DragIndicatorRounded className="text-gray-400 mt-1 group-hover:text-gray-600" />
-                                                <img
-                                                    src={video.thumbnail}
-                                                    alt={video.title}
-                                                    className="w-16 h-12 object-cover rounded flex-shrink-0"
+                                                <input
+                                                    type="checkbox"
+                                                    checked={selectedVideos.has(video.tempId)}
+                                                    onChange={() => toggleVideoSelection(video.tempId)}
+                                                    className="mt-1 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
                                                 />
-                                                <div className="flex-1 min-w-0">
-                                                    <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
-                                                        {video.title}
-                                                    </h4>
-                                                    <div className="flex items-center text-xs text-gray-500 space-x-2">
-                                                        <span className="flex items-center">
-                                                            <AccessTimeRounded style={{ fontSize: '12px' }} className="mr-1" />
-                                                            {formatDuration(video.duration)}
-                                                        </span>
-                                                        <span>#{index + 1}</span>
+                                                <div
+                                                    draggable
+                                                    onDragStart={(e) => handleDragStart(e, video)}
+                                                    onDragEnd={handleDragEnd}
+                                                    className="flex items-start space-x-3 flex-1 cursor-move"
+                                                >
+                                                    <DragIndicatorRounded className="text-gray-400 mt-1 group-hover:text-gray-600" />
+                                                    <img
+                                                        src={video.thumbnail}
+                                                        alt={video.title}
+                                                        className="w-16 h-12 object-cover rounded flex-shrink-0"
+                                                    />
+                                                    <div className="flex-1 min-w-0">
+                                                        <h4 className="text-sm font-medium text-gray-900 line-clamp-2 mb-1">
+                                                            {video.title}
+                                                        </h4>
+                                                        <div className="flex items-center text-xs text-gray-500 space-x-2">
+                                                            <span className="flex items-center">
+                                                                <AccessTimeRounded style={{ fontSize: '12px' }} className="mr-1" />
+                                                                {formatDuration(video.duration)}
+                                                            </span>
+                                                            <span>#{index + 1}</span>
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </div>
@@ -473,7 +566,17 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
                                                             {chapter.lectures.length} lectures
                                                         </span>
                                                     </div>
-                                                    <div className="flex space-x-2">
+                                                    <div className="flex items-center space-x-2">
+                                                        {selectedVideos.size > 0 && (
+                                                            <button
+                                                                onClick={() => moveSelectedVideosToChapter(chapter.id)}
+                                                                className="flex items-center px-2 py-1 bg-green-600 text-white rounded text-xs hover:bg-green-700"
+                                                                title={`Move ${selectedVideos.size} selected videos to this chapter`}
+                                                            >
+                                                                <ArrowDownwardRounded style={{ fontSize: '14px' }} className="mr-1" />
+                                                                Move {selectedVideos.size}
+                                                            </button>
+                                                        )}
                                                         {chapter.lectures.length > 0 && (
                                                             <button
                                                                 onClick={() => moveAllLecturesBackToVideos(chapter.id)}

@@ -27,8 +27,8 @@ const TopBar = ({ name, avatar }) => {
     switch (pathname) {
       case '/dashboard':
         return 'Dashboard';
-      case '/search':
-        return 'Search';
+      case '/browse':
+        return 'Browse';
       case '/profile':
         return 'Profile';
       case '/watchHistory':

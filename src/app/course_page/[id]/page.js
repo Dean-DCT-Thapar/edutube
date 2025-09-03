@@ -27,7 +27,14 @@ const CoursePage = ({ params }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState({});
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    // Initialize from localStorage or default to true
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('course-sidebar-open');
+      return saved !== null ? JSON.parse(saved) : true;
+    }
+    return true;
+  });
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [checkingEnrollment, setCheckingEnrollment] = useState(true);
 
@@ -90,6 +97,13 @@ const CoursePage = ({ params }) => {
     fetchCourseData();
     checkEnrollmentStatus();
   }, [fetchCourseData, checkEnrollmentStatus]);
+
+  // Save sidebar state to localStorage
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('course-sidebar-open', JSON.stringify(sidebarOpen));
+    }
+  }, [sidebarOpen]);
 
   // Get current video details with description
   const videoDetails = useMemo(() => {
@@ -280,10 +294,10 @@ const CoursePage = ({ params }) => {
                 </div>
               </div>
 
-              {/* Mobile sidebar toggle */}
+              {/* Sidebar toggle */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="lg:hidden inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 <MenuBookRounded />
               </button>
@@ -292,10 +306,10 @@ const CoursePage = ({ params }) => {
 
           {/* Main Content - Udemy-style Split Layout */}
           <div className="flex flex-1 min-h-0">
-            {/* Left Side - Video and Description (70%) */}
-            <div className="flex-1 flex flex-col min-h-0 bg-white">
+            {/* Left Side - Video and Description - Fully Scrollable */}
+            <div className="flex-1 overflow-y-auto bg-white min-h-0">
               {videoDetails === undefined ? (
-                <div className="flex-1 flex flex-col items-center justify-center p-6">
+                <div className="flex flex-col items-center justify-center p-6 min-h-full">
                   <div className="w-full max-w-4xl mx-auto">
                     <div className="aspect-video bg-gray-200 animate-pulse rounded-lg mb-8"></div>
                     <div className="space-y-4">
@@ -306,9 +320,9 @@ const CoursePage = ({ params }) => {
                   </div>
                 </div>
               ) : videoDetails ? (
-                <>
-                  {/* Fixed Video Section */}
-                  <div className="flex-shrink-0 bg-black p-4">
+                <div className="pb-8">
+                  {/* Video Section */}
+                  <div className="bg-black p-4">
                     <div className="w-full max-w-5xl mx-auto">
                       <div className="aspect-video w-full bg-black rounded-lg overflow-hidden">
                         <VideoDisplay
@@ -320,12 +334,12 @@ const CoursePage = ({ params }) => {
                     </div>
                   </div>
 
-                  {/* Scrollable Lecture Information */}
-                  <div className="flex-1 overflow-y-auto p-6">
+                  {/* Lecture Information - Scrollable Content */}
+                  <div className="p-6 min-h-96">
                     <div className="max-w-5xl mx-auto">
-                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between">
-                        <div className="flex-1">
-                          <div className="flex items-center space-x-2 text-sm text-gray-500 mb-3">
+                      <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-8">
+                        <div className="flex-1 space-y-6">
+                          <div className="flex items-center space-x-2 text-sm text-gray-500 mb-4">
                             <span className="bg-primary-100 text-primary-700 px-3 py-1 rounded-full text-xs font-medium">
                               Chapter {videoDetails.chapterNumber}
                             </span>
@@ -333,29 +347,25 @@ const CoursePage = ({ params }) => {
                             <span className="font-medium">
                               Lecture {videoDetails.lectureNumber}
                             </span>
-                            <span>•</span>
-                            <span className="text-gray-600">
-                              {videoDetails.duration}
-                            </span>
                           </div>
 
-                          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
+                          <h1 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6">
                             {videoDetails.title}
                           </h1>
 
                           <div className="prose prose-gray max-w-none">
-                            <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                            <h3 className="text-lg font-semibold text-gray-900 mb-4">
                               About this lecture
                             </h3>
-                            <div className="text-gray-700 leading-relaxed text-base">
+                            <div className="text-gray-700 leading-relaxed text-base bg-gray-50 p-4 rounded-lg">
                               {videoDetails.description}
                             </div>
                           </div>
                         </div>
 
                         {/* Navigation Controls */}
-                        <div className="mt-6 lg:mt-0 lg:ml-8 flex-shrink-0">
-                          <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-3">
+                        <div className="lg:ml-8 flex-shrink-0">
+                          <div className="flex flex-row lg:flex-col space-x-3 lg:space-x-0 lg:space-y-3 sticky top-6">
                             {(() => {
                               // Find previous and next lectures
                               let prevLecture = null;
@@ -443,7 +453,7 @@ const CoursePage = ({ params }) => {
                       </div>
                     </div>
                   </div>
-                </>
+                </div>
               ) : (
                 /* Course Overview */
                 <div className="flex-1 overflow-y-auto p-6">
@@ -518,26 +528,22 @@ const CoursePage = ({ params }) => {
               )}
             </div>
 
-            {/* Right Side - Course Content Sidebar (30%) - Always visible on desktop */}
-            <div
-              className={`
-              w-96 bg-white border-l border-gray-200 flex flex-col
-              ${sidebarOpen ? "block" : "hidden lg:flex"}
-            `}
-            >
-              {/* Sidebar Header */}
-              <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gray-50">
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="text-lg font-semibold text-gray-900">
-                    Course Content
-                  </h2>
-                  <button
-                    onClick={() => setSidebarOpen(false)}
-                    className="lg:hidden p-1 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-all"
-                  >
-                    ×
-                  </button>
-                </div>
+            {/* Right Side - Course Content Sidebar (30%) - Conditional visibility */}
+            {sidebarOpen && (
+              <div className="w-96 bg-white border-l border-gray-200 flex flex-col fixed lg:relative right-0 top-0 h-full lg:h-auto z-30 lg:z-auto shadow-2xl lg:shadow-none">
+                {/* Sidebar Header */}
+                <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gray-50">
+                  <div className="flex items-center justify-between mb-3">
+                    <h2 className="text-lg font-semibold text-gray-900">
+                      Course Content
+                    </h2>
+                    <button
+                      onClick={() => setSidebarOpen(false)}
+                      className="p-1 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-all"
+                    >
+                      ×
+                    </button>
+                  </div>
                 {courseOverview && (
                   <div className="text-sm text-gray-600 space-y-1">
                     <div className="flex items-center space-x-2">
@@ -600,7 +606,6 @@ const CoursePage = ({ params }) => {
                               key={`lecture-${chapter.chapter_number}-${lecture.lecture_number}`}
                               id={`lecture-${chapter.chapter_number}-${lecture.lecture_number}`}
                               href={`/course_page/${courseId}?chapter=${chapter.chapter_number}&lecture=${lecture.lecture_number}`}
-                              onClick={() => setSidebarOpen(false)}
                               className={`
                                 block px-6 py-3 text-sm border-l-4 transition-all duration-200 group
                                 ${
@@ -647,13 +652,14 @@ const CoursePage = ({ params }) => {
                 ))}
               </div>
             </div>
+            )}
           </div>
 
-          {/* Mobile overlay for sidebar */}
+          {/* Overlay for sidebar */}
           {sidebarOpen && (
             <div
               onClick={() => setSidebarOpen(false)}
-              className="lg:hidden fixed inset-0 bg-black bg-opacity-50 z-20"
+              className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
             />
           )}
         </main>
