@@ -12,7 +12,7 @@ export async function GET(request) {
         }
 
         // Get unique tags
-        const response = await fetch(`http://localhost:5000/api/admin/tags/unique?${params.toString()}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/tags/unique?${params.toString()}`, {
             headers: {
                 'Cookie': request.headers.get('cookie') || ''
             }

@@ -15,7 +15,7 @@ export async function POST(request) {
         
         console.log('Fetching YouTube playlist:', body);
         
-        const response = await fetch('http://localhost:5000/api/admin/youtube/fetch-playlist', {
+        const response = await fetch('http://localhost:5001/api/admin/youtube/fetch-playlist', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

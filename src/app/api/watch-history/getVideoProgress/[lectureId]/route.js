@@ -15,9 +15,7 @@ export async function GET(request, { params }) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const response = await axios.get(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/getVideoProgress/${lectureId}` 
-            : `http://${WINDOWS_HOST}:5000/getVideoProgress/${lectureId}`, {
+        const response = await axios.get(`http://localhost:5001/getVideoProgress/${lectureId}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

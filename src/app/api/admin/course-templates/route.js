@@ -16,7 +16,7 @@ export async function GET(request) {
         
         console.log('Fetching course templates with params:', queryString);
         
-        const response = await fetch(`http://localhost:5000/api/admin/course-templates${queryString ? `?${queryString}` : ''}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/course-templates${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -52,7 +52,7 @@ export async function POST(request) {
         
         console.log('Creating course template:', body);
         
-        const response = await fetch('http://localhost:5000/api/admin/course-templates', {
+        const response = await fetch('http://localhost:5001/api/admin/course-templates', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

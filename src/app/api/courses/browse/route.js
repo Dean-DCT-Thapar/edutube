@@ -6,10 +6,8 @@ const MODE = process.env.MODE;
 
 export async function GET(request) {
   try {
-    const response = await axios.get(MODE === 'production' 
-        ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/api/courses/browse` 
-        : `http://${WINDOWS_HOST}:5000/api/courses/browse`);
-    
+    const response = await axios.get(`http://localhost:5001/api/courses/browse`);
+
     return NextResponse.json(response.data);
   } catch (error) {
     console.error('Error fetching courses for browsing:', error);

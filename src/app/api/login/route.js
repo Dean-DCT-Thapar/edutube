@@ -8,10 +8,8 @@ export async function POST(request) {
     try {
         const body = await request.json();
         console.log('Request body:', body);
-        
-        const response = await axios.post(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/login` 
-            : `http://${WINDOWS_HOST}:5000/login`, {
+
+        const response = await axios.post(`http://localhost:5001/login`, {
             email: body.email,
             password: body.password,
         });

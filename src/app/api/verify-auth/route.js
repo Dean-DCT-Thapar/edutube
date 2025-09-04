@@ -22,9 +22,7 @@ export async function GET(request) {
             );
         }
 
-        const response = await axios.get(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/verify-auth` 
-            : `http://${WINDOWS_HOST}:5000/verify-auth`, {
+        const response = await axios.get(`http://localhost:5001/verify-auth`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

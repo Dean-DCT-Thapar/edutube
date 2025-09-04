@@ -10,7 +10,7 @@ export async function GET(request) {
   const query = searchParams.get("q") || "";
   const category = searchParams.get("type") || "";
 
-  const response = await axios.get(MODE === "production" ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/search` : `http://${WINDOWS_HOST}:5000/search`, {
+  const response = await axios.get(`http://localhost:5001/search`, {
     params: { keyword: query, type: category },
   });
 

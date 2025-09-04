@@ -21,7 +21,7 @@ export async function GET(request) {
         }
 
         // Search lectures by tags
-        const response = await fetch(`http://localhost:5000/api/admin/lectures/search/by-tags?${params.toString()}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/lectures/search/by-tags?${params.toString()}`, {
             headers: {
                 'Cookie': request.headers.get('cookie') || ''
             }

@@ -16,9 +16,7 @@ export async function POST(request) {
 
         const body = await request.json();
 
-        const response = await axios.post(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/change-password` 
-            : `http://${WINDOWS_HOST}/change-password`, 
+        const response = await axios.post(`http://localhost:5001/change-password`, 
             {
                 oldPassword: body.oldPassword,
                 newPassword: body.newPassword,

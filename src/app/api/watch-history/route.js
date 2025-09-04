@@ -24,9 +24,7 @@ export async function POST(request) {
             progress: body.progress
         });
 
-        const backendUrl = MODE === 'production' 
-            ? 'https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history' 
-            : `http://${WINDOWS_HOST}:5000/watch-history`;
+        const backendUrl = `http://localhost:5001/watch-history`;
         
         console.log('Backend URL:', backendUrl);
 
@@ -67,9 +65,7 @@ export async function GET(request) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const backendUrl = MODE === 'production' 
-            ? 'https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history' 
-            : `http://${WINDOWS_HOST}:5000/watch-history`;
+        const backendUrl = `http://localhost:5001/watch-history`;
         
         console.log('GET watch-history: Backend URL:', backendUrl);
 

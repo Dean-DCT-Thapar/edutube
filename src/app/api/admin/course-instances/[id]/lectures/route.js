@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
         
         console.log('Fetching lectures for course instance:', id, 'with params:', queryString);
         
-        const response = await fetch(`http://localhost:5000/api/admin/course-instances/${id}/lectures${queryString ? `?${queryString}` : ''}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/course-instances/${id}/lectures${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

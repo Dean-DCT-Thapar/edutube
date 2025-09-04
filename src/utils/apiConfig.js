@@ -5,16 +5,13 @@
  */
 
 // Backend base URL
-export const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5000';
+export const BACKEND_URL = 'http://localhost:5001';
 export const WINDOWS_HOST = process.env.WINDOWS_HOST || 'localhost';
 export const MODE = process.env.MODE || 'development';
 
 // Get correct backend URL based on environment
 export const getBackendUrl = () => {
-  if (MODE === 'production') {
-    return 'https://still-citadel-95346-111a1dcad6bd.herokuapp.com';
-  }
-  return `http://${WINDOWS_HOST}:5000`;
+  return `http://localhost:5001`;
 };
 
 // API endpoints mapping
