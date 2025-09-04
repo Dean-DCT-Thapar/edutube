@@ -16,7 +16,7 @@ export async function GET(request) {
         
         console.log('Fetching course instances with params:', queryString);
         
-        const response = await fetch(`http://localhost:5000/api/admin/course-instances${queryString ? `?${queryString}` : ''}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/course-instances${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -52,7 +52,7 @@ export async function POST(request) {
         
         console.log('Creating course instance:', body);
         
-        const response = await fetch('http://localhost:5000/api/admin/course-instances', {
+        const response = await fetch('http://localhost:5001/api/admin/course-instances', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

@@ -16,7 +16,7 @@ export async function GET(request) {
         
         console.log('Fetching users with params:', queryString);
         
-        const response = await fetch(`http://localhost:5000/api/admin/users${queryString ? `?${queryString}` : ''}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/users${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -52,7 +52,7 @@ export async function POST(request) {
         
         console.log('Creating user:', body);
         
-        const response = await fetch('http://localhost:5000/api/admin/users', {
+        const response = await fetch('http://localhost:5001/api/admin/users', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

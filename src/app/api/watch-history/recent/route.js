@@ -17,9 +17,7 @@ export async function GET(request) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const response = await axios.get(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history/recent?limit=${limit}` 
-            : `http://${WINDOWS_HOST}:5000/watch-history/recent?limit=${limit}`, {
+        const response = await axios.get(`http://localhost:5001/watch-history/recent?limit=${limit}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

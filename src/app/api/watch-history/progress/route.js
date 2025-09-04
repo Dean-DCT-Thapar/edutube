@@ -16,9 +16,7 @@ export async function PUT(request) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const response = await axios.post(MODE === 'production' 
-            ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/watch-history` 
-            : `http://${WINDOWS_HOST}:5000/watch-history`, {
+        const response = await axios.post(`http://localhost:5001/watch-history`, {
                 lecture_id: body.lecture_id,
                 progress: body.progress
             }, {

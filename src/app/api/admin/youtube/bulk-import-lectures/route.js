@@ -15,7 +15,7 @@ export async function POST(request) {
         
         console.log('Bulk importing lectures:', body);
         
-        const response = await fetch('http://localhost:5000/api/admin/youtube/bulk-import-lectures', {
+        const response = await fetch('http://localhost:5001/api/admin/youtube/bulk-import-lectures', {
             method: 'POST',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

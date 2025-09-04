@@ -13,7 +13,7 @@ export async function GET(request) {
 
         console.log('Fetching course templates dropdown');
         
-        const response = await fetch('http://localhost:5000/api/admin/course-templates/dropdown', {
+        const response = await fetch('http://localhost:5001/api/admin/course-templates/dropdown', {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

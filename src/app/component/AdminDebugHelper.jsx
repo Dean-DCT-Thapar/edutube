@@ -54,7 +54,7 @@ const AdminDebugHelper = () => {
 
         // Test backend connection
         try {
-            const backendResponse = await fetch('http://localhost:5000/health');
+            const backendResponse = await fetch('http://localhost:5001/health');
             info.apis.backend = {
                 status: backendResponse.status,
                 reachable: true
@@ -193,7 +193,7 @@ const AdminDebugHelper = () => {
                             <div className="text-sm text-blue-800">
                                 <p className="font-medium mb-2">Troubleshooting Steps:</p>
                                 <ol className="text-xs space-y-1 list-decimal list-inside">
-                                    <li>Ensure your backend is running on http://localhost:5000</li>
+                                    <li>Ensure your backend is running on http://localhost:5001</li>
                                     <li>Verify admin user exists in your database</li>
                                     <li>Check that all API endpoints are working</li>
                                     <li>Clear browser storage if there are token conflicts</li>

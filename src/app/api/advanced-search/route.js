@@ -18,9 +18,7 @@ export async function POST(request) {
             );
         }
 
-        const backendUrl = MODE === 'production' 
-            ? 'https://still-citadel-95346-111a1dcad6bd.herokuapp.com'
-            : `http://${WINDOWS_HOST}:5000`;
+        const backendUrl = 'http://localhost:5001';
 
         const response = await axios.post(
             `${backendUrl}/advanced-search`,

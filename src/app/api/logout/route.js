@@ -15,9 +15,7 @@ export async function POST(request) {
 
         if (token) {
             // Call backend logout endpoint
-            await axios.post(MODE === 'production' 
-                ? `https://still-citadel-95346-111a1dcad6bd.herokuapp.com/logout` 
-                : `http://${WINDOWS_HOST}:5000/logout`, {}, {
+            await axios.post(`http://localhost:5001/logout`, {}, {
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 }

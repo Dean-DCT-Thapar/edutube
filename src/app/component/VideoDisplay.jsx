@@ -33,7 +33,7 @@ const VideoDisplay = (props) => {
     // Get the current time in milliseconds.
     const now = Date.now();
     // If the last send was less than 5 seconds ago, skip sending.
-    if (now - lastSentRef.current < 5000) {
+    if (now - lastSentRef.current < 5001) {
       console.log("Skipping sending watch history - throttling active.");
       return;
     }

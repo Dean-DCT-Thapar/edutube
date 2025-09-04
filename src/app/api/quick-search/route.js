@@ -10,9 +10,7 @@ export async function GET(request) {
         const query = searchParams.get('q') || '';
         const limit = searchParams.get('limit') || '5';
 
-        const backendUrl = MODE === 'production' 
-            ? 'https://still-citadel-95346-111a1dcad6bd.herokuapp.com'
-            : `http://${WINDOWS_HOST}:5000`;
+        const backendUrl = `http://localhost:5001`;
 
         const response = await axios.get(
             `${backendUrl}/quick-search`,

@@ -16,7 +16,7 @@ export async function GET(request) {
         
         console.log('Fetching students dropdown with params:', queryString);
         
-        const response = await fetch(`http://localhost:5000/api/admin/students/dropdown${queryString ? `?${queryString}` : ''}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/students/dropdown${queryString ? `?${queryString}` : ''}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

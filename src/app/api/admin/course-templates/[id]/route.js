@@ -15,7 +15,7 @@ export async function GET(request, { params }) {
         
         console.log('Fetching course template:', id);
         
-        const response = await fetch(`http://localhost:5000/api/admin/course-templates/${id}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/course-templates/${id}`, {
             method: 'GET',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -52,7 +52,7 @@ export async function PUT(request, { params }) {
         
         console.log('Updating course template:', id, body);
         
-        const response = await fetch(`http://localhost:5000/api/admin/course-templates/${id}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/course-templates/${id}`, {
             method: 'PUT',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
@@ -89,7 +89,7 @@ export async function DELETE(request, { params }) {
         
         console.log('Deleting course template:', id);
         
-        const response = await fetch(`http://localhost:5000/api/admin/course-templates/${id}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/course-templates/${id}`, {
             method: 'DELETE',
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,

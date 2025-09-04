@@ -5,7 +5,7 @@ export async function DELETE(request, { params }) {
         const { id, tagId } = await params;
 
         // Remove specific tag from lecture
-        const response = await fetch(`http://localhost:5000/api/admin/lectures/${id}/tags/${tagId}`, {
+        const response = await fetch(`http://localhost:5001/api/admin/lectures/${id}/tags/${tagId}`, {
             method: 'DELETE',
             headers: {
                 'Cookie': request.headers.get('cookie') || ''
