@@ -29,20 +29,20 @@ export default function Page() {
           const returnUrl = sessionStorage.getItem('returnUrl');
           if (returnUrl) {
             sessionStorage.removeItem('returnUrl');
-            router.push(returnUrl);
+            window.location.href = returnUrl; // Use full page redirect
             return;
           }
           
           // Default role-based redirect
           switch (response.role) {
             case 'student':
-              router.push('/dashboard');
+              window.location.href = '/dashboard'; // Use full page redirect
               break;
             case 'teacher':
-              router.push('/teacher-dashboard');
+              window.location.href = '/teacher-dashboard'; // Use full page redirect
               break;
             case 'admin':
-              router.push('/admin-dashboard');
+              window.location.href = '/admin-dashboard'; // Use full page redirect
               break;
             default:
               console.error('Unknown role:', response.role);
@@ -93,19 +93,19 @@ export default function Page() {
             if (returnUrl) {
                 console.log('Redirecting to return URL:', returnUrl);
                 sessionStorage.removeItem('returnUrl');
-                router.push(returnUrl);
+                window.location.href = returnUrl; // Use full page redirect instead of router
             } else {
                 // Default role-based redirect
                 console.log('Redirecting based on role:', response.role);
                 switch (response.role) {
                   case 'student':
-                    router.push('/dashboard');
+                    window.location.href = '/dashboard'; // Use full page redirect
                     break;
                   case 'teacher':
-                    router.push('/teacher-dashboard');
+                    window.location.href = '/teacher-dashboard'; // Use full page redirect
                     break;
                   case 'admin':
-                    router.push('/admin-dashboard');
+                    window.location.href = '/admin-dashboard'; // Use full page redirect
                     break;
                   default:
                     toast.error('Unknown user role', {id: loadingToast});

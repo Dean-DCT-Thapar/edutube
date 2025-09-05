@@ -28,9 +28,21 @@ export async function POST(request) {
             { status: 200 }
         );
 
-        // Clear both cookies
-        response.cookies.delete('accessToken');
-        response.cookies.delete('adminToken');
+        // Clear both cookies with proper settings
+        const isHttps = request.headers.get('x-forwarded-proto') === 'https' || 
+                       request.url.startsWith('https://') ||
+                       process.env.NODE_ENV === 'production';
+
+        const cookieOptions = {
+            httpOnly: true,
+            secure: isHttps,
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 0 // Delete cookie
+        };
+
+        response.cookies.set('accessToken', '', cookieOptions);
+        response.cookies.set('adminToken', '', cookieOptions);
 
         return response;
     } catch (error) {

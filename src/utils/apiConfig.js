@@ -18,6 +18,7 @@ export const getApiBaseUrl = () => {
   }
   
   // Client-side: always use the current domain (where Next.js is running)
+  // This handles both localhost and cloudflared tunnels automatically
   return window.location.origin;
 };
 

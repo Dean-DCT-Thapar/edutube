@@ -24,10 +24,14 @@ export async function POST(request) {
         const res = NextResponse.json(responseData, { status: 200 });
 
         // Set httpOnly cookie for production
+        const isHttps = request.headers.get('x-forwarded-proto') === 'https' || 
+                       request.url.startsWith('https://') ||
+                       process.env.NODE_ENV === 'production';
+                       
         const cookieOptions = {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production',
-            sameSite: 'lax',
+            secure: isHttps,
+            sameSite: 'lax', // Use 'lax' for same-site requests
             path: '/',
             maxAge: 60 * 60 * 24 // 1 day
         };
