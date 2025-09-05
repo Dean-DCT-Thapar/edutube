@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../../component/AdminLayout';
 import {
@@ -46,7 +46,7 @@ export default function CourseInstanceLectures() {
 
     const fetchInstanceDetails = async () => {
         try {
-            const response = await axios.get(`/api/admin/course-instances/${instanceId}`, {
+            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}`, {
                 withCredentials: true
             });
             setInstance(response.data.instance);
@@ -58,7 +58,7 @@ export default function CourseInstanceLectures() {
 
     const fetchChapters = async () => {
         try {
-            const response = await axios.get(`/api/admin/course-instances/${instanceId}/chapters`, {
+            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}/chapters`, {
                 withCredentials: true
             });
             setChapters(response.data.chapters || []);
@@ -71,7 +71,7 @@ export default function CourseInstanceLectures() {
     const fetchLectures = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
+            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
                 withCredentials: true
             });
             setLectures(response.data.lectures || []);
@@ -103,7 +103,7 @@ export default function CourseInstanceLectures() {
         }
 
         try {
-            await axios.delete(`/api/admin/lectures/${lectureId}`, {
+            await apiClient.delete(`/api/admin/lectures/${lectureId}`, {
                 withCredentials: true
             });
             toast.success('Lecture deleted successfully');
@@ -123,13 +123,13 @@ export default function CourseInstanceLectures() {
 
             if (editingLecture) {
                 // Use the with-tags endpoint for updating
-                await axios.put(`/api/admin/lectures/${editingLecture.id}/with-tags`, data, {
+                await apiClient.put(`/api/admin/lectures/${editingLecture.id}/with-tags`, data, {
                     withCredentials: true
                 });
                 toast.success('Lecture updated successfully');
             } else {
                 // Create lecture with tags
-                await axios.post(`/api/admin/lectures`, data, {
+                await apiClient.post(`/api/admin/lectures`, data, {
                     withCredentials: true
                 });
                 toast.success('Lecture created successfully');
@@ -186,7 +186,7 @@ export default function CourseInstanceLectures() {
 
         try {
             // Send reorder request to backend
-            await axios.put(`/api/admin/lectures/reorder`, {
+            await apiClient.put(`/api/admin/lectures/reorder`, {
                 chapterId: selectedChapter,
                 lectureOrders: updatedLectures.map(lecture => ({
                     id: lecture.id,

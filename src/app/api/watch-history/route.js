@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { NextResponse } from 'next/server';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -24,11 +24,11 @@ export async function POST(request) {
             progress: body.progress
         });
 
-        const backendUrl = `http://localhost:5001/watch-history`;
+        const backendUrl = `${getBackendUrl()}/watch-history`;
         
         console.log('Backend URL:', backendUrl);
 
-        const response = await axios.post(backendUrl, {
+        const response = await apiClient.post(backendUrl, {
             lecture_id: body.lecture_id,
             progress: body.progress
         }, {
@@ -65,11 +65,11 @@ export async function GET(request) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const backendUrl = `http://localhost:5001/watch-history`;
+        const backendUrl = `${getBackendUrl()}/watch-history`;
         
         console.log('GET watch-history: Backend URL:', backendUrl);
 
-        const response = await axios.get(backendUrl, {
+        const response = await apiClient.get(backendUrl, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import axios from "axios";
+import apiClient from '@/utils/apiClient';;
 import SearchCard from "./SearchCard";
 import Link from "next/link";
 
@@ -17,7 +17,7 @@ export default function SearchBar() {
     setLoading(true);
     setSearchInitiated(true);
     try {
-      const response = await axios.get(`/api/search`, {
+      const response = await apiClient.get(`/api/search`, {
         params: { q: query, type: category },
       });
       setResults(response.data);

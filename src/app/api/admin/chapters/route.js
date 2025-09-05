@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request) {
   try {
@@ -23,7 +23,7 @@ export async function GET(request) {
     if (courseId) queryParams.set('courseId', courseId);
     if (instanceId) queryParams.set('instanceId', instanceId);
     
-    const response = await axios.get(`${BACKEND_URL}/api/admin/chapters/dropdown?${queryParams}`, {
+    const response = await apiClient.get(`/api/admin/chapters/dropdown?${queryParams}`, {
       headers: {
         'Authorization': authHeader
       }
@@ -60,7 +60,7 @@ export async function POST(request) {
     
     const body = await request.json();
     
-    const response = await axios.post(`${BACKEND_URL}/api/admin/chapters`, body, {
+    const response = await apiClient.post(`/api/admin/chapters`, body, {
       headers: {
         'Authorization': authHeader,
         'Content-Type': 'application/json'

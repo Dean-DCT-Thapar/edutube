@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import axios from "axios";
+import frontendApi from '@/utils/frontendApiClient';
 import Link from "next/link";
 import toast from "react-hot-toast";
 import TopBar from '../component/TopBar';
@@ -43,15 +43,16 @@ export default function TeachersPage() {
         params.append('search', search.trim());
       }
 
-      const response = await axios.get(`/api/teachers?${params}`);
+      const response = await frontendApi.get(`/api/teachers?${params}`);
       
       if (page === 1) {
-        setTeachers(response.data.teachers);
+        setTeachers(response.teachers);
       } else {
-        setTeachers(prev => [...prev, ...response.data.teachers]);
+        setTeachers(prev => [...prev, ...response.teachers]);
       }
       
-      setPagination(response.data.pagination);
+      setHasMore(response.hasMore);
+      setTotalTeachers(response.total);
     } catch (error) {
       console.error('Error fetching teachers:', error);
       toast.error('Failed to load teachers');

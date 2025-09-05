@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import {
@@ -41,7 +41,7 @@ const SettingsPage = () => {
 
     const fetchUserData = async () => {
         try {
-            const response = await axios.get('/api/verify-auth');
+            const response = await apiClient.get('/api/verify-auth');
             if (response.data.status === 200) {
                 setUserData(response.data);
                 setProfileData({
@@ -74,7 +74,7 @@ const SettingsPage = () => {
 
         setLoading(prev => ({ ...prev, profile: true }));
         try {
-            await axios.put(`/api/admin/users/${userData.id}`, profileData, {
+            await apiClient.put(`/api/admin/users/${userData.id}`, profileData, {
                 withCredentials: true
             });
             toast.success('Profile updated successfully');
@@ -109,7 +109,7 @@ const SettingsPage = () => {
 
         setLoading(prev => ({ ...prev, password: true }));
         try {
-            await axios.post('/api/change-password', {
+            await apiClient.post('/api/change-password', {
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword
             });

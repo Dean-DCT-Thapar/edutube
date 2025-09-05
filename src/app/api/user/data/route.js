@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request) {
     try {
@@ -10,7 +10,7 @@ export async function GET(request) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });
         }
 
-        const response = await fetch(`${BACKEND_URL}/api/user/data`, {
+        const response = await fetch(`${getBackendUrl()}/api/user/data`, {
             method: 'GET',
             headers: {
                 'Authorization': authHeader,

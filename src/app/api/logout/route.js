@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
@@ -15,7 +15,7 @@ export async function POST(request) {
 
         if (token) {
             // Call backend logout endpoint
-            await axios.post(`http://localhost:5001/logout`, {}, {
+            await apiClient.post(`/logout`, {}, {
                 headers: {
                     Authorization: `Bearer ${token.value}`
                 }

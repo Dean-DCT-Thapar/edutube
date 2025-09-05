@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import React from 'react';
 import TopBar from '../component/TopBar';
@@ -34,16 +34,16 @@ export default function Dashboard() {
             try {
                 // Use cookie-based authentication - no need to pass token
                 const [authResponse, userDataResponse] = await Promise.all([
-                    axios.get('/api/verify-auth'),
-                    axios.get('/api/get-user-data')
+                    frontendApi.verifyAuth(),
+                    frontendApi.getUserData()
                 ]);
 
-                if (authResponse.data.status === 200) {
-                    if (authResponse.data.role !== 'student') {
+                if (authResponse.status === 200) {
+                    if (authResponse.role !== 'student') {
                         throw new Error('Access denied. Students only.');
                     }
                     
-                    setUserData(userDataResponse.data);
+                    setUserData(userDataResponse);
                     toast.success('Welcome back!', { id: 'dashboard-loading' });
                     
                     // Load recent activity
@@ -66,8 +66,8 @@ export default function Dashboard() {
 
         const loadRecentActivity = async () => {
             try {
-                const response = await axios.get('/api/watch-history/recent?limit=3');
-                setRecentActivity(response.data);
+                const response = await frontendApi.get('/api/watch-history/recent?limit=3');
+                setRecentActivity(response);
             } catch (error) {
                 console.error('Error loading recent activity:', error);
                 // Don't show error toast for this as it's not critical

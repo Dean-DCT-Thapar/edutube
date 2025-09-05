@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function PUT(request) {
   try {
@@ -19,7 +19,7 @@ export async function PUT(request) {
     const body = await request.json();
     console.log('Next.js API - Reorder chapters request body:', body);
     
-    const response = await axios.put(`${BACKEND_URL}/api/admin/chapters/reorder`, body, {
+    const response = await apiClient.put(`/api/admin/chapters/reorder`, body, {
       headers: {
         'Authorization': `Bearer ${adminToken.value}`,
         'Content-Type': 'application/json'

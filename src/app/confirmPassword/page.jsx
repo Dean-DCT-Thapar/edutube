@@ -1,7 +1,7 @@
 'use client'
 import { useEffect , useState } from 'react'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
+import apiClient from '@/utils/apiClient';
 import toast from 'react-hot-toast'
 import SideBar from '../component/SideBar'
 import TopBar from '../component/TopBar'
@@ -23,8 +23,8 @@ const page = () => {
     const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
 
     Promise.all([
-        axios.get('/api/verify-auth'),
-        axios.get('/api/get-user-data')
+        apiClient.get('/api/verify-auth'),
+        apiClient.get('/api/get-user-data')
     ])
         .then(([authResponse, userDataResponse]) => {
             if (authResponse.data.status === 200) {
@@ -68,7 +68,7 @@ const page = () => {
           return;
       }
 
-      const response = await axios.post('/api/change-password', {
+      const response = await apiClient.post('/api/change-password', {
           oldPassword: formValues.oldPassword,
           newPassword: formValues.newPassword
       }, {

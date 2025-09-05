@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import TopBar from "../component/TopBar";
 import SideBar from "../component/SideBar";
 import Footer from "../component/Footer";
-import axios from "axios";
+import apiClient from '@/utils/apiClient';;
 import Link from "next/link";
 import { 
   PlayArrowRounded,
@@ -24,7 +24,7 @@ export default function WatchHistory() {
   useEffect(() => {
     const fetchWatchHistory = async () => {
       try {
-        const response = await axios.get('/api/watch-history');
+        const response = await apiClient.get('/api/watch-history');
         setResults(response.data);
       } catch (error) {
         console.error("Error fetching watch history:", error);

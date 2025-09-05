@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function POST(request) {
     try {
@@ -13,7 +13,7 @@ export async function POST(request) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });
         }
 
-        const response = await fetch(`${BACKEND_URL}/api/enrollment/enroll_course`, {
+        const response = await fetch(`${getBackendUrl()}/api/enrollment/enroll_course`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

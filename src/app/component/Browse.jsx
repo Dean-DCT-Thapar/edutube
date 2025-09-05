@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import axios from "axios";
+import apiClient from '@/utils/apiClient';;
 import SearchCard from "./SearchCard";
 import SearchBox from "./SearchBox";
 import Link from "next/link";
@@ -71,7 +71,7 @@ export default function Browse() {
     const checkAuth = async () => {
       try {
         // Use cookie-based authentication
-        const response = await axios.get('/api/verify-auth');
+        const response = await apiClient.get('/api/verify-auth');
         setUserRole(response.data.role);
       } catch (error) {
         console.error('Auth error:', error);
@@ -90,7 +90,7 @@ export default function Browse() {
   const loadAllCourses = async () => {
     setInitialLoading(true);
     try {
-      const response = await axios.get(`/api/courses/browse`);
+      const response = await apiClient.get(`/api/courses/browse`);
       setAllCourses(response.data || []);
     } catch (error) {
       console.error("Error fetching courses:", error);
@@ -108,7 +108,7 @@ export default function Browse() {
     }
 
     try {
-      const response = await axios.get('/api/quick-search', {
+      const response = await apiClient.get('/api/quick-search', {
         params: { q: query, limit: 8 }
       });
       setSuggestions(response.data.suggestions || []);
@@ -162,7 +162,7 @@ export default function Browse() {
     try {
       // Use cookie-based authentication - try advanced search first, fall back to basic search for guests
       try {
-        const response = await axios.post('/api/advanced-search', {
+        const response = await apiClient.post('/api/advanced-search', {
           query: query.trim(),
           type,
           page,
@@ -217,7 +217,7 @@ export default function Browse() {
   // Fallback basic search for guests
   const handleBasicSearch = async (query, type) => {
     try {
-      const response = await axios.get(`/api/search`, {
+      const response = await apiClient.get(`/api/search`, {
         params: { q: query, type: type === 'all' ? '' : type },
       });
       

@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request, { params }) {
   try {
     const { id } = await params;
     
-    const response = await axios.get(`${BACKEND_URL}/api/teachers/${id}`);
+    const response = await apiClient.get(`/api/teachers/${id}`);
     
     return NextResponse.json(response.data);
   } catch (error) {

@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { NextResponse } from 'next/server';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -16,7 +16,7 @@ export async function PUT(request) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const response = await axios.post(`http://localhost:5001/watch-history`, {
+        const response = await apiClient.post(`/watch-history`, {
                 lecture_id: body.lecture_id,
                 progress: body.progress
             }, {

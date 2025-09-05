@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import { SchoolRounded, LoginRounded } from '@mui/icons-material';
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AdminLoginHelper from '../component/AdminLoginHelper';
@@ -20,10 +20,10 @@ export default function Page() {
       try {
         console.log('Login page: Checking authentication...');
         // Check authentication using cookies via API
-        const response = await axios.get('/api/verify-auth');
+        const response = await frontendApi.verifyAuth();
         
-        console.log('Login page: Auth check response:', response.data);
-        if (response.data.status === 200) {
+        console.log('Login page: Auth check response:', response);
+        if (response.status === 200) {
           console.log('Login page: User already authenticated, redirecting...');
           // Check for return URL first
           const returnUrl = sessionStorage.getItem('returnUrl');
@@ -34,7 +34,7 @@ export default function Page() {
           }
           
           // Default role-based redirect
-          switch (response.data.role) {
+          switch (response.role) {
             case 'student':
               router.push('/dashboard');
               break;
@@ -45,7 +45,7 @@ export default function Page() {
               router.push('/admin-dashboard');
               break;
             default:
-              console.error('Unknown role:', response.data.role);
+              console.error('Unknown role:', response.role);
           }
         }
       } catch (error) {
@@ -78,15 +78,12 @@ export default function Page() {
     const loadingToast = toast.loading('Signing in...', {id: 'login-loading'});
     try {
         console.log('Calling /api/login...');
-        const response = await axios.post('/api/login', {
-            email: formValues.email,
-            password: formValues.password,
-        });
+        const response = await frontendApi.login(formValues.email, formValues.password);
         
-        console.log('Login response:', response.data);
-        if (response.data.success) {
+        console.log('Login response:', response);
+        if (response.success) {
             toast.dismiss(loadingToast);
-            console.log('Login successful, user role:', response.data.role);
+            console.log('Login successful, user role:', response.role);
             
             // Since we're using cookies now, we don't need to store tokens in localStorage
             // The cookies are automatically set by the /api/login endpoint
@@ -99,8 +96,8 @@ export default function Page() {
                 router.push(returnUrl);
             } else {
                 // Default role-based redirect
-                console.log('Redirecting based on role:', response.data.role);
-                switch (response.data.role) {
+                console.log('Redirecting based on role:', response.role);
+                switch (response.role) {
                   case 'student':
                     router.push('/dashboard');
                     break;
@@ -117,7 +114,7 @@ export default function Page() {
         }
     }catch (error) {
         console.error('Login error:', error);
-        const errorMessage = error.response?.data?.message || 'Login failed';
+        const errorMessage = error.message || 'Login failed';
         toast.error(errorMessage, {id: loadingToast});
         setFormValues({ email: '', password: '' });
     }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
 const VideoDisplay = (props) => {
   // Early return if essential props are missing
@@ -55,7 +55,7 @@ const VideoDisplay = (props) => {
         progress: Math.round(progress),
         current_time: Math.floor(currentTime)
       });
-      await axios.post('/api/watch-history', {
+      await apiClient.post('/api/watch-history', {
         lecture_id: props.lec_id,  // Fixed: use lecture_id instead of videoId
         progress: Math.round(progress),  // Round progress to avoid decimals
         current_time: Math.floor(currentTime)  // Send actual current time in seconds
@@ -112,7 +112,7 @@ const VideoDisplay = (props) => {
         // Fetch progress from watch history
         if (props.lec_id) {
           console.log('Making API call to get video progress...');
-          const response = await axios.get(`/api/watch-history/getVideoProgress/${props.lec_id}`);
+          const response = await apiClient.get(`/api/watch-history/getVideoProgress/${props.lec_id}`);
           console.log('API response:', response.data);
           
           const progress = response.data.progress || 0;

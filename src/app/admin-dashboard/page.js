@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import AdminLayout from '../component/AdminLayout';
 import DashboardStats from '../component/DashboardStats';
@@ -20,33 +20,29 @@ export default function AdminDashboard() {
         console.log('Admin dashboard useEffect running, loading:', loading);
         const loadingToast = toast.loading('Loading...', { id: 'dashboard-loading' });
 
-        console.log('Calling /api/verify-auth with withCredentials...');
+        console.log('Calling /api/verify-auth...');
         // Verify authentication using cookies
-        axios.get('/api/verify-auth', {
-            withCredentials: true
-        })
+        frontendApi.verifyAuth()
             .then((authResponse) => {
-                console.log('Auth response received:', authResponse.data);
-                if (authResponse.data.status === 200) {
-                    if (authResponse.data.role !== 'admin') {
-                        console.error('User role is not admin:', authResponse.data.role);
+                console.log('Auth response received:', authResponse);
+                if (authResponse.status === 200) {
+                    if (authResponse.role !== 'admin') {
+                        console.error('User role is not admin:', authResponse.role);
                         throw new Error('Access denied. Administrators only.');
                     }
                     console.log('Admin authentication successful');
-                    setUserData(authResponse.data);
+                    setUserData(authResponse);
                     
                     // Fetch dashboard stats using cookies
                     console.log('Fetching dashboard stats...');
-                    return axios.get('/api/admin/dashboard/stats', {
-                        withCredentials: true
-                    });
+                    return frontendApi.get('/api/admin/dashboard/stats');
                 } else {
-                    console.error('Auth response status not 200:', authResponse.data);
-                    throw new Error(authResponse.data.message || 'Authentication failed');
+                    console.error('Auth response status not 200:', authResponse);
+                    throw new Error(authResponse.message || 'Authentication failed');
                 }
             })
             .then((statsResponse) => {
-                setDashboardData(statsResponse.data);
+                setDashboardData(statsResponse);
                 toast.dismiss(loadingToast);
                 setLoading(false);
             })

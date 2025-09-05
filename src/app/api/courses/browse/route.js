@@ -1,4 +1,4 @@
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { NextResponse } from 'next/server';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -6,7 +6,7 @@ const MODE = process.env.MODE;
 
 export async function GET(request) {
   try {
-    const response = await axios.get(`http://localhost:5001/api/courses/browse`);
+    const response = await apiClient.get(`/api/courses/browse`);
 
     return NextResponse.json(response.data);
   } catch (error) {

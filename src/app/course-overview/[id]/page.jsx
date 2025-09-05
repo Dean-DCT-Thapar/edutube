@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import SideBar from '../../component/SideBar';
 import TopBar from '../../component/TopBar';
@@ -42,7 +42,7 @@ export default function CourseOverview() {
     const fetchCourseDetails = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/courses/${courseId}`);
+            const response = await apiClient.get(`/api/courses/${courseId}`);
             const courseData = response.data;
             
             if (courseData && courseData.length > 0) {
@@ -79,7 +79,7 @@ export default function CourseOverview() {
                 return;
             }
 
-            const response = await axios.get(API_ENDPOINTS.CHECK_ENROLLMENT(courseId));
+            const response = await apiClient.get(API_ENDPOINTS.CHECK_ENROLLMENT(courseId));
             setIsEnrolled(response.data.isEnrolled);
         } catch (error) {
             console.error('Error checking enrollment status:', error);
@@ -113,7 +113,7 @@ export default function CourseOverview() {
             setEnrolling(true);
             
             // Only need course_instance_id - backend will handle teacher_id lookup
-            await axios.post(API_ENDPOINTS.ENROLL, {
+            await apiClient.post(API_ENDPOINTS.ENROLL, {
                 course_instance_id: parseInt(courseId)
             });
 
@@ -152,7 +152,7 @@ export default function CourseOverview() {
 
             setUnenrolling(true);
             
-            await axios.delete(API_ENDPOINTS.UNENROLL, {
+            await apiClient.delete(API_ENDPOINTS.UNENROLL, {
                 data: {
                     course_instance_id: parseInt(courseId)
                 }

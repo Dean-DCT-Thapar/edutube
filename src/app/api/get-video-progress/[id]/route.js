@@ -1,5 +1,5 @@
 import { cookies } from 'next/headers';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { NextResponse } from 'next/server';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -17,7 +17,7 @@ export async function GET(request, { params }) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });
         }
 
-        const response = await axios.get(`http://localhost:5001/getVideoProgress/${id}`, {
+        const response = await apiClient.get(`/getVideoProgress/${id}`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

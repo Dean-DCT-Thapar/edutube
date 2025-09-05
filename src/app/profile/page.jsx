@@ -3,7 +3,7 @@ import React from 'react'
 import toast from 'react-hot-toast'
 import { useState ,useEffect } from 'react'
 import { useRouter } from 'next/navigation'
-import axios from 'axios'
+import apiClient from '@/utils/apiClient';
 import TopBar from '../component/TopBar'
 import SideBar from '../component/SideBar'
 import Footer from '../component/Footer'
@@ -19,8 +19,8 @@ const page = () => {
     const loadingToast = toast.loading('Loading...', { id: 'loading' });
 
     Promise.all([
-        axios.get('/api/verify-auth'),
-        axios.get('/api/get-user-data')
+        apiClient.get('/api/verify-auth'),
+        apiClient.get('/api/get-user-data')
     ])
         .then(([authResponse, userDataResponse]) => {
             if (authResponse.data.status === 200) {

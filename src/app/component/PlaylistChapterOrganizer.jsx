@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from 'react';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import {
     PlaylistPlayRounded,
@@ -40,7 +40,7 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
 
         setLoading(true);
         try {
-            const response = await axios.post('/api/admin/youtube/fetch-playlist', {
+            const response = await apiClient.post('/api/admin/youtube/fetch-playlist', {
                 playlistUrl: playlistUrl.trim()
             }, {
                 withCredentials: true
@@ -279,7 +279,7 @@ const PlaylistChapterOrganizer = ({ courseInstanceId, onClose, onImportComplete 
             });
 
             console.log(lectureData);
-            const response = await axios.post('/api/admin/youtube/bulk-import-lectures', {
+            const response = await apiClient.post('/api/admin/youtube/bulk-import-lectures', {
                 courseInstanceId: courseInstanceId,
                 lectureData: lectureData
             }, {

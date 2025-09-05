@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
@@ -10,9 +10,9 @@ export async function GET(request) {
         const query = searchParams.get('q') || '';
         const limit = searchParams.get('limit') || '5';
 
-        const backendUrl = `http://localhost:5001`;
+        const backendUrl = `${getBackendUrl()}`;
 
-        const response = await axios.get(
+        const response = await apiClient.get(
             `${backendUrl}/quick-search`,
             {
                 params: { query, limit }

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import axios from "axios";
+import frontendApi from '@/utils/frontendApiClient';
 import toast from "react-hot-toast";
 import TopBar from "../../component/TopBar";
 import SideBar from "../../component/SideBar";
@@ -51,8 +51,8 @@ const CoursePage = ({ params }) => {
     setError(null);
 
     try {
-      const response = await axios.get(`/api/courses/${courseId}`);
-      setCourseData(response.data);
+      const response = await frontendApi.get(`/api/courses/${courseId}`);
+      setCourseData(response);
 
       // Auto-expand current chapter
       if (chapterNumber) {
@@ -78,10 +78,8 @@ const CoursePage = ({ params }) => {
     try {
       const token = localStorage.getItem("token");
       if (token) {
-        const response = await axios.get(`/api/enrollment/check/${courseId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setIsEnrolled(response.data.isEnrolled);
+        const response = await frontendApi.checkEnrollment(courseId);
+        setIsEnrolled(response.isEnrolled);
       } else {
         setIsEnrolled(false);
       }

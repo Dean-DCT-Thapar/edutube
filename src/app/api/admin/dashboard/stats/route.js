@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request) {
     try {
@@ -13,7 +13,7 @@ export async function GET(request) {
             return NextResponse.json({ message: 'Admin authentication required' }, { status: 401 });
         }
 
-        const response = await axios.get(`${BACKEND_URL}/api/admin/dashboard/stats`, {
+        const response = await apiClient.get(`/api/admin/dashboard/stats`, {
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
                 'Content-Type': 'application/json'

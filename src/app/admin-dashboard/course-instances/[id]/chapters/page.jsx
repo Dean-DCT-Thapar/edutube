@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../../component/AdminLayout';
 import PlaylistChapterOrganizer from '../../../../component/PlaylistChapterOrganizer';
@@ -37,7 +37,7 @@ export default function CourseInstanceChapters() {
 
         const fetchInstanceDetails = async () => {
             try {
-                const response = await axios.get(`/api/admin/course-instances/${instanceId}`, {
+                const response = await apiClient.get(`/api/admin/course-instances/${instanceId}`, {
                     withCredentials: true
                 });
                 setInstance(response.data.instance);
@@ -48,7 +48,7 @@ export default function CourseInstanceChapters() {
         };    const fetchChapters = async () => {
         try {
             setLoading(true);
-            const response = await axios.get(`/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
+            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
                 withCredentials: true
             });
             setChapters(response.data.chapters || []);
@@ -76,7 +76,7 @@ export default function CourseInstanceChapters() {
         }
 
         try {
-            await axios.delete(`/api/admin/chapters/${chapterId}`, {
+            await apiClient.delete(`/api/admin/chapters/${chapterId}`, {
                 withCredentials: true
             });
             toast.success('Chapter deleted successfully');
@@ -95,12 +95,12 @@ export default function CourseInstanceChapters() {
             };
 
             if (editingChapter) {
-                await axios.put(`/api/admin/chapters/${editingChapter.id}`, data, {
+                await apiClient.put(`/api/admin/chapters/${editingChapter.id}`, data, {
                     withCredentials: true
                 });
                 toast.success('Chapter updated successfully');
             } else {
-                await axios.post(`/api/admin/chapters`, data, {
+                await apiClient.post(`/api/admin/chapters`, data, {
                     withCredentials: true
                 });
                 toast.success('Chapter created successfully');
@@ -157,7 +157,7 @@ export default function CourseInstanceChapters() {
 
         try {
             // Send reorder request to backend
-            await axios.put(`/api/admin/chapters/reorder`, {
+            await apiClient.put(`/api/admin/chapters/reorder`, {
                 courseInstanceId: instanceId,
                 chapterOrders: updatedChapters.map(chapter => ({
                     id: chapter.id,

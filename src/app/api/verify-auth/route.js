@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -22,7 +22,7 @@ export async function GET(request) {
             );
         }
 
-        const response = await axios.get(`http://localhost:5001/verify-auth`, {
+        const response = await apiClient.get(`/verify-auth`, {
             headers: {
                 Authorization: `Bearer ${token.value}`
             }

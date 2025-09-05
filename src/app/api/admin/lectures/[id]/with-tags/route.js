@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function PUT(request, { params }) {
     try {
@@ -18,7 +18,7 @@ export async function PUT(request, { params }) {
 
         console.log('Next.js API - Update lecture with tags request body:', body);
 
-        const response = await axios.put(`${BACKEND_URL}/api/admin/lectures/${lectureId}/with-tags`, body, {
+        const response = await apiClient.put(`/api/admin/lectures/${lectureId}/with-tags`, body, {
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
                 'Content-Type': 'application/json'

@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function PUT(request) {
   try {
@@ -18,7 +18,7 @@ export async function PUT(request) {
     
     const body = await request.json();
     
-    const response = await axios.put(`${BACKEND_URL}/api/admin/lectures/reorder`, body, {
+    const response = await apiClient.put(`/api/admin/lectures/reorder`, body, {
       headers: {
         'Authorization': `Bearer ${adminToken.value}`,
         'Content-Type': 'application/json'

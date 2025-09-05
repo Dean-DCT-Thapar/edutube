@@ -1,51 +1,53 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
-
-const WINDOWS_HOST = process.env.WINDOWS_HOST;
-const MODE = process.env.MODE;
+import apiClient from '@/utils/apiClient';
 
 export async function POST(request) {
     try {
         const body = await request.json();
-        console.log('Request body:', body);
+        console.log('Login request received:', { email: body.email });
 
-        const response = await axios.post('http://localhost:5001/login', {
+        // Call backend service using apiClient (handles Docker networking automatically)
+        const response = await apiClient.post('/login', {
             email: body.email,
             password: body.password,
         });
 
-        // Create the response with data for all users
+        const { accessToken, user } = response.data;
+
+        // Response object for frontend usage
         const responseData = { 
             success: true,
-            role: response.data.user.role,
-            accessToken: response.data.accessToken  // Include accessToken for all users
+            role: user.role,
+            accessToken, // still return accessToken for JS usage if needed
         };
 
         const res = NextResponse.json(responseData, { status: 200 });
-        
-        // Set different cookies based on user role
-        if (response.data.user.role === 'admin') {
-            res.cookies.set('adminToken', response.data.accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 60 * 60 * 24
-            });
+
+        // Set httpOnly cookie for production
+        const cookieOptions = {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: 'lax',
+            path: '/',
+            maxAge: 60 * 60 * 24 // 1 day
+        };
+
+        if (user.role === 'admin') {
+            res.cookies.set('adminToken', accessToken, cookieOptions);
         } else {
-            res.cookies.set('accessToken', response.data.accessToken, {
-                httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'strict',
-                maxAge: 60 * 60 * 24
-            });
+            res.cookies.set('accessToken', accessToken, cookieOptions);
         }
 
         return res;
 
     } catch (error) {
-        console.error('Login error:', error);
+        console.error('Login error:', error.response?.data || error.message);
+
         return NextResponse.json(
-            { success: false, message: error.response?.data?.message || 'Login failed' },
+            { 
+                success: false, 
+                message: error.response?.data?.message || 'Login failed' 
+            },
             { status: error.response?.status || 500 }
         );
     }

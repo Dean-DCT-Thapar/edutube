@@ -1,4 +1,4 @@
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 
 /**
  * Update watch progress for a lecture
@@ -8,10 +8,7 @@ import axios from 'axios';
  */
 export const updateWatchProgress = async (lectureId, progress) => {
     try {
-        await axios.put('/api/watch-history/progress', {
-            lecture_id: lectureId,
-            progress: Math.round(progress) // Round to avoid decimal precision issues
-        });
+        await frontendApi.updateWatchProgress(lectureId, Math.round(progress));
     } catch (error) {
         console.error('Failed to update watch progress:', error);
         // Don't throw error to avoid disrupting video playback
@@ -25,8 +22,8 @@ export const updateWatchProgress = async (lectureId, progress) => {
  */
 export const getWatchProgress = async (lectureId) => {
     try {
-        const response = await axios.get(`/api/watch-history/getVideoProgress/${lectureId}`);
-        return response.data.progress || 0;
+        const response = await frontendApi.get(`/api/watch-history/getVideoProgress/${lectureId}`);
+        return response.progress || 0;
     } catch (error) {
         console.error('Failed to get watch progress:', error);
         return 0;

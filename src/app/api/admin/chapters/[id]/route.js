@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
 import { cookies } from 'next/headers';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request, { params }) {
   try {
@@ -18,7 +18,7 @@ export async function GET(request, { params }) {
 
     const { id } = await params;
     
-    const response = await axios.get(`${BACKEND_URL}/api/admin/chapters/${id}`, {
+    const response = await apiClient.get(`/api/admin/chapters/${id}`, {
       headers: {
         'Authorization': `Bearer ${adminToken.value}`
       }
@@ -58,7 +58,7 @@ export async function PUT(request, { params }) {
     
     const body = await request.json();
     
-    const response = await axios.put(`${BACKEND_URL}/api/admin/chapters/${id}`, body, {
+    const response = await apiClient.put(`/api/admin/chapters/${id}`, body, {
       headers: {
         'Authorization': `Bearer ${adminToken.value}`,
         'Content-Type': 'application/json'
@@ -97,7 +97,7 @@ export async function DELETE(request, { params }) {
 
     const { id } = await params;
     
-    const response = await axios.delete(`${BACKEND_URL}/api/admin/chapters/${id}`, {
+    const response = await apiClient.delete(`/api/admin/chapters/${id}`, {
       headers: {
         'Authorization': `Bearer ${adminToken.value}`
       }

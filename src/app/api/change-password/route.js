@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -16,7 +16,7 @@ export async function POST(request) {
 
         const body = await request.json();
 
-        const response = await axios.post(`http://localhost:5001/change-password`, 
+        const response = await apiClient.post(`${getBackendUrl()}/change-password`, 
             {
                 oldPassword: body.oldPassword,
                 newPassword: body.newPassword,

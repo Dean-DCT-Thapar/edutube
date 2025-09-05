@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request) {
   try {
@@ -16,7 +16,7 @@ export async function GET(request) {
       ...(search && { search })
     });
     
-    const response = await axios.get(`${BACKEND_URL}/api/teachers?${queryParams}`);
+    const response = await apiClient.get(`/api/teachers?${queryParams}`);
     
     return NextResponse.json(response.data);
   } catch (error) {

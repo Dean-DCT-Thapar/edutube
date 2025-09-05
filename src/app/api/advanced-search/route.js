@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
@@ -18,9 +18,9 @@ export async function POST(request) {
             );
         }
 
-        const backendUrl = 'http://localhost:5001';
+        const backendUrl = '${getBackendUrl()}';
 
-        const response = await axios.post(
+        const response = await apiClient.post(
             `${backendUrl}/advanced-search`,
             body,
             {

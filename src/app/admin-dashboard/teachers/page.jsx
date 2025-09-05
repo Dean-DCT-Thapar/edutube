@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import TeacherTable from '../../component/TeacherTable';
@@ -34,7 +34,7 @@ const TeachersPage = () => {
                 }
             });
 
-            const response = await axios.get(`/api/admin/teachers?${params}`, {
+            const response = await apiClient.get(`/api/admin/teachers?${params}`, {
                 withCredentials: true
             });
 
@@ -49,7 +49,7 @@ const TeachersPage = () => {
 
     const fetchStudents = async () => {
         try {
-            const response = await axios.get('/api/admin/students/dropdown', {
+            const response = await apiClient.get('/api/admin/students/dropdown', {
                 withCredentials: true
             });
             setStudents(response.data);
@@ -68,7 +68,7 @@ const TeachersPage = () => {
 
     const handleCreateTeacher = async (data) => {
         try {
-            await axios.post('/api/admin/teachers', data, {
+            await apiClient.post('/api/admin/teachers', data, {
                 withCredentials: true
             });
             toast.success('Teacher created successfully');

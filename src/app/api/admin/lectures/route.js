@@ -1,8 +1,8 @@
 import { NextResponse } from 'next/server';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://localhost:5001';
+import { getBackendUrl } from "@/utils/apiConfig";
 
 export async function GET(request) {
     try {
@@ -16,7 +16,7 @@ export async function GET(request) {
         const url = new URL(request.url);
         const searchParams = url.searchParams.toString();
 
-        const response = await axios.get(`${BACKEND_URL}/api/admin/lectures${searchParams ? `?${searchParams}` : ''}`, {
+        const response = await apiClient.get(`/api/admin/lectures${searchParams ? `?${searchParams}` : ''}`, {
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
                 'Content-Type': 'application/json'
@@ -50,7 +50,7 @@ export async function POST(request) {
         
         console.log('Next.js API - Create lecture request body:', body);
 
-        const response = await axios.post(`${BACKEND_URL}/api/admin/lectures`, body, {
+        const response = await apiClient.post(`/api/admin/lectures`, body, {
             headers: {
                 'Authorization': `Bearer ${adminToken.value}`,
                 'Content-Type': 'application/json'

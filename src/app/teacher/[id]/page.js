@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
-import axios from "axios";
+import frontendApi from '@/utils/frontendApiClient';
 import Link from "next/link";
 import toast from "react-hot-toast";
 import TopBar from '../../component/TopBar';
@@ -35,11 +35,11 @@ export default function TeacherPage() {
   const fetchTeacherDetails = async () => {
     try {
       setLoading(true);
-      const response = await axios.get(`/api/teachers/${teacherId}`);
-      setTeacher(response.data);
+      const response = await frontendApi.get(`/api/teachers/${teacherId}`);
+      setTeacher(response);
     } catch (error) {
       console.error('Error fetching teacher details:', error);
-      setError(error.response?.data?.message || 'Failed to load teacher details');
+      setError(error.message || 'Failed to load teacher details');
       toast.error('Failed to load teacher details');
     } finally {
       setLoading(false);

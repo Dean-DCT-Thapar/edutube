@@ -4,10 +4,10 @@
  * ARCHITECTURE:
  * - All authentication now uses httpOnly cookies for security
  * - Frontend API routes (/api/*) handle cookie authentication
- * - Direct backend calls are discouraged - use frontend API routes instead
+ * - Client-side code calls Next.js API routes, not backend directly
  */
 
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 
 // Auth patterns enum
 export const AUTH_PATTERNS = {
@@ -24,20 +24,12 @@ export const getAuthMethod = (apiPath) => {
 };
 
 /**
- * Make authenticated API call with cookie-based authentication
- */
-export const authenticatedRequest = async (config) => {
-  // All requests now use cookies automatically - no manual headers needed
-  return axios(config);
-};
-
-/**
  * Check if user is authenticated using API call
  */
 export const isAuthenticated = async () => {
   try {
-    const response = await axios.get('/api/verify-auth');
-    return response.data.status === 200;
+    const response = await frontendApi.verifyAuth();
+    return response.status === 200;
   } catch (error) {
     return false;
   }
@@ -48,9 +40,9 @@ export const isAuthenticated = async () => {
  */
 export const getUserRole = async () => {
   try {
-    const response = await axios.get('/api/verify-auth');
-    if (response.data.status === 200) {
-      return response.data.role;
+    const response = await frontendApi.verifyAuth();
+    if (response.status === 200) {
+      return response.role;
     }
     return null;
   } catch (error) {
@@ -65,7 +57,7 @@ export const getUserRole = async () => {
 export const clearAuth = async () => {
   try {
     // Call logout API to clear httpOnly cookies
-    await axios.post('/api/logout');
+    await frontendApi.logout();
   } catch (error) {
     console.error('Error during logout:', error);
   }

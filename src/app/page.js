@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import TopBar from './component/TopBar';
 import Footer from './component/Footer';
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 
 export default function Page() {
   const router = useRouter();
@@ -13,8 +13,8 @@ export default function Page() {
     // Check authentication status using cookie-based auth
     const checkAuth = async () => {
       try {
-        const response = await axios.get('/api/verify-auth');
-        if (response.data.status === 200) {
+        const response = await frontendApi.verifyAuth();
+        if (response.status === 200) {
           // User is authenticated, redirect to dashboard
           router.replace('/dashboard');
         }

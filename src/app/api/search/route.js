@@ -1,6 +1,6 @@
 // app/api/search/route.js
 import { NextResponse } from "next/server";
-import axios from "axios";
+import apiClient from '@/utils/apiClient';;
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
@@ -10,7 +10,7 @@ export async function GET(request) {
   const query = searchParams.get("q") || "";
   const category = searchParams.get("type") || "";
 
-  const response = await axios.get(`http://localhost:5001/search`, {
+  const response = await apiClient.get(`/search`, {
     params: { keyword: query, type: category },
   });
 

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import axios from 'axios';
+import frontendApi from '@/utils/frontendApiClient';
 import { 
     SearchRounded, 
     PersonRounded, 
@@ -36,10 +36,8 @@ export default function SearchBox({
             setIsLoading(true);
             debounceRef.current = setTimeout(async () => {
                 try {
-                    const response = await axios.get('/api/quick-search', {
-                        params: { q: query, limit: 8 }
-                    });
-                    setSuggestions(response.data.suggestions || []);
+                    const response = await frontendApi.quickSearch(query);
+                    setSuggestions(response.suggestions || []);
                     setShowSuggestions(true);
                 } catch (error) {
                     console.error('Quick search error:', error);

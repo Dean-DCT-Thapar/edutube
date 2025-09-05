@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import apiClient from '@/utils/apiClient';;
 import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import UserTable from '../../component/UserTable';
@@ -38,7 +38,7 @@ const UsersPage = () => {
                 }
             });
 
-            const response = await axios.get(`/api/admin/users?${params}`, {
+            const response = await apiClient.get(`/api/admin/users?${params}`, {
                 withCredentials: true
             });
 
@@ -57,7 +57,7 @@ const UsersPage = () => {
 
     const handleCreateUser = async (userData) => {
         try {
-            await axios.post('/api/admin/users', userData, {
+            await apiClient.post('/api/admin/users', userData, {
                 withCredentials: true
             });
             toast.success('User created successfully');
@@ -70,7 +70,7 @@ const UsersPage = () => {
 
     const handleUpdateUser = async (userData) => {
         try {
-            await axios.put(`/api/admin/users/${editingUser.id}`, userData, {
+            await apiClient.put(`/api/admin/users/${editingUser.id}`, userData, {
                 withCredentials: true
             });
             toast.success('User updated successfully');
@@ -84,7 +84,7 @@ const UsersPage = () => {
 
     const handleDeleteUser = async () => {
         try {
-            await axios.delete(`/api/admin/users/${deletingUser.id}`, {
+            await apiClient.delete(`/api/admin/users/${deletingUser.id}`, {
                 withCredentials: true
             });
             toast.success('User deleted successfully');

@@ -4,14 +4,21 @@
  * This prevents the "wrong endpoint" errors we encountered
  */
 
-// Backend base URL
-export const BACKEND_URL = 'http://localhost:5001';
-export const WINDOWS_HOST = process.env.WINDOWS_HOST || 'localhost';
-export const MODE = process.env.MODE || 'development';
-
-// Get correct backend URL based on environment
+// Get backend URL for server-side requests (Next.js API routes to backend)
 export const getBackendUrl = () => {
-  return `http://localhost:5001`;
+  // Always use internal Docker network for server-side requests
+  return process.env.BACKEND_URL || 'http://backend:5001';
+};
+
+// Get API base URL for client-side requests (browser to Next.js API routes)
+export const getApiBaseUrl = () => {
+  if (typeof window === 'undefined') {
+    // Server-side: not used, but return empty for safety
+    return '';
+  }
+  
+  // Client-side: always use the current domain (where Next.js is running)
+  return window.location.origin;
 };
 
 // API endpoints mapping
