@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import TeacherTable from '../../component/TeacherTable';
@@ -34,14 +34,13 @@ const TeachersPage = () => {
                 }
             });
 
-            const response = await apiClient.get(`/api/admin/teachers?${params}`, {
-                withCredentials: true
-            });
+            const data = await frontendApi.get(`/api/admin/teachers?${params}`);
 
-            setTeachers(response.data.teachers);
-            setPagination(response.data.pagination);
+            setTeachers(data?.teachers ?? []);
+            setPagination(data?.pagination ?? {});
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to fetch teachers');
+            const message = error?.message || 'Failed to fetch teachers';
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -49,10 +48,8 @@ const TeachersPage = () => {
 
     const fetchStudents = async () => {
         try {
-            const response = await apiClient.get('/api/admin/students/dropdown', {
-                withCredentials: true
-            });
-            setStudents(response.data);
+            const data = await frontendApi.get('/api/admin/students/dropdown');
+            setStudents(data ?? []);
         } catch (error) {
             console.error('Failed to fetch students:', error);
         }
@@ -68,15 +65,14 @@ const TeachersPage = () => {
 
     const handleCreateTeacher = async (data) => {
         try {
-            await apiClient.post('/api/admin/teachers', data, {
-                withCredentials: true
-            });
+            await frontendApi.post('/api/admin/teachers', data);
             toast.success('Teacher created successfully');
             setShowTeacherModal(false);
             fetchTeachers();
             fetchStudents(); // Refresh students list as one has become a teacher
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to create teacher');
+            const message = error?.message || 'Failed to create teacher';
+            toast.error(message);
         }
     };
 

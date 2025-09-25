@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
+import { getBackendUrl } from '@/utils/apiConfig';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
@@ -18,7 +19,7 @@ export async function POST(request) {
             );
         }
 
-        const backendUrl = '${getBackendUrl()}';
+    const backendUrl = getBackendUrl();
 
         const response = await apiClient.post(
             `${backendUrl}/advanced-search`,

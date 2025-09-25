@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { getBackendUrl } from '@/utils/apiConfig';
 
 export async function DELETE(request, { params }) {
     try {

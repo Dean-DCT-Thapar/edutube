@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import UserTable from '../../component/UserTable';
@@ -38,14 +38,13 @@ const UsersPage = () => {
                 }
             });
 
-            const response = await apiClient.get(`/api/admin/users?${params}`, {
-                withCredentials: true
-            });
+            const data = await frontendApi.get(`/api/admin/users?${params}`);
 
-            setUsers(response.data.users);
-            setPagination(response.data.pagination);
+            setUsers(data?.users ?? []);
+            setPagination(data?.pagination ?? {});
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to fetch users');
+            const message = error?.message || 'Failed to fetch users';
+            toast.error(message);
         } finally {
             setLoading(false);
         }
@@ -57,42 +56,39 @@ const UsersPage = () => {
 
     const handleCreateUser = async (userData) => {
         try {
-            await apiClient.post('/api/admin/users', userData, {
-                withCredentials: true
-            });
+            await frontendApi.post('/api/admin/users', userData);
             toast.success('User created successfully');
             setShowUserModal(false);
             fetchUsers();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to create user');
+            const message = error?.message || 'Failed to create user';
+            toast.error(message);
         }
     };
 
     const handleUpdateUser = async (userData) => {
         try {
-            await apiClient.put(`/api/admin/users/${editingUser.id}`, userData, {
-                withCredentials: true
-            });
+            await frontendApi.put(`/api/admin/users/${editingUser.id}`, userData);
             toast.success('User updated successfully');
             setShowUserModal(false);
             setEditingUser(null);
             fetchUsers();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update user');
+            const message = error?.message || 'Failed to update user';
+            toast.error(message);
         }
     };
 
     const handleDeleteUser = async () => {
         try {
-            await apiClient.delete(`/api/admin/users/${deletingUser.id}`, {
-                withCredentials: true
-            });
+            await frontendApi.delete(`/api/admin/users/${deletingUser.id}`);
             toast.success('User deleted successfully');
             setShowDeleteDialog(false);
             setDeletingUser(null);
             fetchUsers();
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to delete user');
+            const message = error?.message || 'Failed to delete user';
+            toast.error(message);
         }
     };
 

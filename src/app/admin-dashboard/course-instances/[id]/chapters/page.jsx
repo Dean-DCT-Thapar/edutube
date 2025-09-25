@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams } from 'next/navigation';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../../component/AdminLayout';
 import PlaylistChapterOrganizer from '../../../../component/PlaylistChapterOrganizer';
@@ -37,24 +37,22 @@ export default function CourseInstanceChapters() {
 
         const fetchInstanceDetails = async () => {
             try {
-                const response = await apiClient.get(`/api/admin/course-instances/${instanceId}`, {
-                    withCredentials: true
-                });
-                setInstance(response.data.instance);
+                const data = await frontendApi.get(`/api/admin/course-instances/${instanceId}`);
+                setInstance(data?.instance ?? null);
             } catch (error) {
                 console.error('Error fetching instance:', error);
-                toast.error('Failed to load course instance details');
+                toast.error(error?.message || 'Failed to load course instance details');
             }
-        };    const fetchChapters = async () => {
+    };
+
+    const fetchChapters = async () => {
         try {
             setLoading(true);
-            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}/chapters?limit=1000`, {
-                withCredentials: true
-            });
-            setChapters(response.data.chapters || []);
+            const data = await frontendApi.get(`/api/admin/course-instances/${instanceId}/chapters?limit=1000`);
+            setChapters(data?.chapters ?? []);
         } catch (error) {
             console.error('Error fetching chapters:', error);
-            toast.error('Failed to load chapters');
+            toast.error(error?.message || 'Failed to load chapters');
         } finally {
             setLoading(false);
         }
@@ -76,14 +74,12 @@ export default function CourseInstanceChapters() {
         }
 
         try {
-            await apiClient.delete(`/api/admin/chapters/${chapterId}`, {
-                withCredentials: true
-            });
+            await frontendApi.delete(`/api/admin/chapters/${chapterId}`);
             toast.success('Chapter deleted successfully');
             fetchChapters();
         } catch (error) {
             console.error('Error deleting chapter:', error);
-            toast.error('Failed to delete chapter');
+            toast.error(error?.message || 'Failed to delete chapter');
         }
     };
 
@@ -95,14 +91,10 @@ export default function CourseInstanceChapters() {
             };
 
             if (editingChapter) {
-                await apiClient.put(`/api/admin/chapters/${editingChapter.id}`, data, {
-                    withCredentials: true
-                });
+                await frontendApi.put(`/api/admin/chapters/${editingChapter.id}`, data);
                 toast.success('Chapter updated successfully');
             } else {
-                await apiClient.post(`/api/admin/chapters`, data, {
-                    withCredentials: true
-                });
+                await frontendApi.post(`/api/admin/chapters`, data);
                 toast.success('Chapter created successfully');
             }
             
@@ -110,7 +102,7 @@ export default function CourseInstanceChapters() {
             fetchChapters();
         } catch (error) {
             console.error('Error saving chapter:', error);
-            toast.error('Failed to save chapter');
+            toast.error(error?.message || 'Failed to save chapter');
         }
     };
 
@@ -157,20 +149,18 @@ export default function CourseInstanceChapters() {
 
         try {
             // Send reorder request to backend
-            await apiClient.put(`/api/admin/chapters/reorder`, {
+            await frontendApi.put(`/api/admin/chapters/reorder`, {
                 courseInstanceId: instanceId,
                 chapterOrders: updatedChapters.map(chapter => ({
                     id: chapter.id,
                     number: chapter.number
                 }))
-            }, {
-                withCredentials: true
             });
 
             toast.success('Chapters reordered successfully');
         } catch (error) {
             console.error('Error reordering chapters:', error);
-            toast.error('Failed to reorder chapters');
+            toast.error(error?.message || 'Failed to reorder chapters');
             // Revert changes on error
             fetchChapters();
         }

@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server';
 import apiClient from '@/utils/apiClient';;
 import { cookies } from 'next/headers';
+import { getBackendUrl } from '@/utils/apiConfig';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
@@ -16,7 +17,7 @@ export async function POST(request) {
 
         const body = await request.json();
 
-        const response = await apiClient.post(`${getBackendUrl()}/change-password`, 
+    const response = await apiClient.post(`${getBackendUrl()}/change-password`, 
             {
                 oldPassword: body.oldPassword,
                 newPassword: body.newPassword,

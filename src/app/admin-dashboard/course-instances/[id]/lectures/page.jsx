@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../../component/AdminLayout';
 import {
@@ -46,38 +46,32 @@ export default function CourseInstanceLectures() {
 
     const fetchInstanceDetails = async () => {
         try {
-            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}`, {
-                withCredentials: true
-            });
-            setInstance(response.data.instance);
+            const data = await frontendApi.get(`/api/admin/course-instances/${instanceId}`);
+            setInstance(data?.instance ?? null);
         } catch (error) {
             console.error('Error fetching instance:', error);
-            toast.error('Failed to load course instance details');
+            toast.error(error?.message || 'Failed to load course instance details');
         }
     };
 
     const fetchChapters = async () => {
         try {
-            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}/chapters`, {
-                withCredentials: true
-            });
-            setChapters(response.data.chapters || []);
+            const data = await frontendApi.get(`/api/admin/course-instances/${instanceId}/chapters`);
+            setChapters(data?.chapters ?? []);
         } catch (error) {
             console.error('Error fetching chapters:', error);
-            toast.error('Failed to load chapters');
+            toast.error(error?.message || 'Failed to load chapters');
         }
     };
 
     const fetchLectures = async () => {
         try {
             setLoading(true);
-            const response = await apiClient.get(`/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`, {
-                withCredentials: true
-            });
-            setLectures(response.data.lectures || []);
+            const data = await frontendApi.get(`/api/admin/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}&limit=1000`);
+            setLectures(data?.lectures ?? []);
         } catch (error) {
             console.error('Error fetching lectures:', error);
-            toast.error('Failed to load lectures');
+            toast.error(error?.message || 'Failed to load lectures');
         } finally {
             setLoading(false);
         }
@@ -103,14 +97,12 @@ export default function CourseInstanceLectures() {
         }
 
         try {
-            await apiClient.delete(`/api/admin/lectures/${lectureId}`, {
-                withCredentials: true
-            });
+            await frontendApi.delete(`/api/admin/lectures/${lectureId}`);
             toast.success('Lecture deleted successfully');
             fetchLectures();
         } catch (error) {
             console.error('Error deleting lecture:', error);
-            toast.error('Failed to delete lecture');
+            toast.error(error?.message || 'Failed to delete lecture');
         }
     };
 
@@ -123,15 +115,11 @@ export default function CourseInstanceLectures() {
 
             if (editingLecture) {
                 // Use the with-tags endpoint for updating
-                await apiClient.put(`/api/admin/lectures/${editingLecture.id}/with-tags`, data, {
-                    withCredentials: true
-                });
+                await frontendApi.put(`/api/admin/lectures/${editingLecture.id}/with-tags`, data);
                 toast.success('Lecture updated successfully');
             } else {
                 // Create lecture with tags
-                await apiClient.post(`/api/admin/lectures`, data, {
-                    withCredentials: true
-                });
+                await frontendApi.post(`/api/admin/lectures`, data);
                 toast.success('Lecture created successfully');
             }
             
@@ -139,7 +127,7 @@ export default function CourseInstanceLectures() {
             fetchLectures();
         } catch (error) {
             console.error('Error saving lecture:', error);
-            toast.error('Failed to save lecture');
+            toast.error(error?.message || 'Failed to save lecture');
         }
     };
 
@@ -186,20 +174,18 @@ export default function CourseInstanceLectures() {
 
         try {
             // Send reorder request to backend
-            await apiClient.put(`/api/admin/lectures/reorder`, {
+            await frontendApi.put(`/api/admin/lectures/reorder`, {
                 chapterId: selectedChapter,
                 lectureOrders: updatedLectures.map(lecture => ({
                     id: lecture.id,
                     lecture_number: lecture.lecture_number
                 }))
-            }, {
-                withCredentials: true
             });
 
             toast.success('Lectures reordered successfully');
         } catch (error) {
             console.error('Error reordering lectures:', error);
-            toast.error('Failed to reorder lectures');
+            toast.error(error?.message || 'Failed to reorder lectures');
             // Revert changes on error
             fetchLectures();
         }

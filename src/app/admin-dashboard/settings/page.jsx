@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import {
@@ -41,16 +41,17 @@ const SettingsPage = () => {
 
     const fetchUserData = async () => {
         try {
-            const response = await apiClient.get('/api/verify-auth');
-            if (response.data.status === 200) {
-                setUserData(response.data);
+            const data = await frontendApi.get('/api/verify-auth');
+            if (data?.status === 200) {
+                setUserData(data);
                 setProfileData({
-                    name: response.data.name || '',
-                    email: response.data.email || ''
+                    name: data.name || '',
+                    email: data.email || ''
                 });
             }
         } catch (error) {
-            toast.error('Failed to load user data');
+            const message = error?.message || 'Failed to load user data';
+            toast.error(message);
         }
     };
 
@@ -74,13 +75,12 @@ const SettingsPage = () => {
 
         setLoading(prev => ({ ...prev, profile: true }));
         try {
-            await apiClient.put(`/api/admin/users/${userData.id}`, profileData, {
-                withCredentials: true
-            });
+            await frontendApi.put(`/api/admin/users/${userData.id}`, profileData);
             toast.success('Profile updated successfully');
             setErrors({});
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update profile');
+            const message = error?.message || 'Failed to update profile';
+            toast.error(message);
         } finally {
             setLoading(prev => ({ ...prev, profile: false }));
         }
@@ -109,7 +109,7 @@ const SettingsPage = () => {
 
         setLoading(prev => ({ ...prev, password: true }));
         try {
-            await apiClient.post('/api/change-password', {
+            await frontendApi.post('/api/change-password', {
                 currentPassword: passwordData.currentPassword,
                 newPassword: passwordData.newPassword
             });
@@ -121,7 +121,8 @@ const SettingsPage = () => {
             });
             setErrors({});
         } catch (error) {
-            toast.error(error.response?.data?.message || 'Failed to update password');
+            const message = error?.message || 'Failed to update password';
+            toast.error(message);
         } finally {
             setLoading(prev => ({ ...prev, password: false }));
         }

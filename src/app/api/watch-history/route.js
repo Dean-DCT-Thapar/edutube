@@ -1,6 +1,7 @@
 import { cookies } from 'next/headers';
 import apiClient from '@/utils/apiClient';;
 import { NextResponse } from 'next/server';
+import { getBackendUrl } from '@/utils/apiConfig';
 
 const WINDOWS_HOST = process.env.WINDOWS_HOST;
 const MODE = process.env.MODE;
