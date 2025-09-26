@@ -1,7 +1,6 @@
 'use client'
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-import TopBar from './component/TopBar';
 import Footer from './component/Footer';
 import frontendApi from '@/utils/frontendApiClient';
 import { 
@@ -71,7 +70,6 @@ export default function Page() {
   if (isChecking) {
     return (
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-primary-50 via-white to-blue-50">
-        <TopBar />
         <main className="flex-1 flex flex-col items-center justify-center px-4">
           <div className="relative">
             <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-200 border-t-primary-700"></div>
@@ -86,7 +84,6 @@ export default function Page() {
   // Beautiful modern landing page
   return (
     <div className="min-h-screen bg-gray-900">
-      <TopBar />
       
       {/* Hero Section with Background Image */}
       <main className="relative overflow-hidden min-h-screen">

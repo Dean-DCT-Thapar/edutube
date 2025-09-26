@@ -157,12 +157,12 @@ export default function Dashboard() {
                         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-16">
                             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-center">
                                 {/* Welcome content - Mobile optimized */}
-                                <div className="lg:col-span-2 text-white space-y-4 sm:space-y-6">
-                                    {/* Logo and Date */}
-                                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
+                                <div className="lg:col-span-2 text-white space-y-3 sm:space-y-4">
+                                    <CurrentDate className="text-white text-sm sm:text-base" />
+                                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold leading-tight">
                                         {getGreeting()}, {userData?.name?.split(' ')[0]}! 👋
                                     </h1>
-                                    <p className="text-base sm:text-lg text-primary-100 leading-relaxed max-w-2xl">
+                                    <p className="text-sm sm:text-base text-primary-100 leading-relaxed max-w-2xl">
                                         Ready to continue your learning journey? 
                                         You have {userData?.enrolled_courses?.length || 0} courses waiting for you.
                                     </p>
@@ -185,8 +185,9 @@ export default function Dashboard() {
                                 
                                 {/* Quick Stats - Mobile responsive */}
                                 <div className="lg:col-span-1">
-                                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
-                                        {getQuickStats().slice(0, 2).map((stat, index) => {
+                                    {/* Mobile: 2x2 grid, Desktop: 2x2 grid */}
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                        {getQuickStats().map((stat, index) => {
                                             const Icon = stat.icon;
                                             return (
                                                 <div key={index} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
@@ -195,36 +196,6 @@ export default function Dashboard() {
                                                     </div>
                                                     <p className="text-xs sm:text-sm text-primary-100 mb-1">{stat.label}</p>
                                                     <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    {/* Additional stats for mobile - shown in row below */}
-                                    <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4 lg:hidden">
-                                        {getQuickStats().slice(2).map((stat, index) => {
-                                            const Icon = stat.icon;
-                                            return (
-                                                <div key={index + 2} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
-                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-2 sm:mb-3`}>
-                                                        <Icon className={`text-base sm:text-lg ${stat.color}`} />
-                                                    </div>
-                                                    <p className="text-xs sm:text-sm text-primary-100 mb-1">{stat.label}</p>
-                                                    <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
-                                                </div>
-                                            );
-                                        })}
-                                    </div>
-                                    {/* Desktop stats continuation */}
-                                    <div className="hidden lg:grid gap-4 mt-4">
-                                        {getQuickStats().slice(2).map((stat, index) => {
-                                            const Icon = stat.icon;
-                                            return (
-                                                <div key={index + 2} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
-                                                    <div className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-3`}>
-                                                        <Icon className={`text-lg ${stat.color}`} />
-                                                    </div>
-                                                    <p className="text-sm text-primary-100 mb-1">{stat.label}</p>
-                                                    <p className="text-2xl font-bold text-white">{stat.value}</p>
                                                 </div>
                                             );
                                         })}
