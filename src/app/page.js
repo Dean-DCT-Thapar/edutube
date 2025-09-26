@@ -148,14 +148,6 @@ export default function Page() {
                   <span>Start Learning Today</span>
                   <ArrowForwardRounded className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </button>
-                
-                <button
-                  onClick={() => router.replace('/dashboard')}
-                  className="px-8 py-4 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl hover:bg-white/30 transition-all duration-300 flex items-center justify-center space-x-2 transform hover:-translate-y-1"
-                >
-                  <PlayArrowRounded className="w-5 h-5" />
-                  <span>Explore Dashboard</span>
-                </button>
               </div>
             </div>
           </div>
