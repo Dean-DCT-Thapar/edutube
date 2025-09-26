@@ -159,19 +159,6 @@ export default function Dashboard() {
                                 {/* Welcome content - Mobile optimized */}
                                 <div className="lg:col-span-2 text-white space-y-4 sm:space-y-6">
                                     {/* Logo and Date */}
-                                    <div className="flex items-center space-x-4 mb-4">
-                                        <img 
-                                            src="/main-site-logo.svg" 
-                                            alt="EduTube Logo" 
-                                            className="h-12 sm:h-16 lg:h-20 w-auto"
-                                            onError={(e) => {
-                                                e.target.style.display = 'none';
-                                            }}
-                                        />
-                                        <div className="flex-1">
-                                            <CurrentDate className="text-white text-sm sm:text-base" />
-                                        </div>
-                                    </div>
                                     <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
                                         {getGreeting()}, {userData?.name?.split(' ')[0]}! 👋
                                     </h1>

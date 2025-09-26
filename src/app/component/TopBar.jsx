@@ -72,14 +72,6 @@ const TopBar = ({ name, avatar }) => {
                 e.target.style.display = 'none';
               }}
             />
-            <div className="flex flex-col justify-center">
-              <h1 className="text-lg sm:text-xl font-bold text-primary-800 group-hover:text-primary-700 transition-colors">
-                Thapar EduTube
-              </h1>
-              <p className="text-xs sm:text-sm text-gray-600">
-                Digital Learning Platform
-              </p>
-            </div>
           </Link>
         </div>
 

@@ -85,46 +85,82 @@ export default function Page() {
 
   // Beautiful modern landing page
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary-50 via-white to-blue-50">
+    <div className="min-h-screen bg-gray-900">
       <TopBar />
       
-      {/* Hero Section */}
-      <main className="relative overflow-hidden">
-        {/* Background decorations */}
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-primary-200 to-blue-300 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-pulse"></div>
-          <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-tr from-blue-200 to-primary-300 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-pulse animation-delay-1000"></div>
-          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gradient-to-r from-primary-100 to-blue-200 rounded-full mix-blend-multiply filter blur-2xl opacity-25 animate-pulse animation-delay-2000"></div>
+      {/* Hero Section with Background Image */}
+      <main className="relative overflow-hidden min-h-screen">
+        {/* Background Image */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{
+            backgroundImage: 'url(/onboardingpage.jpg)',
+          }}
+        />
+        
+        {/* Background Overlay - Stronger overlay to handle bright red colors */}
+        <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-black/60 to-black/50"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-primary-900/40 via-transparent to-blue-900/40"></div>
+        
+        {/* Content overlay decorations - Subtle accent colors */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-30">
+          <div className="absolute top-10 right-10 w-72 h-72 bg-gradient-to-br from-white/10 to-primary-300/20 rounded-full filter blur-xl animate-pulse"></div>
+          <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-tr from-blue-300/10 to-white/20 rounded-full filter blur-xl animate-pulse animation-delay-1000"></div>
         </div>
 
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center min-h-[80vh]">
+          <div className="flex flex-col lg:flex-row items-center justify-center min-h-[85vh] text-center lg:text-left">
             
-            {/* Left Column - Hero Content */}
-            <div className="space-y-8 animate-fade-in-up">
+            {/* Hero Content - Full width with background */}
+            <div className="w-full max-w-4xl space-y-8 animate-fade-in-up">
+              {/* Logo Section */}
+              <div className="flex justify-center lg:justify-start mb-8">
+                <img 
+                  src="/main-site-logo.svg" 
+                  alt="EduTube" 
+                  className="h-16 sm:h-20 lg:h-24 w-auto filter brightness-0 invert"
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              </div>
+              
               <div className="space-y-6">
-                <div className="inline-flex items-center space-x-2 bg-primary-100 text-primary-800 px-4 py-2 rounded-full text-sm font-medium animate-bounce-in">
+                <div className="inline-flex items-center space-x-2 bg-white/20 backdrop-blur-sm text-white px-6 py-3 rounded-full text-sm font-medium animate-bounce-in border border-white/30">
                   <StarRounded className="w-4 h-4" />
                   <span>Thapar University's Premier Learning Platform</span>
                 </div>
                 
-                <h1 className="text-5xl lg:text-7xl font-bold text-gray-900 leading-tight">
-                  Learn <span className="bg-gradient-to-r from-primary-600 to-blue-600 bg-clip-text text-transparent">Smarter</span>,
+                <h1 className="text-4xl sm:text-5xl lg:text-7xl font-bold text-white leading-tight drop-shadow-2xl">
+                  Learn <span className="bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">Smarter</span>,
                   <br />
-                  Achieve <span className="bg-gradient-to-r from-blue-600 to-primary-600 bg-clip-text text-transparent">More</span>
+                  Achieve <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">More</span>
                 </h1>
                 
-                <p className="text-xl text-gray-600 leading-relaxed max-w-lg">
+                <p className="text-lg sm:text-xl text-gray-200 leading-relaxed max-w-2xl mx-auto lg:mx-0 drop-shadow-lg">
                   Transform your academic journey with EduTube's cutting-edge digital learning platform. 
                   Access premium courses, track your progress, and excel like never before.
                 </p>
               </div>
 
+              {/* Stats Section */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-8">
+                {[
+                  { number: "500+", label: "Video Lectures" },
+                  { number: "50+", label: "Courses Available" },
+                  { number: "2000+", label: "Active Students" },
+                  { number: "95%", label: "Success Rate" }
+                ].map((stat, index) => (
+                  <div key={index} className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
+                    <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">{stat.number}</div>
+                    <div className="text-xs sm:text-sm text-gray-300">{stat.label}</div>
+                  </div>
+                ))}
+              </div>
+
               {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-4">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
                 <button
                   onClick={() => router.replace('/login')}
-                  className="group px-8 py-4 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-300 flex items-center justify-center space-x-2"
+                  className="group px-8 py-4 bg-gradient-to-r from-primary-500 to-primary-600 hover:from-primary-600 hover:to-primary-700 text-white font-semibold rounded-xl shadow-2xl hover:shadow-3xl transform hover:-translate-y-2 hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2 backdrop-blur-sm"
                 >
                   <span>Start Learning Today</span>
                   <ArrowForwardRounded className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -132,138 +168,50 @@ export default function Page() {
                 
                 <button
                   onClick={() => router.replace('/dashboard')}
-                  className="px-8 py-4 bg-white border-2 border-gray-200 text-gray-700 font-semibold rounded-xl shadow-md hover:shadow-lg hover:border-primary-300 transition-all duration-300 flex items-center justify-center space-x-2"
+                  className="px-8 py-4 bg-white/20 backdrop-blur-sm border-2 border-white/30 text-white font-semibold rounded-xl shadow-xl hover:shadow-2xl hover:bg-white/30 transition-all duration-300 flex items-center justify-center space-x-2 transform hover:-translate-y-1"
                 >
                   <PlayArrowRounded className="w-5 h-5" />
                   <span>Explore Dashboard</span>
                 </button>
               </div>
             </div>
-
-            {/* Right Column - Onboarding Image */}
-            <div className="relative animate-fade-in-right">
-              <div className="relative overflow-hidden rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500 bg-white">
-                {/* Main Onboarding Image */}
-                <div className="aspect-[4/3] relative overflow-hidden rounded-2xl">
-                  <img 
-                    src="/onboardingpage.jpg"
-                    alt="EduTube Learning Platform - Students engaging in digital learning"
-                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                    onError={(e) => {
-                      // Fallback to feature showcase if image fails
-                      e.target.style.display = 'none';
-                      e.target.nextSibling.style.display = 'block';
-                    }}
-                  />
-                  
-                  {/* Fallback Feature Showcase */}
-                  <div className="hidden bg-white rounded-2xl shadow-2xl p-8">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="text-2xl font-bold text-gray-900">Platform Features</h3>
-                      <div className="flex space-x-1">
-                        {features.map((_, index) => (
-                          <button
-                            key={index}
-                            onClick={() => setCurrentFeature(index)}
-                            className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                              index === currentFeature ? 'bg-primary-600' : 'bg-gray-300'
-                            }`}
-                          />
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Current Feature Display */}
-                    <div className="space-y-6">
-                      <div className="flex items-center space-x-4">
-                        <div className="p-4 bg-gradient-to-br from-primary-100 to-blue-100 rounded-xl">
-                          {React.createElement(features[currentFeature].icon, {
-                            className: "w-8 h-8 text-primary-700"
-                          })}
-                        </div>
-                        <div>
-                          <h4 className="text-xl font-semibold text-gray-900 mb-2">
-                            {features[currentFeature].title}
-                          </h4>
-                          <p className="text-gray-600 leading-relaxed">
-                            {features[currentFeature].description}
-                          </p>
-                        </div>
-                      </div>
-
-                      {/* Feature Preview */}
-                      <div className="bg-gradient-to-br from-gray-50 to-primary-50 rounded-xl p-6">
-                        <div className="flex items-center space-x-3 mb-4">
-                          <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center">
-                            <PlayArrowRounded className="w-6 h-6 text-white" />
-                          </div>
-                          <div className="flex-1">
-                            <div className="h-3 bg-gradient-to-r from-primary-200 to-blue-200 rounded-full mb-2"></div>
-                            <div className="h-2 bg-gray-200 rounded-full w-2/3"></div>
-                          </div>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <CheckCircleRounded className="w-4 h-4 text-green-500" />
-                            <span>Interactive learning modules</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <CheckCircleRounded className="w-4 h-4 text-green-500" />
-                            <span>Real-time progress tracking</span>
-                          </div>
-                          <div className="flex items-center space-x-2 text-sm text-gray-600">
-                            <CheckCircleRounded className="w-4 h-4 text-green-500" />
-                            <span>Personalized learning paths</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Image Overlay with Platform Info */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
-                  <div className="absolute bottom-6 left-6 right-6 text-white">
-                    <div className="flex items-center space-x-2 mb-2">
-                      <img 
-                        src="/main-site-logo.svg" 
-                        alt="EduTube" 
-                        className="h-8 w-auto filter brightness-0 invert"
-                        onError={(e) => e.target.style.display = 'none'}
-                      />
-                    </div>
-                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Experience Learning Excellence</h3>
-                    <p className="text-sm opacity-90">Join thousands of students in their educational journey</p>
-                    
-                    {/* Stats overlay */}
-                    <div className="flex items-center space-x-4 mt-4 text-xs opacity-80">
-                      <div className="flex items-center space-x-1">
-                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
-                        <span>2000+ Students</span>
-                      </div>
-                      <div className="flex items-center space-x-1">
-                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
-                        <span>500+ Lectures</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Floating elements for visual appeal */}
-              <div className="absolute -top-6 -right-6 w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full animate-float opacity-20"></div>
-              <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-gradient-to-br from-green-400 to-blue-500 rounded-full animate-float-delay opacity-30"></div>
-            </div>
           </div>
         </div>
 
         {/* Bottom Wave Transition */}
         <div className="relative">
-          <svg className="w-full h-20 fill-primary-50" viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
+          <svg className="w-full h-20 fill-gray-50" viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
             <path d="M0,96L48,80C96,64,192,32,288,37.3C384,43,480,85,576,90.7C672,96,768,64,864,48C960,32,1056,32,1152,42.7C1248,53,1344,75,1392,85.3L1440,96L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
           </svg>
         </div>
       </main>
+
+      {/* Features Section */}
+      <section className="py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">Platform Features</h2>
+            <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+              Discover the powerful tools and features that make EduTube the perfect platform for your learning journey.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div key={index} className="text-center group">
+                  <div className="w-16 h-16 mx-auto mb-4 bg-gradient-to-br from-primary-100 to-blue-100 rounded-2xl flex items-center justify-center group-hover:from-primary-500 group-hover:to-blue-500 transition-all duration-300 transform group-hover:scale-110">
+                    <Icon className="w-8 h-8 text-primary-700 group-hover:text-white transition-colors duration-300" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-gray-900 mb-2">{feature.title}</h3>
+                  <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
 
       <Footer />
 
