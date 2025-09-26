@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import YouTube from 'react-youtube';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 
 const VideoDisplay = (props) => {
   // Early return if essential props are missing
@@ -55,7 +55,7 @@ const VideoDisplay = (props) => {
         progress: Math.round(progress),
         current_time: Math.floor(currentTime)
       });
-      await apiClient.post('/api/watch-history', {
+      await frontendApi.post('/api/watch-history', {
         lecture_id: props.lec_id,  // Fixed: use lecture_id instead of videoId
         progress: Math.round(progress),  // Round progress to avoid decimals
         current_time: Math.floor(currentTime)  // Send actual current time in seconds
@@ -63,7 +63,7 @@ const VideoDisplay = (props) => {
       console.log('Watch history sent successfully');
     } catch (error) {
       console.error('Error in sendWatchHistory:', error);
-      console.error('Error details:', error.response?.data);
+      console.error('Error details:', error.message);
     }
   };
 
@@ -112,10 +112,10 @@ const VideoDisplay = (props) => {
         // Fetch progress from watch history
         if (props.lec_id) {
           console.log('Making API call to get video progress...');
-          const response = await apiClient.get(`/api/watch-history/getVideoProgress/${props.lec_id}`);
-          console.log('API response:', response.data);
+          const response = await frontendApi.get(`/api/watch-history/getVideoProgress/${props.lec_id}`);
+          console.log('API response:', response);
           
-          const progress = response.data.progress || 0;
+          const progress = response.progress || 0;
           if (progress > 0) {
             setResumeProgress(progress); // Store the progress percentage
             console.log('Will resume from progress:', progress, '% (will calculate time after video loads)');

@@ -33,7 +33,7 @@ export default function TeachersPage() {
 
   const fetchTeachers = async (page = 1, search = "") => {
     try {
-      setLoading(page === 1);
+      setLoading(true);
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '12'
@@ -44,15 +44,27 @@ export default function TeachersPage() {
       }
 
       const response = await frontendApi.get(`/api/teachers?${params}`);
-      
+      const { teachers: fetchedTeachers = [], pagination: paginationData = {} } = response || {};
+
       if (page === 1) {
-        setTeachers(response.teachers);
+        setTeachers(fetchedTeachers);
       } else {
-        setTeachers(prev => [...prev, ...response.teachers]);
+        setTeachers(prev => [...prev, ...fetchedTeachers]);
       }
-      
-      setHasMore(response.hasMore);
-      setTotalTeachers(response.total);
+
+      setPagination(prev => {
+        const currentPage = paginationData.currentPage ?? page;
+        const totalPages = paginationData.totalPages ?? prev.totalPages;
+        const totalCount = paginationData.totalCount ?? prev.totalCount;
+        const hasMore = paginationData.hasMore ?? (currentPage < totalPages);
+
+        return {
+          currentPage,
+          totalPages,
+          totalCount,
+          hasMore
+        };
+      });
     } catch (error) {
       console.error('Error fetching teachers:', error);
       toast.error('Failed to load teachers');
@@ -136,8 +148,8 @@ export default function TeachersPage() {
         </div>
       </div>
 
-      {/* Results Section */}
-      {loading && pagination.currentPage === 1 ? (
+  {/* Results Section */}
+  {loading && teachers.length === 0 ? (
         <div className="flex justify-center items-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
           <span className="ml-2 text-gray-600">Loading teachers...</span>

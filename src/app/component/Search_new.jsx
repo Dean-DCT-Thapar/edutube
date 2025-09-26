@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import SearchCard from "./SearchCard";
 import Link from "next/link";
 
@@ -17,10 +17,12 @@ export default function SearchBar() {
     setLoading(true);
     setSearchInitiated(true);
     try {
-      const response = await apiClient.get(`/api/search`, {
-        params: { q: query, type: category },
-      });
-      setResults(response.data);
+      const params = new URLSearchParams();
+      params.set('q', query);
+      if (category) params.set('type', category);
+
+      const response = await frontendApi.get(`/api/search?${params.toString()}`);
+      setResults(response);
     } catch (error) {
       console.error("Error fetching results:", error);
     } finally {

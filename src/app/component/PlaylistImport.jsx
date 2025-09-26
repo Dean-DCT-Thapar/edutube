@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from 'react';
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
 import {
     PlaylistPlayRounded,
@@ -33,22 +33,20 @@ const PlaylistImport = ({ courseInstanceId, onClose, onImportComplete }) => {
 
         setLoading(true);
         try {
-            const response = await apiClient.post('/api/admin/youtube/fetch-playlist', {
+            const response = await frontendApi.post('/api/admin/youtube/fetch-playlist', {
                 playlistUrl: playlistUrl.trim()
-            }, {
-                withCredentials: true
             });
 
-            if (response.data.success) {
-                setVideos(response.data.videos);
+            if (response.success) {
+                setVideos(response.videos);
                 setStep(2);
-                toast.success(`Found ${response.data.videos.length} videos in playlist`);
+                toast.success(`Found ${response.videos.length} videos in playlist`);
             } else {
                 toast.error('Failed to fetch playlist videos');
             }
         } catch (error) {
             console.error('Error fetching playlist:', error);
-            toast.error(error.response?.data?.message || 'Failed to fetch playlist');
+            toast.error(error.message || 'Failed to fetch playlist');
         } finally {
             setLoading(false);
         }
@@ -141,16 +139,13 @@ const PlaylistImport = ({ courseInstanceId, onClose, onImportComplete }) => {
             });
 
             console.log(lectureData);
-            const response = await apiClient.post('/api/admin/youtube/bulk-import-lectures', {
+            const response = await frontendApi.post('/api/admin/youtube/bulk-import-lectures', {
                 courseInstanceId: courseInstanceId,
                 lectureData: lectureData
-            }, {
-                withCredentials: true
             });
 
-
-            if (response.data.success) {
-                toast.success(response.data.message);
+            if (response.success) {
+                toast.success(response.message);
                 setStep(3);
                 setTimeout(() => {
                     onImportComplete && onImportComplete();
@@ -161,7 +156,7 @@ const PlaylistImport = ({ courseInstanceId, onClose, onImportComplete }) => {
             }
         } catch (error) {
             console.error('Error importing lectures:', error);
-            toast.error(error.response?.data?.message || 'Failed to import lectures');
+            toast.error(error.message || 'Failed to import lectures');
         } finally {
             setImporting(false);
         }

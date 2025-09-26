@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback } from "react";
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import SearchCard from "./SearchCard";
 import SearchBox from "./SearchBox";
 import Link from "next/link";
@@ -70,9 +70,8 @@ export default function Browse() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Use cookie-based authentication
-        const response = await apiClient.get('/api/verify-auth');
-        setUserRole(response.data.role);
+        const response = await frontendApi.verifyAuth();
+        setUserRole(response.role);
       } catch (error) {
         console.error('Auth error:', error);
         setUserRole('guest'); // Allow browsing as guest
@@ -90,8 +89,8 @@ export default function Browse() {
   const loadAllCourses = async () => {
     setInitialLoading(true);
     try {
-      const response = await apiClient.get(`/api/courses/browse`);
-      setAllCourses(response.data || []);
+      const courses = await frontendApi.get(`/api/courses/browse`);
+      setAllCourses(courses || []);
     } catch (error) {
       console.error("Error fetching courses:", error);
       setAllCourses([]);
@@ -108,10 +107,8 @@ export default function Browse() {
     }
 
     try {
-      const response = await apiClient.get('/api/quick-search', {
-        params: { q: query, limit: 8 }
-      });
-      setSuggestions(response.data.suggestions || []);
+      const response = await frontendApi.get(`/api/quick-search?q=${encodeURIComponent(query)}&limit=8`);
+      setSuggestions(response.suggestions || []);
     } catch (error) {
       console.error('Suggestions error:', error);
       setSuggestions([]);
@@ -162,7 +159,7 @@ export default function Browse() {
     try {
       // Use cookie-based authentication - try advanced search first, fall back to basic search for guests
       try {
-        const response = await apiClient.post('/api/advanced-search', {
+        const response = await frontendApi.post('/api/advanced-search', {
           query: query.trim(),
           type,
           page,
@@ -173,14 +170,14 @@ export default function Browse() {
         });
 
         if (replace || page === 1) {
-          setResults(response.data);
+          setResults(response);
         } else {
           // Append results for pagination
           setResults(prev => ({
-            ...response.data,
-            teachers: [...prev.teachers, ...response.data.teachers],
-            courses: [...prev.courses, ...response.data.courses],
-            lectures: [...prev.lectures, ...response.data.lectures]
+            ...response,
+            teachers: [...prev.teachers, ...response.teachers],
+            courses: [...prev.courses, ...response.courses],
+            lectures: [...prev.lectures, ...response.lectures]
           }));
         }
       } catch (authError) {
@@ -217,19 +214,21 @@ export default function Browse() {
   // Fallback basic search for guests
   const handleBasicSearch = async (query, type) => {
     try {
-      const response = await apiClient.get(`/api/search`, {
-        params: { q: query, type: type === 'all' ? '' : type },
-      });
+      const params = new URLSearchParams();
+      if (query) params.set('q', query);
+      if (type && type !== 'all') params.set('type', type);
+
+      const response = await frontendApi.get(`/api/search?${params.toString()}`);
       
       // Transform legacy response to new format
       const transformedResults = {
-        teachers: response.data.filter(r => r.type === 'teacher'),
-        courses: response.data.filter(r => r.type === 'course'),
-        lectures: response.data.filter(r => r.type === 'lecture'),
-        totalCount: response.data.length,
+        teachers: response.filter(r => r.type === 'teacher'),
+        courses: response.filter(r => r.type === 'course'),
+        lectures: response.filter(r => r.type === 'lecture'),
+        totalCount: response.length,
         hasMore: false,
         page: 1,
-        limit: response.data.length
+        limit: response.length
       };
       
       setResults(transformedResults);

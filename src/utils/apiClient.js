@@ -1,10 +1,10 @@
 // utils/apiClient.js
 import axios from 'axios';
-import { getBackendUrl } from './apiConfig';
+import { getBackendUrl, getApiBaseUrl } from './apiConfig';
 
 // Create a reusable Axios instance for backend communication
 const apiClient = axios.create({
-    baseURL: getBackendUrl(),
+    baseURL: typeof window === 'undefined' ? getBackendUrl() : getApiBaseUrl(),
     withCredentials: true,
     headers: {
         'Content-Type': 'application/json',
