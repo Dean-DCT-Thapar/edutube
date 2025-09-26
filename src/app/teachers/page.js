@@ -103,48 +103,51 @@ export default function TeachersPage() {
         <SideBar />
         <main className="flex-1 p-4 sm:p-6 lg:p-8">
           <div className="max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Our Teachers</h1>
-        <p className="text-gray-600">
+      {/* Header - Mobile responsive */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Our Teachers</h1>
+        <p className="text-sm sm:text-base text-gray-600">
           Meet our amazing educators and explore the courses they teach.
         </p>
       </div>
 
-      {/* Search Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-        <div className="flex flex-col sm:flex-row gap-4">
+      {/* Search Section - Mobile responsive */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+        <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
           {/* Search Input */}
           <div className="flex-1 relative">
-            <SearchRounded className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+            <SearchRounded className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg sm:text-xl" />
             <input
               type="text"
               placeholder="Search teachers by name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyPress={handleKeyPress}
-              className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+              className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
             />
           </div>
 
-          {/* Search Button */}
-          <button
-            onClick={handleSearch}
-            className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center gap-2"
-          >
-            <SearchRounded />
-            Search
-          </button>
-
-          {/* Clear Button */}
-          {(searchQuery || searchInitiated) && (
+          {/* Button Group */}
+          <div className="flex gap-2 sm:gap-3">
+            {/* Search Button */}
             <button
-              onClick={handleClearSearch}
-              className="px-4 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors"
+              onClick={handleSearch}
+              className="flex-1 sm:flex-none px-4 sm:px-6 py-2.5 sm:py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors flex items-center justify-center gap-2 text-sm sm:text-base"
             >
-              <ClearRounded />
+              <SearchRounded className="text-sm sm:text-base" />
+              <span className="hidden sm:inline">Search</span>
             </button>
-          )}
+
+            {/* Clear Button */}
+            {(searchQuery || searchInitiated) && (
+              <button
+                onClick={handleClearSearch}
+                className="px-3 sm:px-4 py-2.5 sm:py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 transition-colors flex items-center justify-center"
+              >
+                <ClearRounded className="text-sm sm:text-base" />
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
@@ -156,27 +159,27 @@ export default function TeachersPage() {
         </div>
       ) : (
         <div>
-          {/* Results Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-xl font-semibold text-gray-900">
+          {/* Results Header - Mobile responsive */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-2 sm:space-y-0">
+            <h2 className="text-lg sm:text-xl font-semibold text-gray-900">
               {searchInitiated && searchQuery 
                 ? `Search results for "${searchQuery}"`
                 : "All Teachers"
               }
             </h2>
-            <div className="text-sm text-gray-600">
+            <div className="text-xs sm:text-sm text-gray-600">
               {pagination.totalCount} {pagination.totalCount === 1 ? 'teacher' : 'teachers'}
             </div>
           </div>
 
-          {/* Teachers Grid */}
+          {/* Teachers Grid - Mobile responsive */}
           {teachers.length === 0 ? (
-            <div className="text-center py-12">
-              <PersonRounded className="text-6xl text-gray-300 mb-4 mx-auto" />
-              <p className="text-gray-500 text-lg">
+            <div className="text-center py-8 sm:py-12">
+              <PersonRounded className="text-4xl sm:text-6xl text-gray-300 mb-4 mx-auto" />
+              <p className="text-gray-500 text-base sm:text-lg">
                 {searchInitiated ? 'No teachers found' : 'No teachers available'}
               </p>
-              <p className="text-gray-400">
+              <p className="text-sm sm:text-base text-gray-400">
                 {searchInitiated 
                   ? 'Try adjusting your search terms'
                   : 'Check back later for new teachers'
@@ -185,37 +188,37 @@ export default function TeachersPage() {
             </div>
           ) : (
             <>
-              <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {teachers.map((teacher) => (
                   <Link 
                     key={teacher.id} 
                     href={`/teacher/${teacher.id}`}
                     className="block group"
                   >
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md hover:border-primary-300 transition-all duration-200 group-hover:bg-primary-50">
-                      <div className="flex items-center space-x-4 mb-4">
-                        <div className="w-16 h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-xl font-bold">
+                    <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 hover:shadow-md hover:border-primary-300 transition-all duration-200 group-hover:bg-primary-50">
+                      <div className="flex items-center space-x-3 sm:space-x-4 mb-3 sm:mb-4">
+                        <div className="w-12 h-12 sm:w-16 sm:h-16 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-lg sm:text-xl font-bold flex-shrink-0">
                           {teacher.name.charAt(0).toUpperCase()}
                         </div>
-                        <div className="flex-1">
+                        <div className="flex-1 min-w-0">
                           <div className="flex items-center space-x-2 mb-1">
-                            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors">
+                            <h3 className="text-sm sm:text-lg font-semibold text-gray-900 group-hover:text-primary-600 transition-colors truncate">
                               {teacher.name}
                             </h3>
-                            <VerifiedRounded className="text-primary-600 text-sm" />
+                            <VerifiedRounded className="text-primary-600 text-xs sm:text-sm flex-shrink-0" />
                           </div>
-                          <p className="text-sm text-gray-600">{teacher.email}</p>
+                          <p className="text-xs sm:text-sm text-gray-600 truncate">{teacher.email}</p>
                         </div>
                       </div>
                       
-                      <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 mb-3 sm:mb-4">
                         <div className="flex items-center text-gray-600">
-                          <SchoolRounded className="mr-2 text-lg" />
-                          <span className="text-sm">{teacher.courseCount} courses</span>
+                          <SchoolRounded className="mr-2 text-sm sm:text-lg" />
+                          <span className="text-xs sm:text-sm">{teacher.courseCount} courses</span>
                         </div>
                         <div className="flex items-center text-gray-600">
-                          <GroupRounded className="mr-2 text-lg" />
-                          <span className="text-sm">{teacher.studentCount} students</span>
+                          <GroupRounded className="mr-2 text-sm sm:text-lg" />
+                          <span className="text-xs sm:text-sm">{teacher.studentCount} students</span>
                         </div>
                       </div>
                       
@@ -230,13 +233,13 @@ export default function TeachersPage() {
                 ))}
               </div>
 
-              {/* Load More Button */}
+              {/* Load More Button - Mobile responsive */}
               {pagination.hasMore && (
-                <div className="flex justify-center mt-8">
+                <div className="flex justify-center mt-6 sm:mt-8">
                   <button
                     onClick={handleLoadMore}
                     disabled={loading}
-                    className="px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 disabled:opacity-50"
+                    className="w-full sm:w-auto px-6 py-3 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 disabled:opacity-50 text-sm sm:text-base"
                   >
                     {loading ? 'Loading...' : 'Load More Teachers'}
                   </button>

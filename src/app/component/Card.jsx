@@ -128,41 +128,41 @@ const Card = ({
         {/* Removed - entire card is now clickable */}
       </div>
 
-      {/* Course Info */}
-      <div className="px-6 py-4 space-y-3">
+      {/* Course Info - Mobile responsive padding */}
+      <div className="px-4 sm:px-6 py-3 sm:py-4 space-y-2 sm:space-y-3">
         {/* Title */}
-        <h3 className="font-semibold text-lg text-gray-900 line-clamp-2 group-hover:text-primary-800 transition-colors duration-200">
+        <h3 className="font-semibold text-base sm:text-lg text-gray-900 line-clamp-2 group-hover:text-primary-800 transition-colors duration-200 leading-tight">
           {title}
         </h3>
 
         {/* Author */}
         {author && (
-          <div className="flex items-center space-x-2 text-sm text-gray-600">
-            <PersonOutline className="text-base" />
-            <span>{author.replace('by ', '')}</span>
+          <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+            <PersonOutline className="text-sm sm:text-base" />
+            <span className="truncate">{author.replace('by ', '')}</span>
           </div>
         )}
 
-        {/* Meta information */}
-        <div className="flex items-center justify-between text-sm text-gray-500">
+        {/* Meta information - Stack on mobile */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-0 text-xs sm:text-sm text-gray-500">
           {enrolledCount && (
             <span>{enrolledCount} students</span>
           )}
           {lastAccessed && (
-            <span>Last viewed {formatLastAccessed(lastAccessed)}</span>
+            <span className="truncate">Last viewed {formatLastAccessed(lastAccessed)}</span>
           )}
         </div>
 
         {/* Progress indicator */}
         {progress !== undefined && (
           <div className="space-y-1">
-            <div className="flex justify-between text-sm">
+            <div className="flex justify-between text-xs sm:text-sm">
               <span className="text-gray-600">Progress</span>
               <span className="font-medium text-primary-800">{Math.round(progress)}%</span>
             </div>
-            <div className="w-full bg-gray-200 rounded-full h-2">
+            <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
               <div 
-                className="bg-primary-600 h-2 rounded-full transition-all duration-300"
+                className="bg-primary-600 h-1.5 sm:h-2 rounded-full transition-all duration-300"
                 style={{ width: `${Math.min(progress, 100)}%` }}
               />
             </div>
@@ -170,12 +170,12 @@ const Card = ({
         )}
       </div>
 
-      {/* Action Footer */}
-      <div className="px-6 py-4 bg-gray-50 group-hover:bg-gray-100 transition-colors duration-200">
-        <div className="w-full inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 space-x-2 group/btn shadow-sm">
-          <PlayArrowRounded className="text-lg" />
-          <span>{progress > 0 ? 'Continue Learning' : 'Start Course'}</span>
-          <span className="transform translate-x-0 group-hover/btn:translate-x-1 transition-transform duration-200">
+      {/* Action Footer - Mobile responsive */}
+      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 group-hover:bg-gray-100 transition-colors duration-200">
+        <div className="w-full inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 space-x-1 sm:space-x-2 group/btn shadow-sm">
+          <PlayArrowRounded className="text-base sm:text-lg" />
+          <span className="truncate">{progress > 0 ? 'Continue Learning' : 'Start Course'}</span>
+          <span className="transform translate-x-0 group-hover/btn:translate-x-1 transition-transform duration-200 hidden sm:inline">
             →
           </span>
         </div>

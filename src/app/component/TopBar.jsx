@@ -63,12 +63,20 @@ const TopBar = ({ name, avatar }) => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
-          <Link href="/dashboard" className="flex items-center group">
+          <Link href="/dashboard" className="flex items-center space-x-3 group">
+            <img 
+              src="/main-site-logo.svg" 
+              alt="EduTube Logo" 
+              className="h-8 sm:h-10 w-auto"
+              onError={(e) => {
+                e.target.style.display = 'none';
+              }}
+            />
             <div className="flex flex-col justify-center">
-              <h1 className="text-xl font-bold text-primary-800 group-hover:text-primary-700 transition-colors">
+              <h1 className="text-lg sm:text-xl font-bold text-primary-800 group-hover:text-primary-700 transition-colors">
                 Thapar EduTube
               </h1>
-              <p className="text-sm text-gray-600">
+              <p className="text-xs sm:text-sm text-gray-600">
                 Digital Learning Platform
               </p>
             </div>

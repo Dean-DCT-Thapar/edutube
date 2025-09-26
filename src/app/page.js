@@ -42,13 +42,6 @@ export default function Page() {
     }
   ];
 
-  const stats = [
-    { number: "500+", label: "Video Lectures" },
-    { number: "50+", label: "Courses Available" },
-    { number: "2000+", label: "Active Students" },
-    { number: "95%", label: "Success Rate" }
-  ];
-
   useEffect(() => {
     // Check authentication status using cookie-based auth
     const checkAuth = async () => {
@@ -145,79 +138,112 @@ export default function Page() {
                   <span>Explore Dashboard</span>
                 </button>
               </div>
-
-              {/* Quick Stats */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 pt-8">
-                {stats.map((stat, index) => (
-                  <div key={index} className="text-center space-y-1 animate-fade-in-up" style={{animationDelay: `${index * 100}ms`}}>
-                    <div className="text-2xl lg:text-3xl font-bold text-primary-700">{stat.number}</div>
-                    <div className="text-sm text-gray-600 font-medium">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
             </div>
 
-            {/* Right Column - Interactive Feature Showcase */}
+            {/* Right Column - Onboarding Image */}
             <div className="relative animate-fade-in-right">
-              <div className="bg-white rounded-2xl shadow-2xl p-8 transform hover:scale-105 transition-transform duration-500">
-                {/* Feature Header */}
-                <div className="flex items-center justify-between mb-6">
-                  <h3 className="text-2xl font-bold text-gray-900">Platform Features</h3>
-                  <div className="flex space-x-1">
-                    {features.map((_, index) => (
-                      <button
-                        key={index}
-                        onClick={() => setCurrentFeature(index)}
-                        className={`w-3 h-3 rounded-full transition-colors duration-300 ${
-                          index === currentFeature ? 'bg-primary-600' : 'bg-gray-300'
-                        }`}
+              <div className="relative overflow-hidden rounded-2xl shadow-2xl transform hover:scale-105 transition-transform duration-500 bg-white">
+                {/* Main Onboarding Image */}
+                <div className="aspect-[4/3] relative overflow-hidden rounded-2xl">
+                  <img 
+                    src="/onboardingpage.jpg"
+                    alt="EduTube Learning Platform - Students engaging in digital learning"
+                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    onError={(e) => {
+                      // Fallback to feature showcase if image fails
+                      e.target.style.display = 'none';
+                      e.target.nextSibling.style.display = 'block';
+                    }}
+                  />
+                  
+                  {/* Fallback Feature Showcase */}
+                  <div className="hidden bg-white rounded-2xl shadow-2xl p-8">
+                    <div className="flex items-center justify-between mb-6">
+                      <h3 className="text-2xl font-bold text-gray-900">Platform Features</h3>
+                      <div className="flex space-x-1">
+                        {features.map((_, index) => (
+                          <button
+                            key={index}
+                            onClick={() => setCurrentFeature(index)}
+                            className={`w-3 h-3 rounded-full transition-colors duration-300 ${
+                              index === currentFeature ? 'bg-primary-600' : 'bg-gray-300'
+                            }`}
+                          />
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Current Feature Display */}
+                    <div className="space-y-6">
+                      <div className="flex items-center space-x-4">
+                        <div className="p-4 bg-gradient-to-br from-primary-100 to-blue-100 rounded-xl">
+                          {React.createElement(features[currentFeature].icon, {
+                            className: "w-8 h-8 text-primary-700"
+                          })}
+                        </div>
+                        <div>
+                          <h4 className="text-xl font-semibold text-gray-900 mb-2">
+                            {features[currentFeature].title}
+                          </h4>
+                          <p className="text-gray-600 leading-relaxed">
+                            {features[currentFeature].description}
+                          </p>
+                        </div>
+                      </div>
+
+                      {/* Feature Preview */}
+                      <div className="bg-gradient-to-br from-gray-50 to-primary-50 rounded-xl p-6">
+                        <div className="flex items-center space-x-3 mb-4">
+                          <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center">
+                            <PlayArrowRounded className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <div className="h-3 bg-gradient-to-r from-primary-200 to-blue-200 rounded-full mb-2"></div>
+                            <div className="h-2 bg-gray-200 rounded-full w-2/3"></div>
+                          </div>
+                        </div>
+                        
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <CheckCircleRounded className="w-4 h-4 text-green-500" />
+                            <span>Interactive learning modules</span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <CheckCircleRounded className="w-4 h-4 text-green-500" />
+                            <span>Real-time progress tracking</span>
+                          </div>
+                          <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <CheckCircleRounded className="w-4 h-4 text-green-500" />
+                            <span>Personalized learning paths</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  {/* Image Overlay with Platform Info */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+                  <div className="absolute bottom-6 left-6 right-6 text-white">
+                    <div className="flex items-center space-x-2 mb-2">
+                      <img 
+                        src="/main-site-logo.svg" 
+                        alt="EduTube" 
+                        className="h-8 w-auto filter brightness-0 invert"
+                        onError={(e) => e.target.style.display = 'none'}
                       />
-                    ))}
-                  </div>
-                </div>
-
-                {/* Current Feature Display */}
-                <div className="space-y-6">
-                  <div className="flex items-center space-x-4">
-                    <div className="p-4 bg-gradient-to-br from-primary-100 to-blue-100 rounded-xl">
-                      {React.createElement(features[currentFeature].icon, {
-                        className: "w-8 h-8 text-primary-700"
-                      })}
                     </div>
-                    <div>
-                      <h4 className="text-xl font-semibold text-gray-900 mb-2">
-                        {features[currentFeature].title}
-                      </h4>
-                      <p className="text-gray-600 leading-relaxed">
-                        {features[currentFeature].description}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Feature Preview */}
-                  <div className="bg-gradient-to-br from-gray-50 to-primary-50 rounded-xl p-6">
-                    <div className="flex items-center space-x-3 mb-4">
-                      <div className="w-12 h-12 bg-gradient-to-br from-primary-500 to-blue-500 rounded-lg flex items-center justify-center">
-                        <PlayArrowRounded className="w-6 h-6 text-white" />
-                      </div>
-                      <div className="flex-1">
-                        <div className="h-3 bg-gradient-to-r from-primary-200 to-blue-200 rounded-full mb-2"></div>
-                        <div className="h-2 bg-gray-200 rounded-full w-2/3"></div>
-                      </div>
-                    </div>
+                    <h3 className="text-xl sm:text-2xl font-bold mb-2">Experience Learning Excellence</h3>
+                    <p className="text-sm opacity-90">Join thousands of students in their educational journey</p>
                     
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <CheckCircleRounded className="w-4 h-4 text-green-500" />
-                        <span>Interactive learning modules</span>
+                    {/* Stats overlay */}
+                    <div className="flex items-center space-x-4 mt-4 text-xs opacity-80">
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-green-400 rounded-full"></div>
+                        <span>2000+ Students</span>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <CheckCircleRounded className="w-4 h-4 text-green-500" />
-                        <span>Real-time progress tracking</span>
-                      </div>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <CheckCircleRounded className="w-4 h-4 text-green-500" />
-                        <span>Personalized learning paths</span>
+                      <div className="flex items-center space-x-1">
+                        <div className="w-2 h-2 bg-blue-400 rounded-full"></div>
+                        <span>500+ Lectures</span>
                       </div>
                     </div>
                   </div>

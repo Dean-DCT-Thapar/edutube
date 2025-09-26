@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import TopBar from "../component/TopBar";
 import SideBar from "../component/SideBar";
 import Footer from "../component/Footer";
-import apiClient from '@/utils/apiClient';;
+import frontendApi from '@/utils/frontendApiClient';
 import Link from "next/link";
 import { 
   PlayArrowRounded,
@@ -24,10 +24,11 @@ export default function WatchHistory() {
   useEffect(() => {
     const fetchWatchHistory = async () => {
       try {
-        const response = await apiClient.get('/api/watch-history');
-        setResults(response.data);
+        const response = await frontendApi.get('/api/watch-history');
+        setResults(response);
       } catch (error) {
         console.error("Error fetching watch history:", error);
+        setResults([]);
       } finally {
         setLoading(false);
       }
@@ -113,9 +114,9 @@ export default function WatchHistory() {
         className="group block"
       >
         <div className="bg-white rounded-xl shadow-sm hover:shadow-lg border border-gray-100 overflow-hidden transition-all duration-300 hover:border-primary-200 hover:-translate-y-1">
-          <div className="flex flex-col sm:flex-row">
-            {/* Video Thumbnail */}
-            <div className="relative sm:w-80 sm:flex-shrink-0">
+          <div className="flex flex-col md:flex-row">
+            {/* Video Thumbnail - Mobile responsive */}
+            <div className="relative md:w-64 lg:w-80 md:flex-shrink-0">
               <div className="aspect-video bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center relative overflow-hidden">
                 {thumbnailUrl ? (
                   <img 
@@ -132,13 +133,13 @@ export default function WatchHistory() {
                 
                 {/* Fallback icon */}
                 <div className={`absolute inset-0 flex items-center justify-center ${thumbnailUrl ? 'hidden' : 'flex'}`}>
-                  <VideoLibraryRounded className="text-4xl text-gray-400" />
+                  <VideoLibraryRounded className="text-3xl sm:text-4xl text-gray-400" />
                 </div>
                 
                 {/* Play Button Overlay */}
                 <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-30 transition-all duration-300 flex items-center justify-center">
-                  <div className="w-16 h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300">
-                    <PlayArrowRounded className="text-2xl text-primary-700 ml-1" />
+                  <div className="w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-90 rounded-full flex items-center justify-center transform scale-0 group-hover:scale-100 transition-transform duration-300">
+                    <PlayArrowRounded className="text-xl sm:text-2xl text-primary-700 ml-1" />
                   </div>
                 </div>
                 
@@ -154,7 +155,7 @@ export default function WatchHistory() {
                 
                 {/* Progress Badge */}
                 {progress > 0 && (
-                  <div className="absolute top-3 right-3 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
+                  <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
                     <TrendingUpRounded className="text-xs" />
                     <span>{progress}%</span>
                   </div>
@@ -162,56 +163,56 @@ export default function WatchHistory() {
               </div>
             </div>
             
-            {/* Content */}
-            <div className="flex-1 p-6">
-              <div className="flex items-start justify-between mb-4">
+            {/* Content - Mobile responsive */}
+            <div className="flex-1 p-4 sm:p-6">
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="flex-1 min-w-0">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2 truncate group-hover:text-primary-700 transition-colors">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-700 transition-colors leading-tight">
                     {video.lecture_title}
                   </h3>
                   
-                  <div className="space-y-2">
+                  <div className="space-y-1 sm:space-y-2">
                     {/* Course Info */}
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                      <VideoLibraryRounded className="text-base" />
-                      <span className="font-medium">{video.course_name}</span>
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                      <VideoLibraryRounded className="text-sm sm:text-base" />
+                      <span className="font-medium truncate">{video.course_name}</span>
                     </div>
                     
                     {/* Instructor Info */}
-                    <div className="flex items-center space-x-2 text-sm text-gray-600">
-                      <PersonRounded className="text-base" />
-                      <span>{video.teacher_name}</span>
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
+                      <PersonRounded className="text-sm sm:text-base" />
+                      <span className="truncate">{video.teacher_name}</span>
                     </div>
                     
                     {/* Watch Time */}
-                    <div className="flex items-center space-x-2 text-sm text-gray-500">
-                      <HistoryRounded className="text-base" />
+                    <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-500">
+                      <HistoryRounded className="text-sm sm:text-base" />
                       <span>{formatDate(video.last_watched)}</span>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {/* Progress Section */}
+              {/* Progress Section - Mobile responsive */}
               {progress > 0 && (
-                <div className="mt-4">
-                  <div className="flex items-center justify-between text-sm mb-2">
+                <div className="mt-3 sm:mt-4">
+                  <div className="flex items-center justify-between text-xs sm:text-sm mb-2">
                     <span className="text-gray-600">Progress</span>
                     <span className="font-medium text-gray-900">{progress}% complete</span>
                   </div>
-                  <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div className="w-full bg-gray-200 rounded-full h-1.5 sm:h-2">
                     <div 
-                      className="bg-gradient-to-r from-primary-500 to-primary-600 h-2 rounded-full transition-all duration-500"
+                      className="bg-gradient-to-r from-primary-500 to-primary-600 h-1.5 sm:h-2 rounded-full transition-all duration-500"
                       style={{ width: `${progress}%` }}
                     />
                   </div>
                 </div>
               )}
               
-              {/* Continue Watching Button */}
-              <div className="mt-6">
-                <div className="inline-flex items-center text-sm font-medium text-primary-700 group-hover:text-primary-800 transition-colors">
-                  <PlayArrowRounded className="mr-1" />
+              {/* Continue Watching Button - Mobile responsive */}
+              <div className="mt-4 sm:mt-6">
+                <div className="inline-flex items-center text-xs sm:text-sm font-medium text-primary-700 group-hover:text-primary-800 transition-colors">
+                  <PlayArrowRounded className="mr-1 text-sm sm:text-base" />
                   {progress > 0 ? 'Continue Watching' : 'Start Watching'}
                 </div>
               </div>
@@ -230,16 +231,16 @@ export default function WatchHistory() {
         <SideBar />
         
         <main className="flex-1 transition-all duration-300 ease-in-out">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            {/* Header */}
-            <div className="mb-8">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+            {/* Header - Mobile responsive */}
+            <div className="mb-6 sm:mb-8">
               <div className="flex items-center space-x-3 mb-2">
-                <div className="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
-                  <HistoryRounded className="text-primary-600" />
+                <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+                  <HistoryRounded className="text-primary-600 text-sm sm:text-base" />
                 </div>
-                <h1 className="text-2xl lg:text-3xl font-bold text-gray-900">Watch History</h1>
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Watch History</h1>
               </div>
-              <p className="text-gray-600">Continue where you left off or revisit your favorite lectures</p>
+              <p className="text-sm sm:text-base text-gray-600">Continue where you left off or revisit your favorite lectures</p>
             </div>
             
             {loading ? (
@@ -264,8 +265,8 @@ export default function WatchHistory() {
                 ))}
               </div>
             ) : results.length > 0 ? (
-              /* Results */
-              <div className="space-y-6">
+              /* Results - Mobile responsive spacing */
+              <div className="space-y-4 sm:space-y-6">
                 {results.map((result, index) => (
                   <WatchHistoryCard key={index} video={result} index={index} />
                 ))}

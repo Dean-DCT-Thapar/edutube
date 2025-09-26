@@ -6,6 +6,11 @@ export const metadata = {
   description: "Educational platform for Thapar University students",
   keywords: "education, learning, thapar, university, courses",
   viewport: "width=device-width, initial-scale=1",
+  icons: {
+    icon: '/favicon.png',
+    shortcut: '/favicon.png',
+    apple: '/favicon.png',
+  },
 };
 
 export default function RootLayout({ children }) {

@@ -23,10 +23,10 @@ const Footer = () => {
   };
 
   const socialLinks = [
-    { icon: FacebookOutlined, href: 'https://facebook.com/thaparuniversity', label: 'Facebook' },
-    { icon: Twitter, href: 'https://twitter.com/thaparuniversity', label: 'Twitter' },
-    { icon: LinkedIn, href: 'https://linkedin.com/school/thapar-university', label: 'LinkedIn' },
-    { icon: Instagram, href: 'https://instagram.com/thaparuniversity', label: 'Instagram' },
+    { icon: FacebookOutlined, href: 'https://www.facebook.com/officialTIET/', label: 'Facebook' },
+    { icon: Twitter, href: 'https://x.com/TIETofficial', label: 'Twitter' },
+    { icon: LinkedIn, href: 'https://www.linkedin.com/school/tietofficial/', label: 'LinkedIn' },
+    { icon: Instagram, href: 'https://www.instagram.com/tietofficial/', label: 'Instagram' },
   ];
 
   return (
@@ -111,10 +111,6 @@ const Footer = () => {
                 <a href="mailto:support@edutube.thapar.edu" className="hover:text-primary-700 transition-colors">
                   support@edutube.thapar.edu
                 </a>
-              </div>
-              <div className="flex items-center space-x-3 text-sm text-gray-600">
-                <PhoneOutlined className="text-base text-primary-600" />
-                <span>+91-175-2393000</span>
               </div>
             </div>
 

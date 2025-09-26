@@ -361,7 +361,7 @@ export default function Browse() {
               <SchoolRounded className="mr-2" />
               Courses ({results.courses.length})
             </h3>
-            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               {results.courses.map((course) => (
                 <Link 
                   key={course.id} 
@@ -393,7 +393,7 @@ export default function Browse() {
               <PlayLessonRounded className="mr-2" />
               Lectures ({results.lectures.length})
             </h3>
-            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               {results.lectures.map((lecture) => (
                 <Link 
                   key={lecture.id} 
@@ -424,7 +424,7 @@ export default function Browse() {
               <PersonRounded className="mr-2" />
               Teachers ({results.teachers.length})
             </h3>
-            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               {results.teachers.map((teacher) => (
                 <Link 
                   key={teacher.id} 
@@ -461,22 +461,22 @@ export default function Browse() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-900 mb-2">Browse Courses</h1>
-        <p className="text-gray-600">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+      {/* Header - Mobile responsive */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">Browse Courses</h1>
+        <p className="text-sm sm:text-base text-gray-600 leading-relaxed">
           Discover and preview all available courses. You can watch lectures without enrolling - 
           enrollment just saves courses to your dashboard!
         </p>
       </div>
 
-      {/* Advanced Search Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
-        {/* Main Search Bar */}
+      {/* Advanced Search Section - Mobile responsive */}
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+        {/* Main Search Bar - Mobile responsive */}
         <div className="relative mb-4">
           <div className="relative">
-            <SearchRounded className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl" />
+            <SearchRounded className="absolute left-3 sm:left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-lg sm:text-xl" />
             <input
               ref={searchInputRef}
               type="text"
@@ -485,12 +485,12 @@ export default function Browse() {
               onKeyPress={handleKeyPress}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               placeholder="Search for courses, teachers, lectures..."
-              className="w-full pl-12 pr-24 py-4 border border-gray-300 rounded-xl text-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 sm:pl-12 pr-16 sm:pr-24 py-3 sm:py-4 border border-gray-300 rounded-xl text-sm sm:text-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
             />
             <button
               onClick={() => handleAdvancedSearch()}
               disabled={isLoading}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 disabled:opacity-50"
+              className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 disabled:opacity-50 text-xs sm:text-sm"
             >
               {isLoading ? 'Searching...' : 'Search'}
             </button>
@@ -518,41 +518,43 @@ export default function Browse() {
           )}
         </div>
 
-        {/* Search Controls */}
-        <div className="flex items-center justify-between">
-          {/* Search Type Tabs */}
-          <div className="flex space-x-1 bg-gray-100 rounded-lg p-1">
-            {Object.entries(SEARCH_TYPES).map(([key, config]) => {
-              const Icon = config.icon;
-              const isActive = searchType === key;
+        {/* Search Controls - Mobile responsive */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+          {/* Search Type Tabs - Horizontal scroll on mobile */}
+          <div className="overflow-x-auto">
+            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 min-w-max">
+              {Object.entries(SEARCH_TYPES).map(([key, config]) => {
+                const Icon = config.icon;
+                const isActive = searchType === key;
 
-              return (
-                <button
-                  key={key}
-                  onClick={() => {
-                    setSearchType(key);
-                    if (searchQuery) {
-                      handleAdvancedSearch(searchQuery, key);
-                    }
-                  }}
-                  className={`flex items-center space-x-2 px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 ${
-                    isActive 
-                      ? 'bg-white text-primary-600 shadow-sm' 
-                      : 'text-gray-600 hover:text-gray-900'
-                  }`}
-                >
-                  <Icon className="text-lg" />
-                  <span>{config.label}</span>
-                </button>
-              );
-            })}
+                return (
+                  <button
+                    key={key}
+                    onClick={() => {
+                      setSearchType(key);
+                      if (searchQuery) {
+                        handleAdvancedSearch(searchQuery, key);
+                      }
+                    }}
+                    className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                      isActive 
+                        ? 'bg-white text-primary-600 shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <Icon className="text-base sm:text-lg" />
+                    <span className="hidden sm:inline">{config.label}</span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
 
-          {/* Filter and Sort Controls */}
-          <div className="flex items-center space-x-4">
+          {/* Filter and Sort Controls - Stack on mobile */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center space-x-2 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200"
+              className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 text-sm"
             >
               <TuneRounded />
               <span>Filters</span>
@@ -567,7 +569,7 @@ export default function Browse() {
                   handleAdvancedSearch(searchQuery, searchType, filters, e.target.value, sortOrder);
                 }
               }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
             >
               {SORT_OPTIONS.map(option => (
                 <option key={option.value} value={option.value}>
@@ -579,7 +581,7 @@ export default function Browse() {
             {(searchQuery || searchInitiated) && (
               <button
                 onClick={clearSearch}
-                className="flex items-center space-x-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200"
+                className="flex items-center justify-center space-x-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 text-sm"
               >
                 <ClearRounded />
                 <span>Clear</span>
@@ -588,70 +590,70 @@ export default function Browse() {
           </div>
         </div>
 
-        {/* Advanced Filters */}
+        {/* Advanced Filters - Mobile responsive */}
         {showFilters && (
-          <div className="bg-gray-50 rounded-lg p-6 mt-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Advanced Filters</h3>
+          <div className="bg-gray-50 rounded-lg p-4 sm:p-6 mt-4 space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
+              <h3 className="text-base sm:text-lg font-semibold text-gray-900">Advanced Filters</h3>
               <button
                 onClick={clearFilters}
-                className="flex items-center space-x-1 text-sm text-gray-500 hover:text-gray-700"
+                className="flex items-center justify-center space-x-1 text-sm text-gray-500 hover:text-gray-700 self-start sm:self-auto"
               >
                 <ClearRounded className="text-sm" />
                 <span>Clear all</span>
               </button>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Course Code</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Course Code</label>
                 <input
                   type="text"
                   value={filters.courseCode}
                   onChange={(e) => setFilters(prev => ({ ...prev, courseCode: e.target.value }))}
                   placeholder="e.g. CS101"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Teacher Name</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Teacher Name</label>
                 <input
                   type="text"
                   value={filters.teacherName}
                   onChange={(e) => setFilters(prev => ({ ...prev, teacherName: e.target.value }))}
                   placeholder="Teacher name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Chapter</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Chapter</label>
                 <input
                   type="text"
                   value={filters.chapterName}
                   onChange={(e) => setFilters(prev => ({ ...prev, chapterName: e.target.value }))}
                   placeholder="Chapter name"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Tags</label>
+                <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Tags</label>
                 <input
                   type="text"
                   value={filters.tags}
                   onChange={(e) => setFilters(prev => ({ ...prev, tags: e.target.value }))}
                   placeholder="Tags (keywords)"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
                 />
               </div>
             </div>
             
-            <div className="flex justify-end">
+            <div className="flex justify-stretch sm:justify-end">
               <button
                 onClick={() => handleAdvancedSearch(searchQuery, searchType, filters, sortBy, sortOrder)}
-                className="px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200"
+                className="w-full sm:w-auto px-6 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 text-sm"
               >
                 Apply Filters
               </button>
@@ -682,7 +684,7 @@ export default function Browse() {
               <p className="text-gray-400">Check back later for new courses</p>
             </div>
           ) : (
-            <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+            <div className="grid gap-4 sm:gap-6 grid-cols-1 lg:grid-cols-2">
               {allCourses.map((course, index) => (
                 <Link 
                   key={course.id || index} 

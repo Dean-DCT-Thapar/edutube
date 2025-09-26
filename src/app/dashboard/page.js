@@ -147,69 +147,115 @@ export default function Dashboard() {
             <div className="flex flex-1">
                 <SideBar />
                 <main className="flex-1 transition-all duration-300 ease-in-out">
-                    {/* Hero Section - logo and dashboard text removed */}
+                    {/* Hero Section - Mobile Responsive */}
                     <section className="relative overflow-hidden bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900">
-                        {/* Background decoration */}
+                        {/* Background decoration - Responsive sizes */}
                         <div className="absolute inset-0 opacity-10">
-                            <div className="absolute top-0 right-0 w-96 h-96 bg-white rounded-full -translate-y-48 translate-x-48"></div>
-                            <div className="absolute bottom-0 left-0 w-64 h-64 bg-accent-500 rounded-full translate-y-32 -translate-x-32"></div>
+                            <div className="absolute top-0 right-0 w-48 h-48 sm:w-72 sm:h-72 lg:w-96 lg:h-96 bg-white rounded-full -translate-y-24 sm:-translate-y-36 lg:-translate-y-48 translate-x-24 sm:translate-x-36 lg:translate-x-48"></div>
+                            <div className="absolute bottom-0 left-0 w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 bg-accent-500 rounded-full translate-y-16 sm:translate-y-24 lg:translate-y-32 -translate-x-16 sm:-translate-x-24 lg:-translate-x-32"></div>
                         </div>
-                        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 lg:py-16">
-                            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
-                                {/* Welcome content - logo and dashboard text removed */}
-                                <div className="text-white space-y-4">
-                                    <CurrentDate className="text-white" />
-                                    <h1 className="text-3xl lg:text-4xl font-bold">
+                        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 lg:py-16">
+                            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8 items-center">
+                                {/* Welcome content - Mobile optimized */}
+                                <div className="lg:col-span-2 text-white space-y-4 sm:space-y-6">
+                                    {/* Logo and Date */}
+                                    <div className="flex items-center space-x-4 mb-4">
+                                        <img 
+                                            src="/main-site-logo.svg" 
+                                            alt="EduTube Logo" 
+                                            className="h-12 sm:h-16 lg:h-20 w-auto"
+                                            onError={(e) => {
+                                                e.target.style.display = 'none';
+                                            }}
+                                        />
+                                        <div className="flex-1">
+                                            <CurrentDate className="text-white text-sm sm:text-base" />
+                                        </div>
+                                    </div>
+                                    <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight">
                                         {getGreeting()}, {userData?.name?.split(' ')[0]}! 👋
                                     </h1>
-                                    <p className="text-lg text-primary-100 leading-relaxed">
+                                    <p className="text-base sm:text-lg text-primary-100 leading-relaxed max-w-2xl">
                                         Ready to continue your learning journey? 
                                         You have {userData?.enrolled_courses?.length || 0} courses waiting for you.
                                     </p>
-                                    {/* Quick actions */}
-                                    <div className="flex flex-wrap gap-3 pt-4">
+                                    {/* Quick actions - Mobile responsive */}
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2 sm:pt-4">
                                         <button 
                                             onClick={() => router.push('/browse')}
-                                            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-accent-600 text-white hover:bg-accent-500 focus:ring-2 focus:ring-accent-500 focus:outline-none transition-all duration-200"
+                                            className="inline-flex items-center justify-center px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-lg bg-accent-600 text-white hover:bg-accent-500 focus:ring-2 focus:ring-accent-500 focus:outline-none transition-all duration-200 shadow-lg"
                                         >
                                             Explore Courses
                                         </button>
                                         <button 
                                             onClick={() => router.push('/watchHistory')}
-                                            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-white text-primary-800 hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 focus:outline-none transition-all duration-200"
+                                            className="inline-flex items-center justify-center px-4 sm:px-6 py-3 text-sm sm:text-base font-medium rounded-lg bg-white text-primary-800 hover:bg-gray-100 focus:ring-2 focus:ring-gray-300 focus:outline-none transition-all duration-200 shadow-lg"
                                         >
                                             Continue Watching
                                         </button>
                                     </div>
                                 </div>
-                                {/* Stats cards */}
-                                {/* <div className="grid grid-cols-2 gap-4">
-                                    {getQuickStats().map((stat, index) => {
-                                        const Icon = stat.icon;
-                                        return (
-                                            <div key={index} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border border-white border-opacity-20">
-                                                <div className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-3`}>
-                                                    <Icon className={`text-lg ${stat.color}`} />
+                                
+                                {/* Quick Stats - Mobile responsive */}
+                                <div className="lg:col-span-1">
+                                    <div className="grid grid-cols-2 lg:grid-cols-1 gap-3 sm:gap-4">
+                                        {getQuickStats().slice(0, 2).map((stat, index) => {
+                                            const Icon = stat.icon;
+                                            return (
+                                                <div key={index} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
+                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-2 sm:mb-3`}>
+                                                        <Icon className={`text-base sm:text-lg ${stat.color}`} />
+                                                    </div>
+                                                    <p className="text-xs sm:text-sm text-primary-100 mb-1">{stat.label}</p>
+                                                    <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
                                                 </div>
-                                                <p className="text-sm text-primary-100 mb-1">{stat.label}</p>
-                                                <p className="text-2xl font-bold text-white">{stat.value}</p>
-                                            </div>
-                                        );
-                                    })}
-                                </div> */}
+                                            );
+                                        })}
+                                    </div>
+                                    {/* Additional stats for mobile - shown in row below */}
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4 mt-3 sm:mt-4 lg:hidden">
+                                        {getQuickStats().slice(2).map((stat, index) => {
+                                            const Icon = stat.icon;
+                                            return (
+                                                <div key={index + 2} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
+                                                    <div className={`w-8 h-8 sm:w-10 sm:h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-2 sm:mb-3`}>
+                                                        <Icon className={`text-base sm:text-lg ${stat.color}`} />
+                                                    </div>
+                                                    <p className="text-xs sm:text-sm text-primary-100 mb-1">{stat.label}</p>
+                                                    <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                    {/* Desktop stats continuation */}
+                                    <div className="hidden lg:grid gap-4 mt-4">
+                                        {getQuickStats().slice(2).map((stat, index) => {
+                                            const Icon = stat.icon;
+                                            return (
+                                                <div key={index + 2} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
+                                                    <div className={`w-10 h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-3`}>
+                                                        <Icon className={`text-lg ${stat.color}`} />
+                                                    </div>
+                                                    <p className="text-sm text-primary-100 mb-1">{stat.label}</p>
+                                                    <p className="text-2xl font-bold text-white">{stat.value}</p>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </section>
 
                     {/* Main content */}
-                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
                         {/* Recent Activity */}
                         <section>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Recent Activity</h2>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Recent Activity</h2>
                                 <button 
                                     onClick={() => router.push('/watchHistory')}
-                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200"
+                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200 self-start sm:self-auto"
                                 >
                                     View All
                                 </button>
@@ -251,18 +297,18 @@ export default function Dashboard() {
 
                         {/* Your Courses */}
                         <section>
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-2xl lg:text-3xl font-bold text-gray-900">Your Courses</h2>
+                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                                <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Your Courses</h2>
                                 <button 
                                     onClick={() => router.push('/browse')}
-                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200"
+                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200 self-start sm:self-auto"
                                 >
                                     Browse More
                                 </button>
                             </div>
 
                             {userData?.enrolled_courses?.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
                                     {userData.enrolled_courses.map((course, index) => (
                                         <Card 
                                             key={course.course_instance_id || index}
