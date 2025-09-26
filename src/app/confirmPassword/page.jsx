@@ -53,7 +53,7 @@ const page = () => {
     
     //Validate new password
     if (!validateNewPassword(formValues.newPassword)) {
-      toast.error('New Password must have at least 8 characters, 1 digit, 1 lowercase letter, 1 uppercase letter, and 1 special character.');
+      toast.error('New Password must be at least 6 characters long.');
       return;
     }
 
@@ -97,18 +97,8 @@ const page = () => {
     }
 
   const validateNewPassword = (password) => {
-    const minLength = 8;
-    const hasDigit = /\d/.test(password);
-    const hasLowercase = /[a-z]/.test(password);
-    const hasUppercase = /[A-Z]/.test(password);
-    const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(password);
-    return (
-      password.length >= minLength &&
-      hasDigit &&
-      hasLowercase &&
-      hasUppercase &&
-      hasSpecialChar
-    );
+    const minLength = 6;
+    return password.length > minLength;
   };
 
   const handleClick = (e) => {
@@ -118,7 +108,7 @@ const page = () => {
     const confirmPass = document.querySelector('#confirmPassword').value;
 
     if (!validateNewPassword(newPass)) {
-      alert('New Password must have at least 8 characters, 1 digit, 1 lowercase letter, 1 uppercase letter, and 1 special character.');
+      alert('New Password must be at least 6 characters long.');
       return;
     }
 
@@ -229,11 +219,7 @@ const page = () => {
                 <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
                   <h4 className="text-sm font-medium text-blue-900 mb-2">Password Requirements:</h4>
                   <ul className="text-sm text-blue-700 space-y-1">
-                    <li>• At least 8 characters long</li>
-                    <li>• At least 1 digit</li>
-                    <li>• At least 1 lowercase letter</li>
-                    <li>• At least 1 uppercase letter</li>
-                    <li>• At least 1 special character</li>
+                    <li>• Must be more than 6 characters long</li>
                   </ul>
                 </div>
 
