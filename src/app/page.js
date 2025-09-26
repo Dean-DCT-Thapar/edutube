@@ -138,20 +138,6 @@ export default function Page() {
                 </p>
               </div>
 
-              {/* Stats Section */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-6 py-8">
-                {[
-                  { number: "500+", label: "Video Lectures" },
-                  { number: "50+", label: "Courses Available" },
-                  { number: "2000+", label: "Active Students" },
-                  { number: "95%", label: "Success Rate" }
-                ].map((stat, index) => (
-                  <div key={index} className="text-center bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
-                    <div className="text-2xl sm:text-3xl font-bold text-white drop-shadow-lg">{stat.number}</div>
-                    <div className="text-xs sm:text-sm text-gray-300">{stat.label}</div>
-                  </div>
-                ))}
-              </div>
 
               {/* CTA Buttons */}
               <div className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start">
