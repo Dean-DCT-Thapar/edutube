@@ -140,45 +140,125 @@ const page = () => {
   };
 
   return (
-    <div>
+    <div className="min-h-screen flex flex-col bg-gray-50">
       <TopBar name={userData?.name} />
-      <SideBar />
-      <main className='pt-15'>
-        <div className='flex flex-row sm:ml-44 ml-20 -z-10 w-4/5'>
-          <img src='profile.png' className='rounded-full h-24 sm:h-44' />
-          <div className='text-[#102c57] ml-5 my-auto text-xl sm:text-3xl font-poppins'>
-            {userData?.name}<br />
-            ROLL NUMBER ENDPOINT
+      <div className="flex flex-1">
+        <SideBar />
+        <main className="flex-1 transition-all duration-300 ease-in-out">
+          <div className="max-w-4xl mx-auto px-4 py-8">
+            {/* Profile Header */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-8">
+              <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+                <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-bold">
+                  {userData?.name?.charAt(0)?.toUpperCase() || 'U'}
+                </div>
+                <div className="text-center sm:text-left">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-2">
+                    {userData?.name || 'User'}
+                  </h1>
+                  <p className="text-gray-600 text-lg">{userData?.email}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Change Password Form */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+              <h2 className="text-2xl font-bold text-gray-900 mb-6">Change Password</h2>
+              
+              <form onSubmit={handleSubmit} className="space-y-6">
+                {/* Username Display */}
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between py-3 border-b border-gray-100">
+                  <label className="text-sm font-medium text-gray-700 mb-1 sm:mb-0">
+                    Username:
+                  </label>
+                  <span className="text-gray-900 font-medium">{userData?.email}</span>
+                </div>
+
+                {/* Old Password */}
+                <div className="space-y-2">
+                  <label htmlFor="oldPassword" className="block text-sm font-medium text-gray-700">
+                    Current Password
+                  </label>
+                  <input
+                    id="oldPassword"
+                    name="oldPassword"
+                    type="password"
+                    required
+                    value={formValues.oldPassword}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                    placeholder="Enter your current password"
+                  />
+                </div>
+
+                {/* New Password */}
+                <div className="space-y-2">
+                  <label htmlFor="newPassword" className="block text-sm font-medium text-gray-700">
+                    New Password
+                  </label>
+                  <input
+                    id="newPassword"
+                    name="newPassword"
+                    type="password"
+                    required
+                    value={formValues.newPassword}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                    placeholder="Enter your new password"
+                  />
+                </div>
+
+                {/* Confirm Password */}
+                <div className="space-y-2">
+                  <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700">
+                    Confirm New Password
+                  </label>
+                  <input
+                    id="confirmPassword"
+                    name="confirmPassword"
+                    type="password"
+                    required
+                    value={formValues.confirmPassword}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors"
+                    placeholder="Confirm your new password"
+                  />
+                </div>
+
+                {/* Password Requirements */}
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4">
+                  <h4 className="text-sm font-medium text-blue-900 mb-2">Password Requirements:</h4>
+                  <ul className="text-sm text-blue-700 space-y-1">
+                    <li>• At least 8 characters long</li>
+                    <li>• At least 1 digit</li>
+                    <li>• At least 1 lowercase letter</li>
+                    <li>• At least 1 uppercase letter</li>
+                    <li>• At least 1 special character</li>
+                  </ul>
+                </div>
+
+                {/* Form Buttons */}
+                <div className="flex flex-col sm:flex-row gap-3 pt-6">
+                  <button
+                    type="submit"
+                    className="flex-1 bg-primary-600 text-white py-3 px-6 rounded-md hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-colors font-medium"
+                  >
+                    Save Changes
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => router.push("/dashboard")}
+                    className="flex-1 bg-gray-600 text-white py-3 px-6 rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors font-medium"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
-        </div>
-        <div className='border-[#102c57] text-[#102c57] border-1.5 p-3 mt-5 mb-10 sm:ml-44 ml-4.5 -z-10 w-4/5'>
-          <p className='text-xl sm:text-3xl font-poppins'>Change Password</p>
-          <form className='mt-5' onSubmit={handleSubmit}>
-            <div className='flex flex-row text-lg sm:text-2xl sm:justify-between mx-5'>
-              <p>Username:</p>
-              <p>{userData?.email}</p>
-            </div>
-            <div className='flex flex-row mt-4 text-lg sm:text-2xl justify-between mx-5'>
-              <p>Old Password:</p>
-              <input required name='oldPassword' value={formValues.oldPassword} onChange={handleChange} type='password' className='border-1 border-[#102c57] w-24 h-7 sm:h-10 sm:w-72' id='oldPassword' />
-            </div>
-            <div className='flex flex-row mt-4 text-lg sm:text-2xl justify-between mx-5'>
-              <p>New Password:</p>
-              <input required name='newPassword' value={formValues.newPassword} onChange={handleChange} type='password' className='border-1 border-[#102c57] w-24 h-7 sm:h-10 sm:w-72' id='newPassword'></input>
-            </div>
-            <div className='flex flex-row mt-4 text-lg sm:text-2xl justify-between mx-5'>
-              <p>Confirm Password:</p>
-              <input required name='confirmPassword' value={formValues.confirmPassword} onChange={handleChange} type='password' className='border-1 border-[#102c57] w-24 h-7 sm:h-10 sm:w-72' id='confirmPassword'></input>
-            </div>
-            <p className='text-black text-sm text-center mt-2'>The password must have at least 8 characters, at least 1 digit(s), at least 1 lowercase letter, at least 1 uppercase letter, and at least 1 special character.</p>
-            <div className='flex flex-row justify-center mt-5'>
-              <button type='submit' className='bg-[#b42625] text-white font-poppins text-sm sm:text-xl px-0.128  sm:px-5 sm:py-2 w-52 mr-5'>Save Changes</button>
-              <button type='button' onClick={() => router.push("/dashboard")} className='bg-[#102c57] text-white font-poppins text-sm sm:text-xl sm:px-5 sm:py-2 h-7 sm:h-12 w-52'>Cancel</button>
-            </div>
-          </form>
-        </div>
-        <Footer style={{width: '100%'}}/>
-      </main>
+        </main>
+      </div>
+      <Footer />
     </div>
   )
 }

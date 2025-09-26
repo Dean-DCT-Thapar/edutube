@@ -17,18 +17,8 @@ const Footer = () => {
       { label: 'Search Courses', href: '/browse' },
       { label: 'Watch History', href: '/watchHistory' },
       { label: 'Profile', href: '/profile' },
-    ],
-    support: [
-      { label: 'Help Center', href: '/help' },
-      { label: 'Contact Support', href: '/support' },
-      { label: 'System Status', href: '/status' },
-      { label: 'Release Notes', href: '/releases' },
-    ],
-    legal: [
-      { label: 'Privacy Policy', href: '/privacy' },
-      { label: 'Terms of Service', href: '/terms' },
-      { label: 'Academic Integrity', href: '/integrity' },
-      { label: 'Accessibility', href: '/accessibility' },
+      { label: 'Teachers', href: '/teachers' },
+      { label: 'Browse All Courses', href: '/browse' },
     ],
   };
 
@@ -43,7 +33,7 @@ const Footer = () => {
     <footer className="bg-white border-t border-gray-200 mt-auto">
       {/* Main footer content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand section */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-4">
@@ -60,7 +50,7 @@ const Footer = () => {
                 <p className="text-sm text-gray-600">Digital Learning</p>
               </div>
             </div>
-            <p className="text-gray-600 text-sm mb-4 leading-relaxed">
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
               Empowering Thapar University students with cutting-edge digital learning experiences. 
               Access courses, track progress, and excel in your academic journey.
             </p>
@@ -87,14 +77,15 @@ const Footer = () => {
 
           {/* Platform links */}
           <div>
-            <h4 className="font-semibold text-gray-900 mb-4">Platform</h4>
-            <ul className="space-y-2">
+            <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
+            <ul className="space-y-3">
               {footerLinks.platform.map((link) => (
                 <li key={link.label}>
                   <Link 
                     href={link.href}
-                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200"
+                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200 flex items-center"
                   >
+                    <span className="w-2 h-2 bg-primary-400 rounded-full mr-3"></span>
                     {link.label}
                   </Link>
                 </li>
@@ -102,58 +93,38 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Support links */}
+          {/* Contact Info */}
           <div>
-            <h4 className="font-semibold text-gray-900 mb-4">Support</h4>
-            <ul className="space-y-2">
-              {footerLinks.support.map((link) => (
-                <li key={link.label}>
-                  <Link 
-                    href={link.href}
-                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          {/* Contact & Legal */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-4">Contact & Legal</h4>
+            <h4 className="font-semibold text-gray-900 mb-4">Contact Information</h4>
             
             {/* Contact info */}
-            <div className="space-y-2 mb-4">
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <LocationOnOutlined className="text-base" />
-                <span>Thapar University, Patiala</span>
+            <div className="space-y-3">
+              <div className="flex items-start space-x-3 text-sm text-gray-600">
+                <LocationOnOutlined className="text-base mt-0.5 text-primary-600" />
+                <div>
+                  <div className="font-medium text-gray-900">Thapar University</div>
+                  <div>Patiala, Punjab, India</div>
+                </div>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <EmailOutlined className="text-base" />
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <EmailOutlined className="text-base text-primary-600" />
                 <a href="mailto:support@edutube.thapar.edu" className="hover:text-primary-700 transition-colors">
                   support@edutube.thapar.edu
                 </a>
               </div>
-              <div className="flex items-center space-x-2 text-sm text-gray-600">
-                <PhoneOutlined className="text-base" />
+              <div className="flex items-center space-x-3 text-sm text-gray-600">
+                <PhoneOutlined className="text-base text-primary-600" />
                 <span>+91-175-2393000</span>
               </div>
             </div>
 
-            {/* Legal links */}
-            <ul className="space-y-2">
-              {footerLinks.legal.map((link) => (
-                <li key={link.label}>
-                  <Link 
-                    href={link.href}
-                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200"
-                  >
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            {/* University Info */}
+            <div className="mt-6 p-4 bg-primary-50 rounded-lg">
+              <div className="text-sm text-primary-800 font-medium">Academic Excellence</div>
+              <div className="text-xs text-primary-700 mt-1">
+                Fostering innovation and learning since 1956
+              </div>
+            </div>
           </div>
         </div>
       </div>

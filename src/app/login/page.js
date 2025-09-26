@@ -220,10 +220,10 @@ export default function Page() {
       </div>
       
       {/* Admin Login Helper for Development */}
-      <AdminLoginHelper />
+      {/* <AdminLoginHelper /> */}
       
       {/* Debug Helper for Troubleshooting */}
-      <AdminDebugHelper />
+      {/* <AdminDebugHelper /> */}
     </div>
   );
 }
