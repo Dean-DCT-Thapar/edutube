@@ -20,7 +20,7 @@ COPY . .
 
 # Next.js collects completely anonymous telemetry data about general usage.
 # Uncomment the following line to disable telemetry during the build.
-ENV NEXT_TELEMETRY_DISABLED 1
+ENV NEXT_TELEMETRY_DISABLED=1
 
 RUN npm run build
 

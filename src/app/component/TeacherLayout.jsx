@@ -1,57 +1,39 @@
 'use client';
+
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
 import {
     DashboardRounded,
-    PeopleRounded,
     SchoolRounded,
-    MenuBookRounded,
-    VideoLibraryRounded,
-    SettingsRounded,
     LogoutRounded,
     MenuRounded,
     CloseRounded,
     PersonRounded,
-    AdminPanelSettingsRounded,
-    TuneRounded,
-    AutoStoriesRounded,
-    AccountTreeRounded,
-    GroupRounded,
-    VpnKeyRounded
+    MenuBookRounded
 } from '@mui/icons-material';
 
-
-const AdminLayout = ({ children, title, userName }) => {
+const TeacherLayout = ({ children, title, userName }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
 
     const navigation = [
-        { name: 'Dashboard', href: '/admin-dashboard', icon: DashboardRounded },
-        { name: 'Users', href: '/admin-dashboard/users', icon: PeopleRounded },
-        { name: 'Course Templates', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
-        { name: 'Course Instances', href: '/admin-dashboard/course-instances', icon: GroupRounded },
-        { name: 'CLI API Keys', href: '/admin-dashboard/cli-keys', icon: VpnKeyRounded },
-        { name: 'Settings', href: '/admin-dashboard/settings', icon: SettingsRounded },
+        { name: 'Dashboard', href: '/teacher-dashboard', icon: DashboardRounded },
+        { name: 'My courses', href: '/teacher-dashboard/instances', icon: SchoolRounded }
     ];
 
     const handleLogout = async () => {
         try {
-            // Call the logout API to clear cookies
-            await fetch('/api/logout', { 
+            await fetch('/api/logout', {
                 method: 'POST',
                 credentials: 'include'
             });
-            
-            // Also clear any lingering localStorage tokens for cleanup
             localStorage.removeItem('adminToken');
             localStorage.removeItem('token');
-            
             router.push('/login');
         } catch (error) {
             console.error('Logout failed:', error);
-            // Even if API fails, clear local storage and redirect
             localStorage.removeItem('adminToken');
             localStorage.removeItem('token');
             router.push('/login');
@@ -67,29 +49,28 @@ const AdminLayout = ({ children, title, userName }) => {
 
     return (
         <div className="h-screen bg-gray-50 flex overflow-hidden">
-            {/* Mobile sidebar overlay */}
             {sidebarOpen && (
-                <div 
+                <div
                     className="fixed inset-0 bg-black bg-opacity-50 z-20 lg:hidden"
                     onClick={() => setSidebarOpen(false)}
                 />
             )}
 
-            {/* Sidebar */}
-            <div className={`
+            <div
+                className={`
                 fixed lg:static inset-y-0 left-0 z-30 w-64 bg-white border-r border-gray-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0
                 ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-            `}>
+            `}
+            >
                 <div className="flex flex-col h-full">
-                    {/* Logo */}
                     <div className="flex items-center justify-between p-4 border-b border-gray-200">
                         <div className="flex items-center space-x-3">
                             <div className="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center">
-                                <AdminPanelSettingsRounded className="text-white text-sm" />
+                                <MenuBookRounded className="text-white text-sm" />
                             </div>
                             <div>
-                                <h1 className="text-lg font-bold text-gray-900">Admin Panel</h1>
-                                <p className="text-xs text-gray-600">EduTube Management</p>
+                                <h1 className="text-lg font-bold text-gray-900">Teacher</h1>
+                                <p className="text-xs text-gray-600">EduTube</p>
                             </div>
                         </div>
                         <button
@@ -100,10 +81,12 @@ const AdminLayout = ({ children, title, userName }) => {
                         </button>
                     </div>
 
-                    {/* Navigation */}
                     <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                         {navigation.map((item) => {
-                            const isActive = pathname === item.href;
+                            const isActive =
+                                item.href === '/teacher-dashboard'
+                                    ? pathname === '/teacher-dashboard'
+                                    : pathname.startsWith('/teacher-dashboard/instances');
                             return (
                                 <Link
                                     key={item.name}
@@ -111,20 +94,22 @@ const AdminLayout = ({ children, title, userName }) => {
                                     onClick={() => setSidebarOpen(false)}
                                     className={`
                                         flex items-center px-3 py-2 text-sm font-medium rounded-lg transition-colors duration-200
-                                        ${isActive 
-                                            ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600' 
-                                            : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
+                                        ${
+                                            isActive
+                                                ? 'bg-primary-50 text-primary-700 border-r-2 border-primary-600'
+                                                : 'text-gray-700 hover:bg-gray-100 hover:text-gray-900'
                                         }
                                     `}
                                 >
-                                    <item.icon className={`mr-3 text-lg ${isActive ? 'text-primary-600' : 'text-gray-400'}`} />
+                                    <item.icon
+                                        className={`mr-3 text-lg ${isActive ? 'text-primary-600' : 'text-gray-400'}`}
+                                    />
                                     {item.name}
                                 </Link>
                             );
                         })}
                     </nav>
 
-                    {/* User profile and logout */}
                     <div className="p-4 border-t border-gray-200">
                         <div className="flex items-center space-x-3 mb-3">
                             <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center">
@@ -132,9 +117,9 @@ const AdminLayout = ({ children, title, userName }) => {
                             </div>
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-medium text-gray-900 truncate">
-                                    {userName || 'Admin'}
+                                    {userName || 'Teacher'}
                                 </p>
-                                <p className="text-xs text-gray-600">Administrator</p>
+                                <p className="text-xs text-gray-600">Instructor</p>
                             </div>
                         </div>
                         <button
@@ -148,9 +133,7 @@ const AdminLayout = ({ children, title, userName }) => {
                 </div>
             </div>
 
-            {/* Main content */}
             <div className="flex-1 flex flex-col overflow-hidden">
-                {/* Top bar */}
                 <header className="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4">
@@ -163,33 +146,27 @@ const AdminLayout = ({ children, title, userName }) => {
                             <div>
                                 <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
                                 <p className="text-sm text-gray-600">
-                                    {getWelcomeMessage()}, {userName?.split(' ')[0] || 'Admin'}!
+                                    {getWelcomeMessage()}, {userName?.split(' ')[0] || 'Teacher'}!
                                 </p>
                             </div>
                         </div>
-                        
-                        <div className="hidden md:block">
-                            <div className="text-right">
-                                <p className="text-sm font-medium text-gray-900">
-                                    {new Date().toLocaleDateString('en-US', { 
-                                        weekday: 'long', 
-                                        year: 'numeric', 
-                                        month: 'long', 
-                                        day: 'numeric' 
-                                    })}
-                                </p>
-                            </div>
+                        <div className="hidden md:block text-right">
+                            <p className="text-sm font-medium text-gray-900">
+                                {new Date().toLocaleDateString('en-US', {
+                                    weekday: 'long',
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}
+                            </p>
                         </div>
                     </div>
                 </header>
 
-                {/* Page content */}
-                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
-                    {children}
-                </main>
+                <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">{children}</main>
             </div>
         </div>
     );
 };
 
-export default AdminLayout;
+export default TeacherLayout;
