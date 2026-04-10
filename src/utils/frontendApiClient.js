@@ -49,7 +49,14 @@ class FrontendApiClient {
       }
 
       if (!response.ok) {
-        throw new Error(data.message || `HTTP error! status: ${response.status}`);
+        const err = new Error(
+          typeof data === 'object' && data?.message
+            ? data.message
+            : `HTTP error! status: ${response.status}`
+        );
+        err.status = response.status;
+        if (typeof data === 'object' && data) err.data = data;
+        throw err;
       }
 
       return data;

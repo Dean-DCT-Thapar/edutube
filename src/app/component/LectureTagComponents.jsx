@@ -46,9 +46,10 @@ const TagInput = ({ tags, onTagsChange, availableTags = [], placeholder = "Add t
         onTagsChange(tags.filter(tag => tag !== tagToRemove));
     };
 
-    const handleKeyPress = (e) => {
+    const handleKeyDown = (e) => {
         if (e.key === 'Enter' || e.key === ',') {
             e.preventDefault();
+            e.stopPropagation();
             if (inputValue.trim()) {
                 addTag(inputValue);
             }
@@ -78,7 +79,7 @@ const TagInput = ({ tags, onTagsChange, availableTags = [], placeholder = "Add t
                     type="text"
                     value={inputValue}
                     onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
+                    onKeyDown={handleKeyDown}
                     placeholder={tags.length === 0 ? placeholder : ""}
                     className="flex-1 outline-none bg-transparent min-w-[120px]"
                 />
