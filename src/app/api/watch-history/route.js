@@ -13,7 +13,7 @@ export async function POST(request) {
         console.log('API route received body:', body);
         
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if(!token){
             console.log('No token found in cookies');
@@ -59,7 +59,7 @@ export async function POST(request) {
 export async function GET(request) {
     try {
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if (!token) {
             console.log('GET watch-history: No token found in cookies');

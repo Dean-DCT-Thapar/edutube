@@ -9,7 +9,7 @@ const MODE = process.env.MODE;
 export async function GET(request, { params }) {
     try {
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         const { id } = await params;
 

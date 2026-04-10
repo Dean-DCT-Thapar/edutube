@@ -52,6 +52,36 @@ export const getUserRole = async () => {
 };
 
 /**
+ * Get full auth context including actual role and active viewing mode.
+ */
+export const getAuthContext = async () => {
+  try {
+    const response = await frontendApi.verifyAuth();
+    if (response.status === 200) {
+      return {
+        actualRole: response.actualRole || response.role,
+        activeRole: response.activeRole || response.role,
+        actor: response.actor,
+        effectiveUser: response.effectiveUser,
+        viewMode: response.viewMode || { active: false, type: null }
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting auth context:', error);
+    return null;
+  }
+};
+
+/**
+ * Helper for quickly checking if student view mode is active.
+ */
+export const isStudentViewModeActive = async () => {
+  const context = await getAuthContext();
+  return context?.viewMode?.active === true;
+};
+
+/**
  * Clear all authentication data
  */
 export const clearAuth = async () => {

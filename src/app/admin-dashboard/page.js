@@ -26,6 +26,11 @@ export default function AdminDashboard() {
             .then((authResponse) => {
                 console.log('Auth response received:', authResponse);
                 if (authResponse.status === 200) {
+                    if (authResponse.viewMode?.active) {
+                        router.push('/dashboard');
+                        throw new Error('Student view mode active');
+                    }
+
                     if (authResponse.role !== 'admin') {
                         console.error('User role is not admin:', authResponse.role);
                         throw new Error('Access denied. Administrators only.');

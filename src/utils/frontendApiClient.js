@@ -103,6 +103,14 @@ class FrontendApiClient {
     return this.get('/api/verify-auth');
   }
 
+  async startStudentViewMode() {
+    return this.post('/api/student-view');
+  }
+
+  async stopStudentViewMode() {
+    return this.delete('/api/student-view');
+  }
+
   async getUserData() {
     return this.get('/api/get-user-data');
   }

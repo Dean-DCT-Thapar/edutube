@@ -6,7 +6,7 @@ export async function POST(request) {
     try {
         const body = await request.json();
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if (!token) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });
@@ -41,7 +41,7 @@ export async function DELETE(request) {
     try {
         const body = await request.json();
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if (!token) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });

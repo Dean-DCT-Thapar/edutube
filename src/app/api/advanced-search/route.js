@@ -10,7 +10,7 @@ export async function POST(request) {
     try {
         const body = await request.json();
         const cookieStore = await cookies();
-        const accessToken = cookieStore.get('accessToken');
+        const accessToken = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if (!accessToken) {
             return NextResponse.json(

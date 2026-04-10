@@ -9,7 +9,7 @@ export async function GET(request, { params }) {
     try {
         const { lectureId } = await params;
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if (!token) {
             return NextResponse.json({ status: 401, message: 'No token found' }, { status: 401 });

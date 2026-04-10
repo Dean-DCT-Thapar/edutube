@@ -1,10 +1,15 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useRouter } from 'next/navigation'
+import frontendApi from '@/utils/frontendApiClient'
+import toast from 'react-hot-toast'
 
 const TopBar = ({ name, avatar }) => {
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const [authContext, setAuthContext] = React.useState(null);
+  const [exitingMode, setExitingMode] = React.useState(false);
+  const router = useRouter();
 
   React.useEffect(() => {
     // Listen for sidebar toggle events
@@ -19,6 +24,12 @@ const TopBar = ({ name, avatar }) => {
       window.removeEventListener('toggleSidebar', handleToggle);
       window.removeEventListener('sidebarState', handleSidebarState);
     };
+  }, []);
+
+  React.useEffect(() => {
+    frontendApi.verifyAuth()
+      .then((auth) => setAuthContext(auth))
+      .catch(() => setAuthContext(null));
   }, []);
   const pathname = usePathname();
   
@@ -128,6 +139,40 @@ const TopBar = ({ name, avatar }) => {
           {getPageTitle()}
         </h2>
       </div>
+
+      {authContext?.viewMode?.active && (
+        <div className="px-4 sm:px-6 lg:px-8 py-2 bg-amber-50 border-t border-amber-200">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+            <p className="text-sm text-amber-900">
+              Signed in as {authContext.actualRole} and viewing as student ({authContext.viewMode.targetUserEmail}).
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  setExitingMode(true);
+                  const response = await frontendApi.stopStudentViewMode();
+                  toast.success('Exited student view mode');
+                  if (response.actualRole === 'admin') {
+                    router.push('/admin-dashboard');
+                  } else if (response.actualRole === 'teacher') {
+                    router.push('/teacher-dashboard');
+                  } else {
+                    router.push('/dashboard');
+                  }
+                } catch (error) {
+                  toast.error(error?.data?.message || error.message || 'Failed to exit student view mode');
+                } finally {
+                  setExitingMode(false);
+                }
+              }}
+              disabled={exitingMode}
+              className="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-amber-700 text-white text-xs font-medium hover:bg-amber-800 disabled:opacity-60"
+            >
+              {exitingMode ? 'Exiting...' : 'Exit Student View'}
+            </button>
+          </div>
+        </div>
+      )}
     </header>
   )
 }

@@ -7,7 +7,7 @@ export async function GET(request, { params }) {
     try {
         const { course_id } = await params;
         const cookieStore = await cookies();
-        const token = cookieStore.get('accessToken');
+        const token = cookieStore.get('adminToken') || cookieStore.get('accessToken');
 
         if (!token) {
             return NextResponse.json({ message: 'Authorization required' }, { status: 401 });

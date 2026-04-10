@@ -3,6 +3,8 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter, usePathname } from 'next/navigation';
+import frontendApi from '@/utils/frontendApiClient';
+import toast from 'react-hot-toast';
 import {
     DashboardRounded,
     SchoolRounded,
@@ -15,8 +17,22 @@ import {
 
 const TeacherLayout = ({ children, title, userName }) => {
     const [sidebarOpen, setSidebarOpen] = useState(false);
+    const [switchingMode, setSwitchingMode] = useState(false);
     const router = useRouter();
     const pathname = usePathname();
+
+    React.useEffect(() => {
+        frontendApi.verifyAuth()
+            .then((auth) => {
+                if (auth?.viewMode?.active) {
+                    toast('You are in student view mode');
+                    router.replace('/dashboard');
+                }
+            })
+            .catch(() => {
+                // Best-effort at layout level.
+            });
+    }, [router]);
 
     const navigation = [
         { name: 'Dashboard', href: '/teacher-dashboard', icon: DashboardRounded },
@@ -45,6 +61,19 @@ const TeacherLayout = ({ children, title, userName }) => {
         if (hour < 12) return 'Good morning';
         if (hour < 17) return 'Good afternoon';
         return 'Good evening';
+    };
+
+    const handleSwitchToStudentView = async () => {
+        try {
+            setSwitchingMode(true);
+            await frontendApi.startStudentViewMode();
+            toast.success('Now viewing as student@thapar.edu');
+            router.push('/dashboard');
+        } catch (error) {
+            toast.error(error?.data?.message || error.message || 'Failed to enter student view mode');
+        } finally {
+            setSwitchingMode(false);
+        }
     };
 
     return (
@@ -122,6 +151,14 @@ const TeacherLayout = ({ children, title, userName }) => {
                                 <p className="text-xs text-gray-600">Instructor</p>
                             </div>
                         </div>
+                        <button
+                            onClick={handleSwitchToStudentView}
+                            disabled={switchingMode}
+                            className="w-full flex items-center px-3 py-2 mb-2 text-sm font-medium text-blue-700 rounded-lg bg-blue-50 hover:bg-blue-100 transition-colors duration-200 disabled:opacity-60"
+                        >
+                            <PersonRounded className="mr-3 text-lg" />
+                            {switchingMode ? 'Switching...' : 'View as Student'}
+                        </button>
                         <button
                             onClick={handleLogout}
                             className="w-full flex items-center px-3 py-2 text-sm font-medium text-red-600 rounded-lg hover:bg-red-50 transition-colors duration-200"
