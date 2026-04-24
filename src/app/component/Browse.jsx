@@ -87,6 +87,14 @@ export default function Browse() {
   const debounceRef = useRef(null);
   const hasHydratedStateRef = useRef(false);
 
+  const dismissMobileKeyboard = useCallback(() => {
+    if (typeof document === 'undefined') return;
+    const active = document.activeElement;
+    if (active && typeof active.blur === 'function') {
+      active.blur();
+    }
+  }, []);
+
   const persistSearchState = useCallback((scrollYOverride) => {
     if (typeof window === 'undefined') return;
     try {
@@ -366,6 +374,7 @@ export default function Browse() {
 
   // Handle suggestion click
   const handleSuggestionClick = (suggestion) => {
+    dismissMobileKeyboard();
     setSearchQuery(suggestion.title);
     const newType = suggestion.type === 'course' ? 'courses' : 
                    suggestion.type === 'teacher' ? 'teachers' : 
@@ -419,6 +428,7 @@ export default function Browse() {
 
   const handleKeyPress = (e) => {
     if (e.key === "Enter") {
+      dismissMobileKeyboard();
       handleAdvancedSearch();
     }
   };
@@ -588,7 +598,7 @@ export default function Browse() {
       </div>
 
       {/* Advanced Search Section - Mobile responsive */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 mb-6 sm:mb-8">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-6 mb-6 sm:mb-8">
         {/* Main Search Bar - Mobile responsive */}
         <div className="relative mb-4">
           <div className="relative">
@@ -601,12 +611,26 @@ export default function Browse() {
               onKeyDown={handleKeyPress}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               placeholder="Search for courses, teachers, lectures..."
-              className="w-full pl-10 sm:pl-12 pr-16 sm:pr-24 py-3 sm:py-4 border border-gray-300 rounded-xl text-sm sm:text-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
+              className="w-full pl-10 sm:pl-12 pr-28 sm:pr-32 py-2.5 sm:py-4 border border-gray-300 rounded-xl text-sm sm:text-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
             />
+            {searchQuery && (
+              <button
+                type="button"
+                onClick={clearSearch}
+                className="absolute right-[76px] sm:right-[88px] top-1/2 transform -translate-y-1/2 p-1 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
+                aria-label="Clear search"
+                title="Clear search"
+              >
+                <ClearRounded className="text-base sm:text-lg" />
+              </button>
+            )}
             <button
-              onClick={() => handleAdvancedSearch()}
+              onClick={() => {
+                dismissMobileKeyboard();
+                handleAdvancedSearch();
+              }}
               disabled={isLoading}
-              className="absolute right-2 sm:right-3 top-1/2 transform -translate-y-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 disabled:opacity-50 text-xs sm:text-sm"
+              className="absolute right-1.5 sm:right-3 top-1/2 transform -translate-y-1/2 px-2.5 sm:px-4 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 disabled:opacity-50 text-xs sm:text-sm"
             >
               {isLoading ? 'Searching...' : 'Search'}
             </button>
@@ -635,7 +659,7 @@ export default function Browse() {
         </div>
 
         {/* Search Controls - Mobile responsive */}
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 lg:gap-0">
           {/* Show search type tabs only after user has searched */}
           {searchInitiated && (
             <div className="overflow-x-auto">
@@ -668,17 +692,7 @@ export default function Browse() {
             </div>
           )}
 
-          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4">
-            {(searchQuery || searchInitiated) && (
-              <button
-                onClick={clearSearch}
-                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-xs sm:text-sm font-medium"
-              >
-                <ClearRounded className="text-sm" />
-                <span>Clear</span>
-              </button>
-            )}
-          </div>
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3 sm:space-x-0" />
         </div>
 
         {/* Filters/sort are temporarily disabled */}

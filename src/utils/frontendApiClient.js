@@ -115,6 +115,14 @@ class FrontendApiClient {
     return this.get('/api/get-user-data');
   }
 
+  async getAvatarVariant() {
+    return this.get('/api/user/avatar-variant');
+  }
+
+  async updateAvatarVariant(avatarVariant) {
+    return this.put('/api/user/avatar-variant', { avatar_variant: avatarVariant });
+  }
+
   async enrollCourse(courseInstanceId) {
     return this.post('/api/enrollment', { courseInstanceId });
   }

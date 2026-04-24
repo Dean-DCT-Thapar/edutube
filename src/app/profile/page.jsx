@@ -16,12 +16,21 @@ import {
   AccountCircleOutlined,
   SchoolOutlined
 } from '@mui/icons-material';
+import {
+  AVATAR_PRESETS,
+  getInitials,
+  getAvatarStyle,
+  isValidAvatarVariant,
+  resolveAvatarVariant,
+  saveAvatarVariant
+} from '@/utils/avatarGenerator';
 
 const page = () => {
 
   const router = useRouter();
   const [userData, setUserData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [avatarVariant, setAvatarVariant] = useState('sunset');
 
   useEffect(() => {
     const loadData = async () => {
@@ -55,6 +64,36 @@ const page = () => {
 
     loadData();
   }, [router]);
+
+  useEffect(() => {
+    if (!userData) return;
+    const preferredVariant = isValidAvatarVariant(userData?.avatar_variant)
+      ? userData.avatar_variant
+      : resolveAvatarVariant({
+          id: userData?.id,
+          name: userData?.name,
+          email: userData?.email
+        });
+    setAvatarVariant(preferredVariant);
+    saveAvatarVariant(preferredVariant);
+  }, [userData]);
+
+  const handleAvatarChange = async (variantId) => {
+    if (!isValidAvatarVariant(variantId)) return;
+
+    const previousVariant = avatarVariant;
+    setAvatarVariant(variantId);
+    saveAvatarVariant(variantId);
+
+    try {
+      await frontendApi.updateAvatarVariant(variantId);
+      toast.success('Avatar updated');
+    } catch (error) {
+      setAvatarVariant(previousVariant);
+      saveAvatarVariant(previousVariant);
+      toast.error(error?.message || 'Failed to save avatar');
+    }
+  };
 
   const handleLogout = async () => {
     const logoutToast = toast.loading('Logging out...', { id: 'logout' });
@@ -99,8 +138,13 @@ const page = () => {
             <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl shadow-lg p-6 sm:p-8 text-white">
               <div className="flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
                 <div className="relative">
-                  <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white bg-opacity-20 rounded-full flex items-center justify-center backdrop-blur-sm border border-white border-opacity-30">
-                    <AccountCircleOutlined className="text-4xl sm:text-5xl text-white" />
+                  <div
+                    className="w-20 h-20 sm:w-24 sm:h-24 rounded-full flex items-center justify-center backdrop-blur-sm border border-white border-opacity-30"
+                    style={getAvatarStyle(avatarVariant)}
+                  >
+                    <span className="text-2xl sm:text-3xl font-semibold text-white">
+                      {getInitials(userData?.name, userData?.email)}
+                    </span>
                   </div>
                   <div className="absolute -bottom-2 -right-2 w-6 h-6 sm:w-8 sm:h-8 bg-green-500 rounded-full border-2 sm:border-4 border-white flex items-center justify-center">
                     <span className="text-xs sm:text-sm">✓</span>
@@ -118,6 +162,26 @@ const page = () => {
                       Active
                     </span>
                   </div>
+                </div>
+              </div>
+              <div className="mt-5 sm:mt-6">
+                <p className="text-xs sm:text-sm text-primary-100 mb-2">Choose your avatar</p>
+                <div className="flex flex-wrap gap-2">
+                  {AVATAR_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => handleAvatarChange(preset.id)}
+                      className={`w-9 h-9 sm:w-10 sm:h-10 rounded-full border-2 transition-all ${
+                        avatarVariant === preset.id
+                          ? 'border-white scale-110'
+                          : 'border-white/40 hover:border-white/80'
+                      }`}
+                      style={{ backgroundImage: preset.cssGradient }}
+                      aria-label={`Select ${preset.label} avatar`}
+                      title={preset.label}
+                    />
+                  ))}
                 </div>
               </div>
             </div>

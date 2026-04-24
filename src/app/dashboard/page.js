@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import frontendApi from '@/utils/frontendApiClient';
 import toast from 'react-hot-toast';
@@ -22,6 +22,7 @@ import {
 
 export default function Dashboard() {
     const router = useRouter();
+    const yourCoursesRef = useRef(null);
     const [userData, setUserData] = useState(null);
     const [isLoading, setIsLoading] = useState(true);
     const [recentActivity, setRecentActivity] = useState([]);
@@ -139,6 +140,21 @@ export default function Dashboard() {
         ];
     };
 
+    const handleStatClick = (label) => {
+        if (label === 'Enrolled Courses') {
+            // Use scrollMarginTop in target and scroll to 'nearest', extra fallback with setTimeout for stubborn browsers
+            yourCoursesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            setTimeout(() => {
+                yourCoursesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 300);
+            return;
+        }
+
+        if (label === 'Videos Watched') {
+            router.push('/watchHistory');
+        }
+    };
+
     const enrolledCourses = userData?.enrolled_courses || [];
     const visibleCourses = showAllCourses ? enrolledCourses : enrolledCourses.slice(0, 8);
     const hasMoreCourses = enrolledCourses.length > 8;
@@ -192,13 +208,18 @@ export default function Dashboard() {
                                         {getQuickStats().map((stat, index) => {
                                             const Icon = stat.icon;
                                             return (
-                                                <div key={index} className="bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200">
+                                                <button
+                                                    key={index}
+                                                    type="button"
+                                                    onClick={() => handleStatClick(stat.label)}
+                                                    className="w-full text-left bg-white bg-opacity-10 backdrop-blur-sm rounded-xl p-3 sm:p-4 border border-white border-opacity-20 hover:bg-opacity-20 transition-all duration-200"
+                                                >
                                                     <div className={`w-8 h-8 sm:w-10 sm:h-10 ${stat.bgColor} rounded-lg flex items-center justify-center mb-2 sm:mb-3`}>
                                                         <Icon className={`text-base sm:text-lg ${stat.color}`} />
                                                     </div>
                                                     <p className="text-xs sm:text-sm text-primary-100 mb-1">{stat.label}</p>
                                                     <p className="text-xl sm:text-2xl font-bold text-white">{stat.value}</p>
-                                                </div>
+                                                </button>
                                             );
                                         })}
                                     </div>
@@ -210,7 +231,7 @@ export default function Dashboard() {
                     {/* Main content */}
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
                         {/* Recent Activity */}
-                        <section>
+                        <section ref={yourCoursesRef}>
                             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
                                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Recent Activity</h2>
                                 <button 
@@ -269,7 +290,7 @@ export default function Dashboard() {
 
                             {enrolledCourses.length > 0 ? (
                                 <>
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+                                <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-6">
                                     {visibleCourses.map((course, index) => (
                                         <Card 
                                             key={course.course_instance_id || index}

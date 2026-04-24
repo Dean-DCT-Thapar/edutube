@@ -4,6 +4,48 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import frontendApi from '@/utils/frontendApiClient'
 import toast from 'react-hot-toast'
+import {
+  AVATAR_UPDATED_EVENT,
+  getInitials,
+  getAvatarStyle,
+  isValidAvatarVariant,
+  resolveAvatarVariant,
+  saveAvatarVariant
+} from '@/utils/avatarGenerator'
+
+const TOPBAR_IDENTITY_CACHE_KEY = 'topbarIdentityCache';
+
+const readIdentityCache = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const raw = localStorage.getItem(TOPBAR_IDENTITY_CACHE_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed || typeof parsed !== 'object') return null;
+    return {
+      id: parsed.id ?? null,
+      name: parsed.name ?? null,
+      email: parsed.email ?? null,
+      role: parsed.role ?? null,
+      viewMode: parsed.viewMode ?? null
+    };
+  } catch {
+    return null;
+  }
+};
+
+const writeIdentityCache = (identity) => {
+  if (typeof window === 'undefined') return;
+  try {
+    if (!identity) {
+      localStorage.removeItem(TOPBAR_IDENTITY_CACHE_KEY);
+      return;
+    }
+    localStorage.setItem(TOPBAR_IDENTITY_CACHE_KEY, JSON.stringify(identity));
+  } catch {
+    // Ignore cache write failures.
+  }
+};
 
 const TopBar = ({ name, avatar }) => {
   const SIDEBAR_COLLAPSED_KEY = 'studentSidebarCollapsed';
@@ -13,9 +55,10 @@ const TopBar = ({ name, avatar }) => {
     if (!isDesktop) return false;
     return localStorage.getItem('studentSidebarCollapsed') !== 'true';
   });
-  const [authContext, setAuthContext] = React.useState(null);
+  const [authContext, setAuthContext] = React.useState(() => readIdentityCache());
   const [exitingMode, setExitingMode] = React.useState(false);
   const [isReadyForTransitions, setIsReadyForTransitions] = React.useState(false);
+  const [avatarVariant, setAvatarVariant] = React.useState('sunset');
   const router = useRouter();
 
   React.useEffect(() => {
@@ -37,8 +80,22 @@ const TopBar = ({ name, avatar }) => {
 
   React.useEffect(() => {
     frontendApi.verifyAuth()
-      .then((auth) => setAuthContext(auth))
-      .catch(() => setAuthContext(null));
+      .then(async (auth) => {
+        setAuthContext(auth);
+        writeIdentityCache(auth);
+        try {
+          const avatarData = await frontendApi.getAvatarVariant();
+          if (isValidAvatarVariant(avatarData?.avatar_variant)) {
+            saveAvatarVariant(avatarData.avatar_variant);
+            setAvatarVariant(avatarData.avatar_variant);
+          }
+        } catch {
+          // Keep deterministic/local fallback on avatar fetch failures.
+        }
+      })
+      .catch(() => {
+        // Keep cached identity on transient auth fetch failures to prevent UI flicker.
+      });
   }, []);
 
   React.useEffect(() => {
@@ -65,6 +122,34 @@ const TopBar = ({ name, avatar }) => {
     if (hour < 17) return 'Good afternoon';
     return 'Good evening';
   };
+
+  const displayName = name || authContext?.name || '';
+  const avatarSeed = `${authContext?.id || ''}:${displayName}:${authContext?.email || ''}`;
+
+  React.useEffect(() => {
+    setAvatarVariant(resolveAvatarVariant({
+      id: authContext?.id,
+      name: displayName,
+      email: authContext?.email
+    }));
+  }, [avatarSeed]);
+
+  React.useEffect(() => {
+    const syncAvatar = () => {
+      setAvatarVariant(resolveAvatarVariant({
+        id: authContext?.id,
+        name: displayName,
+        email: authContext?.email
+      }));
+      writeIdentityCache(authContext || readIdentityCache());
+    };
+    window.addEventListener(AVATAR_UPDATED_EVENT, syncAvatar);
+    window.addEventListener('storage', syncAvatar);
+    return () => {
+      window.removeEventListener(AVATAR_UPDATED_EVENT, syncAvatar);
+      window.removeEventListener('storage', syncAvatar);
+    };
+  }, [avatarSeed]);
 
   return (
     <header className={`sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm ${isReadyForTransitions ? 'transition-all duration-300' : ''} ${sidebarOpen ? 'lg:pl-64' : 'lg:pl-16'}`}>
@@ -98,41 +183,27 @@ const TopBar = ({ name, avatar }) => {
 
         {/* Right section - User info */}
         <div className="flex items-center space-x-4">
-          {/* Welcome message (hidden on small screens) */}
-          {name && (
-            <div className="hidden lg:block text-right">
-              <p className="text-sm font-medium text-gray-900">
-                {getWelcomeMessage()}, {name.split(' ')[0]}!
-              </p>
-              <p className="text-xs text-gray-600">
-                Ready to learn something new?
-              </p>
-            </div>
-          )}
-
           {/* User avatar and profile link */}
           <Link 
             href="/profile" 
             className="flex items-center space-x-3 p-2 rounded-lg hover:bg-gray-100 transition-colors duration-200 group"
           >
             <div className="relative">
-              <img 
-                src={avatar || '/profile.png'}
-                alt={`${name || 'User'}'s profile`}
-                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full object-cover border-2 border-gray-200 group-hover:border-primary-300 transition-colors"
-                onError={(e) => {
-                  e.target.src = '/profile.png';
-                }}
-              />
+              <div
+                className="h-8 w-8 sm:h-10 sm:w-10 rounded-full border-2 border-gray-200 group-hover:border-primary-300 transition-colors text-white font-semibold text-xs sm:text-sm flex items-center justify-center"
+                style={getAvatarStyle(avatarVariant)}
+              >
+                {(displayName || authContext?.email) ? getInitials(displayName, authContext?.email) : ''}
+              </div>
               {/* Online indicator */}
               <div className="absolute -bottom-0.5 -right-0.5 h-3 w-3 bg-success-600 rounded-full border-2 border-white"></div>
             </div>
             
-            {/* User name (visible on mobile in collapsed state) */}
-            {name && (
-              <div className="block sm:hidden lg:block">
+            {/* User name - consistently visible from small screens and up */}
+            {displayName && (
+              <div className="hidden sm:block">
                 <p className="text-sm font-medium text-gray-900 truncate max-w-32">
-                  {name}
+                  {displayName}
                 </p>
                 <p className="text-xs text-gray-600">
                   View Profile

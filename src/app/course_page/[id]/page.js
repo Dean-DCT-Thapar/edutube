@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 
 const CoursePage = ({ params }) => {
+  const COURSE_SIDEBAR_COLLAPSED_KEY = "courseContentSidebarCollapsed";
   const router = useRouter();
   const searchParams = useSearchParams();
   const [courseData, setCourseData] = useState(null);
@@ -27,13 +28,16 @@ const CoursePage = ({ params }) => {
   const [error, setError] = useState(null);
   const [expandedChapters, setExpandedChapters] = useState({});
   const [sidebarOpen, setSidebarOpen] = useState(() => {
-    // Initialize from localStorage or default to true
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('course-sidebar-open');
-      return saved !== null ? JSON.parse(saved) : true;
-    }
-    return true;
+    if (typeof window === "undefined") return false;
+    const mobile = window.innerWidth < 1024;
+    if (mobile) return false;
+    return localStorage.getItem(COURSE_SIDEBAR_COLLAPSED_KEY) !== "true";
   });
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === "undefined") return true;
+    return window.innerWidth < 1024;
+  });
+  const [isReadyForTransitions, setIsReadyForTransitions] = useState(false);
   const [isEnrolled, setIsEnrolled] = useState(false);
   const [checkingEnrollment, setCheckingEnrollment] = useState(true);
 
@@ -95,12 +99,35 @@ const CoursePage = ({ params }) => {
     checkEnrollmentStatus();
   }, [fetchCourseData, checkEnrollmentStatus]);
 
-  // Save sidebar state to localStorage
+  // Desktop/mobile parity with dashboard sidebar behavior.
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      localStorage.setItem('course-sidebar-open', JSON.stringify(sidebarOpen));
-    }
-  }, [sidebarOpen]);
+    if (typeof window === "undefined") return;
+
+    const syncWithViewport = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+
+      if (mobile) {
+        setSidebarOpen(false);
+        return;
+      }
+
+      const storedCollapsed = localStorage.getItem(COURSE_SIDEBAR_COLLAPSED_KEY);
+      setSidebarOpen(storedCollapsed !== "true");
+    };
+
+    syncWithViewport();
+    requestAnimationFrame(() => setIsReadyForTransitions(true));
+    window.addEventListener("resize", syncWithViewport);
+
+    return () => window.removeEventListener("resize", syncWithViewport);
+  }, []);
+
+  // Persist desktop sidebar collapsed state.
+  useEffect(() => {
+    if (typeof window === "undefined" || isMobile) return;
+    localStorage.setItem(COURSE_SIDEBAR_COLLAPSED_KEY, String(!sidebarOpen));
+  }, [sidebarOpen, isMobile]);
 
   // Get current video details with description
   const videoDetails = useMemo(() => {
@@ -188,6 +215,7 @@ const CoursePage = ({ params }) => {
     return {
       title: courseData[0]?.course_name || "Course",
       instructor: courseData[0]?.instructor_name || "Instructor",
+      teacherId: courseData[0]?.teacher_id || null,
       totalChapters: courseData.length,
       totalLectures,
       totalDuration: `${Math.floor(totalDuration / 60)}h ${Math.floor(
@@ -464,7 +492,17 @@ const CoursePage = ({ params }) => {
                           {courseOverview.title}
                         </h1>
                         <p className="text-lg text-gray-600">
-                          by {courseOverview.instructor}
+                          by{" "}
+                          {courseOverview.teacherId ? (
+                            <Link
+                              href={`/teacher/${courseOverview.teacherId}`}
+                              className="text-primary-700 hover:text-primary-800 underline underline-offset-2"
+                            >
+                              {courseOverview.instructor}
+                            </Link>
+                          ) : (
+                            courseOverview.instructor
+                          )}
                         </p>
                       </div>
 
@@ -528,12 +566,15 @@ const CoursePage = ({ params }) => {
             {/* Right Side - Course Content Sidebar */}
             <div
               className={`
-                bg-white border-l border-gray-200 flex flex-col
+                bg-white border-l border-gray-200 flex flex-col overflow-hidden
                 fixed lg:relative inset-y-0 right-0 z-40 lg:z-auto
-                w-[88vw] max-w-sm sm:max-w-md lg:w-[360px]
+                w-[88vw] max-w-sm sm:max-w-md
+                ${sidebarOpen ? "lg:w-[360px]" : "lg:w-0 lg:border-l-0"}
                 shadow-2xl lg:shadow-none
-                transform transition-transform duration-300 ease-in-out
-                ${sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+                ${sidebarOpen ? "" : "pointer-events-none"}
+                transform ${isReadyForTransitions ? "transition-all duration-300 ease-in-out" : ""}
+                ${sidebarOpen ? "translate-x-0 opacity-100" : "translate-x-full lg:translate-x-0 opacity-0 lg:opacity-100"}
+                lg:translate-x-0
               `}
             >
                 {/* Sidebar Header */}

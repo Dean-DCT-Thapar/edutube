@@ -74,25 +74,7 @@ const Footer = () => {
               })}
             </div>
           </div>
-
-          {/* Platform links */}
-          <div>
-            <h4 className="font-semibold text-gray-900 mb-4">Quick Links</h4>
-            <ul className="space-y-3">
-              {footerLinks.platform.map((link) => (
-                <li key={link.label}>
-                  <Link 
-                    href={link.href}
-                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200 flex items-center break-words"
-                  >
-                    <span className="w-2 h-2 bg-primary-400 rounded-full mr-3"></span>
-                    {link.label}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
-
+          
           {/* Contact Info */}
           <div>
             <h4 className="font-semibold text-gray-900 mb-4">Contact Information</h4>

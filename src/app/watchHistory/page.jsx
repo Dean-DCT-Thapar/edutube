@@ -14,12 +14,24 @@ import {
   PersonRounded,
   TrendingUpRounded,
   DeleteRounded,
-  HistoryRounded
+  HistoryRounded,
+  SearchRounded,
+  ClearRounded
 } from '@mui/icons-material';
 
 export default function WatchHistory() {
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [debouncedQuery, setDebouncedQuery] = useState('');
+  const [visibleCount, setVisibleCount] = useState(15);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedQuery(searchQuery.trim().toLowerCase());
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
 
   useEffect(() => {
     const fetchWatchHistory = async () => {
@@ -108,6 +120,24 @@ export default function WatchHistory() {
 
     const thumbnailUrl = getYouTubeThumbnail(video.youtube_url);
     
+    const renderHighlightedText = (text) => {
+      if (!text) return '';
+      if (!debouncedQuery) return text;
+      const lowerText = text.toLowerCase();
+      const matchIndex = lowerText.indexOf(debouncedQuery);
+      if (matchIndex === -1) return text;
+      const before = text.slice(0, matchIndex);
+      const match = text.slice(matchIndex, matchIndex + debouncedQuery.length);
+      const after = text.slice(matchIndex + debouncedQuery.length);
+      return (
+        <>
+          {before}
+          <mark className="bg-yellow-100 text-inherit rounded px-0.5">{match}</mark>
+          {after}
+        </>
+      );
+    };
+
     return (
       <Link 
         href={`/course_page/${video.course_instance_id}?chapter=${video.chapter_number}&lecture=${video.lecture_number}`}
@@ -168,20 +198,20 @@ export default function WatchHistory() {
               <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="flex-1 min-w-0">
                   <h3 className="text-base sm:text-lg font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-primary-700 transition-colors leading-tight">
-                    {video.lecture_title}
+                    {renderHighlightedText(video.lecture_title)}
                   </h3>
                   
                   <div className="space-y-1 sm:space-y-2">
                     {/* Course Info */}
                     <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
                       <VideoLibraryRounded className="text-sm sm:text-base" />
-                      <span className="font-medium truncate">{video.course_name}</span>
+                      <span className="font-medium truncate">{renderHighlightedText(video.course_name)}</span>
                     </div>
                     
                     {/* Instructor Info */}
                     <div className="flex items-center space-x-2 text-xs sm:text-sm text-gray-600">
                       <PersonRounded className="text-sm sm:text-base" />
-                      <span className="truncate">{video.teacher_name}</span>
+                      <span className="truncate">{renderHighlightedText(video.teacher_name)}</span>
                     </div>
                     
                     {/* Watch Time */}
@@ -216,6 +246,22 @@ export default function WatchHistory() {
     );
   };
 
+  const filteredResults = results.filter((item) => {
+    const q = debouncedQuery;
+    if (!q) return true;
+    return (
+      (item.lecture_title || '').toLowerCase().includes(q) ||
+      (item.course_name || '').toLowerCase().includes(q) ||
+      (item.teacher_name || '').toLowerCase().includes(q)
+    );
+  });
+
+  useEffect(() => {
+    setVisibleCount(15);
+  }, [debouncedQuery, results.length]);
+
+  const visibleResults = filteredResults.slice(0, visibleCount);
+
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <TopBar />
@@ -234,6 +280,30 @@ export default function WatchHistory() {
                 <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Watch History</h1>
               </div>
               <p className="text-sm sm:text-base text-gray-600">Continue where you left off or revisit your favorite lectures</p>
+            </div>
+
+            {/* Search - Mobile responsive */}
+            <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 mb-5 sm:mb-6">
+              <div className="relative">
+                <SearchRounded className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-lg" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by lecture, course, or teacher..."
+                  className="w-full pl-10 pr-10 py-2.5 sm:py-3 border border-gray-300 rounded-lg text-sm sm:text-base focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
+                />
+                {searchQuery && (
+                  <button
+                    type="button"
+                    onClick={() => setSearchQuery('')}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+                    aria-label="Clear search"
+                  >
+                    <ClearRounded className="text-base" />
+                  </button>
+                )}
+              </div>
             </div>
             
             {loading ? (
@@ -257,12 +327,23 @@ export default function WatchHistory() {
                   </div>
                 ))}
               </div>
-            ) : results.length > 0 ? (
+            ) : filteredResults.length > 0 ? (
               /* Results - Mobile responsive spacing */
               <div className="space-y-4 sm:space-y-6">
-                {results.map((result, index) => (
+                {visibleResults.map((result, index) => (
                   <WatchHistoryCard key={index} video={result} index={index} />
                 ))}
+                {filteredResults.length > visibleCount && (
+                  <div className="flex justify-center pt-2">
+                    <button
+                      type="button"
+                      onClick={() => setVisibleCount((prev) => prev + 15)}
+                      className="w-full sm:w-auto inline-flex items-center justify-center px-5 py-2.5 text-sm font-medium rounded-lg bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200"
+                    >
+                      Load More
+                    </button>
+                  </div>
+                )}
               </div>
             ) : (
               /* Empty State */
@@ -270,9 +351,13 @@ export default function WatchHistory() {
                 <div className="w-24 h-24 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-6">
                   <HistoryRounded className="text-4xl text-gray-400" />
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">No Watch History Yet</h3>
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                  {searchQuery ? 'No Matching Results' : 'No Watch History Yet'}
+                </h3>
                 <p className="text-gray-600 mb-8 max-w-md mx-auto">
-                  Start watching courses and lectures to build your learning journey. Your progress will be saved here for easy access.
+                  {searchQuery
+                    ? 'Try a different search term for lecture, course, or teacher.'
+                    : 'Start watching courses and lectures to build your learning journey. Your progress will be saved here for easy access.'}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-4 justify-center">
                   <Link 

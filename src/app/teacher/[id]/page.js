@@ -69,9 +69,9 @@ export default function TeacherPage() {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <TopBar />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-x-hidden">
           <SideBar />
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
               <div className="flex items-center justify-center py-20">
                 <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-primary-600"></div>
@@ -87,17 +87,17 @@ export default function TeacherPage() {
     return (
       <div className="min-h-screen flex flex-col bg-gray-50">
         <TopBar />
-        <div className="flex flex-1">
+        <div className="flex flex-1 overflow-x-hidden">
           <SideBar />
-          <main className="flex-1 p-4 sm:p-6 lg:p-8">
+          <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
             <div className="max-w-7xl mx-auto">
               <div className="text-center py-20">
                 <PersonRounded className="text-6xl text-gray-300 mb-4 mx-auto" />
-                <h2 className="text-2xl font-bold text-gray-900 mb-2">Teacher Not Found</h2>
-                <p className="text-gray-600 mb-6">{error || 'The teacher you are looking for does not exist.'}</p>
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-2">Teacher Not Found</h2>
+                <p className="text-sm sm:text-base text-gray-600 mb-6">{error || 'The teacher you are looking for does not exist.'}</p>
                 <Link 
                   href="/teachers"
-                  className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
+                  className="inline-flex items-center px-4 py-2 text-sm sm:text-base bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   <ArrowBackRounded className="mr-2" />
                   Back to Teachers
@@ -113,14 +113,14 @@ export default function TeacherPage() {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <TopBar />
-      <div className="flex flex-1">
+      <div className="flex flex-1 overflow-x-hidden">
         <SideBar />
-        <main className="flex-1 flex flex-col p-4 sm:p-6 lg:p-8">
-          <div className="max-w-7xl mx-auto w-full flex-1">{/* Back Button */}
+        <main className="flex-1 min-w-0 flex flex-col p-4 sm:p-6 lg:p-8">
+          <div className="max-w-7xl mx-auto w-full min-w-0 flex-1">{/* Back Button */}
       <div className="mb-6">
         <Link 
           href="/teachers"
-          className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
+          className="inline-flex items-center text-sm sm:text-base text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowBackRounded className="mr-2" />
           Back to Teachers
@@ -128,24 +128,24 @@ export default function TeacherPage() {
       </div>
 
       {/* Teacher Header */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-8">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8 mb-6 sm:mb-8">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between">
-          <div className="flex items-center space-x-6 mb-6 md:mb-0">
-            <div className="w-24 h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-3xl font-bold">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 mb-6 md:mb-0 min-w-0">
+            <div className="w-20 h-20 sm:w-24 sm:h-24 bg-gradient-to-br from-primary-400 to-primary-600 rounded-full flex items-center justify-center text-white text-2xl sm:text-3xl font-bold flex-shrink-0">
               {teacher.name.charAt(0).toUpperCase()}
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center space-x-2 mb-2">
-                <h1 className="text-3xl font-bold text-gray-900">{teacher.name}</h1>
-                <VerifiedRounded className="text-primary-600" />
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 truncate">{teacher.name}</h1>
+                <VerifiedRounded className="text-primary-600 flex-shrink-0" />
               </div>
-              <div className="flex items-center text-gray-600 mb-2">
-                <EmailRounded className="mr-2 text-sm" />
-                <span>{teacher.email}</span>
+              <div className="flex items-center text-gray-600 mb-2 min-w-0">
+                <EmailRounded className="mr-2 text-sm flex-shrink-0" />
+                <span className="text-sm sm:text-base truncate">{teacher.email}</span>
               </div>
               <div className="flex items-center text-gray-500">
-                <DateRangeRounded className="mr-2 text-sm" />
-                <span>Joined {formatDate(teacher.joinedAt)}</span>
+                <DateRangeRounded className="mr-2 text-sm flex-shrink-0" />
+                <span className="text-sm sm:text-base">Joined {formatDate(teacher.joinedAt)}</span>
               </div>
             </div>
           </div>
@@ -153,43 +153,43 @@ export default function TeacherPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-          <SchoolRounded className="text-primary-600 text-3xl mb-2 mx-auto" />
-          <div className="text-2xl font-bold text-gray-900">{teacher.stats.totalCourses}</div>
-          <div className="text-sm text-gray-600">Courses</div>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
+          <SchoolRounded className="text-primary-600 text-2xl sm:text-3xl mb-2 mx-auto" />
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalCourses}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Courses</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-          <GroupRounded className="text-green-600 text-3xl mb-2 mx-auto" />
-          <div className="text-2xl font-bold text-gray-900">{teacher.stats.totalStudents}</div>
-          <div className="text-sm text-gray-600">Students</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
+          <GroupRounded className="text-green-600 text-2xl sm:text-3xl mb-2 mx-auto" />
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalStudents}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Students</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-          <BookmarkBorderRounded className="text-blue-600 text-3xl mb-2 mx-auto" />
-          <div className="text-2xl font-bold text-gray-900">{teacher.stats.totalChapters}</div>
-          <div className="text-sm text-gray-600">Chapters</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
+          <BookmarkBorderRounded className="text-blue-600 text-2xl sm:text-3xl mb-2 mx-auto" />
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalChapters}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Chapters</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-          <PlayLessonRounded className="text-purple-600 text-3xl mb-2 mx-auto" />
-          <div className="text-2xl font-bold text-gray-900">{teacher.stats.totalLectures}</div>
-          <div className="text-sm text-gray-600">Lectures</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
+          <PlayLessonRounded className="text-purple-600 text-2xl sm:text-3xl mb-2 mx-auto" />
+          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalLectures}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Lectures</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 text-center">
-          <TimerRounded className="text-orange-600 text-3xl mb-2 mx-auto" />
-          <div className="text-2xl font-bold text-gray-900">{formatDuration(teacher.stats.totalDuration)}</div>
-          <div className="text-sm text-gray-600">Content</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
+          <TimerRounded className="text-orange-600 text-2xl sm:text-3xl mb-2 mx-auto" />
+          <div className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{formatDuration(teacher.stats.totalDuration)}</div>
+          <div className="text-xs sm:text-sm text-gray-600">Content</div>
         </div>
       </div>
 
       {/* Courses Section */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-8">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-900">Courses by {teacher.name}</h2>
-          <div className="text-sm text-gray-600">
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6 lg:p-8">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-6 min-w-0">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-900 truncate">Courses by {teacher.name}</h2>
+          <div className="text-xs sm:text-sm text-gray-600">
             {teacher.courses.length} {teacher.courses.length === 1 ? 'course' : 'courses'}
           </div>
         </div>
@@ -201,25 +201,25 @@ export default function TeacherPage() {
             <p className="text-gray-400">This teacher hasn't created any courses yet.</p>
           </div>
         ) : (
-          <div className="grid gap-6 sm:grid-cols-1 lg:grid-cols-2">
+          <div className="grid gap-4 sm:gap-6 sm:grid-cols-1 lg:grid-cols-2">
             {teacher.courses.map((course) => (
               <Link 
                 key={course.id} 
                 href={`/course-overview/${course.id}`}
                 className="block group"
               >
-                <div className="bg-gray-50 rounded-lg border border-gray-200 p-6 hover:shadow-md hover:border-primary-300 transition-all duration-200 group-hover:bg-primary-50">
+                <div className="bg-gray-50 rounded-lg border border-gray-200 p-4 sm:p-6 hover:shadow-md hover:border-primary-300 transition-all duration-200 group-hover:bg-primary-50">
                   <div className="flex items-start justify-between mb-4">
-                    <div className="flex-1">
-                      <h3 className="text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors">
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors truncate">
                         {course.courseName}
                       </h3>
-                      <div className="flex items-center space-x-4 text-sm text-gray-600 mb-3">
-                        <span className="bg-gray-200 px-2 py-1 rounded-md font-medium">
+                      <div className="flex flex-wrap items-center gap-2 sm:gap-3 text-xs sm:text-sm text-gray-600 mb-3">
+                        <span className="bg-gray-200 px-2 py-1 rounded-md font-medium break-all">
                           {course.courseCode}
                         </span>
                         {course.instanceName && (
-                          <span className="text-gray-500">• {course.instanceName}</span>
+                          <span className="text-gray-500 truncate">• {course.instanceName}</span>
                         )}
                       </div>
                       {course.description && (
@@ -230,7 +230,7 @@ export default function TeacherPage() {
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div className="grid grid-cols-2 gap-2 sm:gap-4 text-xs sm:text-sm">
                     <div className="flex items-center text-gray-600">
                       <BookmarkBorderRounded className="mr-2 text-lg" />
                       <span>{course.chaptersCount} chapters</span>

@@ -56,6 +56,7 @@ export default function CourseOverview() {
                     id: courseId,
                     course_name: firstChapter.course_name,
                     instructor_name: firstChapter.instructor_name,
+                    teacher_id: firstChapter.teacher_id,
                     course_code: firstChapter.course_code,
                     course_description: firstChapter.course_description || ''
                 };
@@ -305,7 +306,16 @@ export default function CourseOverview() {
                                             
                                             <div className="flex items-center justify-center sm:justify-start text-gray-600 mb-4">
                                                 <PersonRounded className="w-5 h-5 mr-2" />
-                                                <span className="break-words">Instructor: {course.instructor_name}</span>
+                                                <span className="break-words">
+                                                    Instructor:{' '}
+                                                    {course.teacher_id ? (
+                                                        <Link href={`/teacher/${course.teacher_id}`} className="text-primary-700 hover:text-primary-800 underline underline-offset-2">
+                                                            {course.instructor_name}
+                                                        </Link>
+                                                    ) : (
+                                                        course.instructor_name
+                                                    )}
+                                                </span>
                                             </div>
 
                                             <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 sm:gap-6 text-sm text-gray-500 mb-6">
