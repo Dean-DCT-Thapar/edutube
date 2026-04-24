@@ -78,6 +78,7 @@ export default function TeacherSettingsPage() {
                 newPassword: '',
                 confirmPassword: ''
             });
+            router.push('/teacher-dashboard');
         } catch (error) {
             if (error?.response?.status === 401 || error?.status === 401) {
                 toast.error('Invalid current password');
