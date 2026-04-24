@@ -105,17 +105,39 @@ export default function Page() {
           <div className="absolute bottom-10 left-10 w-96 h-96 bg-gradient-to-tr from-blue-300/10 to-white/20 rounded-full filter blur-xl animate-pulse animation-delay-1000"></div>
         </div>
 
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
-          <div className="flex flex-col lg:flex-row items-center justify-center min-h-[85vh] text-center lg:text-left">
-            
-            {/* Hero Content - Full width with background */}
-            <div className="w-full max-w-4xl space-y-8 animate-fade-in-up">
-              {/* Logo Section */}
-              <div className="flex justify-center lg:justify-start mb-8">
+        {/* Navigation Header */}
+        <nav className="relative z-10 w-full">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-3">
                 <img 
                   src="/main-site-logo.svg" 
                   alt="EduTube" 
-                  className="h-16 sm:h-20 lg:h-24 w-auto filter brightness-0 invert"
+                  className="h-8 sm:h-10 w-auto filter brightness-0 invert"
+                  onError={(e) => e.target.style.display = 'none'}
+                />
+              </div>
+              <button
+                onClick={() => router.push('/login')}
+                className="inline-flex items-center px-5 py-2.5 text-sm font-medium rounded-lg bg-white/15 backdrop-blur-sm text-white border border-white/25 hover:bg-white/25 transition-all duration-200"
+              >
+                Sign In
+              </button>
+            </div>
+          </div>
+        </nav>
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-16">
+          <div className="flex flex-col lg:flex-row items-center justify-center min-h-[85vh] text-center lg:text-left">
+            
+            {/* Hero Content - Full width with background */}
+            <div className="w-full max-w-4xl space-y-6 sm:space-y-8 animate-fade-in-up">
+              {/* Logo Section */}
+              <div className="flex justify-center lg:justify-start mb-6 sm:mb-8">
+                <img 
+                  src="/main-site-logo.svg" 
+                  alt="EduTube" 
+                  className="h-12 sm:h-20 lg:h-24 w-auto filter brightness-0 invert"
                   onError={(e) => e.target.style.display = 'none'}
                 />
               </div>
@@ -153,12 +175,6 @@ export default function Page() {
           </div>
         </div>
 
-        {/* Bottom Wave Transition */}
-        <div className="relative">
-          <svg className="w-full h-20 fill-gray-50" viewBox="0 0 1440 120" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0,96L48,80C96,64,192,32,288,37.3C384,43,480,85,576,90.7C672,96,768,64,864,48C960,32,1056,32,1152,42.7C1248,53,1344,75,1392,85.3L1440,96L1440,120L1392,120C1344,120,1248,120,1152,120C1056,120,960,120,864,120C768,120,672,120,576,120C480,120,384,120,288,120C192,120,96,120,48,120L0,120Z"></path>
-          </svg>
-        </div>
       </main>
 
       {/* Features Section */}

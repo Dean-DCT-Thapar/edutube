@@ -6,9 +6,18 @@ import SearchIcon from '@mui/icons-material/Search';
 import SettingsAccessibilityIcon from '@mui/icons-material/SettingsAccessibility';
 import DvrSharpIcon from '@mui/icons-material/DvrSharp';
 import PersonIcon from '@mui/icons-material/Person';
-import CloseIcon from '@mui/icons-material/Close';
+import ChevronLeftRounded from '@mui/icons-material/ChevronLeftRounded';
+import ChevronRightRounded from '@mui/icons-material/ChevronRightRounded';
+import LogoutRounded from '@mui/icons-material/LogoutRounded';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
+
+const debugLog = (payload) => {
+  // #region agent log
+  fetch('http://localhost:7921/ingest/827b3ddb-567d-4b3e-975a-5acd118ec4c4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'9a2b90'},body:JSON.stringify({sessionId:'9a2b90',runId:'baseline',timestamp:Date.now(),...payload})}).catch(()=>{});
+  // #endregion
+};
 
 const SideBar = () => {
   // Use consistent initial state for SSR
@@ -16,6 +25,7 @@ const SideBar = () => {
   const [isMobile, setIsMobile] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
 
 
   // Handle hydration and initial setup
@@ -25,6 +35,14 @@ const SideBar = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
       setIsOpen(!mobile); // Open by default on desktop, closed on mobile
+      // #region agent log
+      debugLog({
+        hypothesisId: 'H1',
+        location: 'SideBar.jsx:checkMobile',
+        message: 'Viewport breakpoint evaluated',
+        data: { pathname, innerWidth: window.innerWidth, mobile, nextOpenState: !mobile }
+      });
+      // #endregion
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -37,6 +55,14 @@ const SideBar = () => {
     // defer dispatch to avoid updating during render
     const evt = new CustomEvent('sidebarState', { detail: isOpen });
     setTimeout(() => window.dispatchEvent(evt), 0);
+    // #region agent log
+    debugLog({
+      hypothesisId: 'H2',
+      location: 'SideBar.jsx:sidebarStateEffect',
+      message: 'Sidebar state dispatched',
+      data: { pathname, isOpen, isMobile, isHydrated }
+    });
+    // #endregion
   }, [isOpen, isHydrated]);
 
   // Listen for toggle event from TopBar
@@ -70,6 +96,14 @@ const SideBar = () => {
     if (!isHydrated || !isMobile) return;
     setIsOpen(false);
     window.dispatchEvent(new CustomEvent('sidebarState', { detail: false }));
+    // #region agent log
+    debugLog({
+      hypothesisId: 'H3',
+      location: 'SideBar.jsx:closeSidebar',
+      message: 'Sidebar closed from overlay/nav click',
+      data: { pathname, isOpenBeforeClose: isOpen, isMobile }
+    });
+    // #endregion
   };
 
   const navItems = [
@@ -134,17 +168,18 @@ const SideBar = () => {
           <button
             onClick={toggleSidebar}
             className={`
-              flex items-center justify-center w-8 h-8 rounded-lg
-              hover:bg-primary-700 focus:bg-primary-700 focus:outline-none
-              transition-colors duration-200
-              ${!isHydrated || !isOpen ? 'mx-auto' : ''}
+              flex items-center justify-center w-10 h-10 lg:w-8 lg:h-8 rounded-lg
+              hover:bg-primary-700 bg-primary-800 text-white focus:outline-none
+              transition-colors duration-200 border border-primary-600
+              ${!isHydrated || !isOpen ? 'mx-auto' : 'ml-auto mx-2 lg:mx-0'}
             `}
             aria-label={isHydrated && isOpen ? 'Close sidebar' : 'Open sidebar'}
+            title={isHydrated && isOpen ? 'Close Menu' : 'Open Menu'}
           >
             {isHydrated && isOpen ? (
-              <CloseIcon className="w-5 h-5" />
+              <ChevronLeftRounded className="w-6 h-6" />
             ) : (
-              <MenuIcon className="w-5 h-5" />
+              <ChevronRightRounded className="w-6 h-6" />
             )}
           </button>
           
@@ -197,10 +232,48 @@ const SideBar = () => {
         {/* Footer */}
         {isHydrated && isOpen && (
           <div className="p-4 border-t border-solid border-primary-700 opacity-0 animate-[fadeIn_0.5s_ease-in-out_forwards]">
+            <button
+              onClick={async () => {
+                const logoutToast = toast.loading('Logging out...', { id: 'logout' });
+                try {
+                  await fetch('/api/logout', { method: 'POST' });
+                  toast.success('Logged out successfully', { id: 'logout' });
+                  router.push('/login');
+                } catch (error) {
+                  toast.error('Logout failed', { id: 'logout' });
+                }
+              }}
+              className="w-full flex items-center p-3 rounded-lg text-primary-200 hover:bg-red-600/20 hover:text-red-300 transition-all duration-200 group mb-3"
+            >
+              <LogoutRounded className="w-5 h-5 flex-shrink-0 text-primary-300 group-hover:text-red-300 transition-colors duration-200" />
+              <div className="ml-3">
+                <div className="font-medium text-sm">Log Out</div>
+              </div>
+            </button>
             <div className="text-xs text-primary-300 text-center">
-              <p>&copy; 2025 Thapar University</p>
+              <p>&copy; {new Date().getFullYear()} Thapar University</p>
               <p className="mt-1">Educational Platform</p>
             </div>
+          </div>
+        )}
+        {isHydrated && !isOpen && (
+          <div className="p-2 border-t border-solid border-primary-700">
+            <button
+              onClick={async () => {
+                const logoutToast = toast.loading('Logging out...', { id: 'logout' });
+                try {
+                  await fetch('/api/logout', { method: 'POST' });
+                  toast.success('Logged out successfully', { id: 'logout' });
+                  router.push('/login');
+                } catch (error) {
+                  toast.error('Logout failed', { id: 'logout' });
+                }
+              }}
+              className="w-full flex items-center justify-center p-3 rounded-lg text-primary-200 hover:bg-red-600/20 hover:text-red-300 transition-all duration-200"
+              title="Log Out"
+            >
+              <LogoutRounded className="w-5 h-5" />
+            </button>
           </div>
         )}
       </aside>

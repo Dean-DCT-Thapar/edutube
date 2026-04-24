@@ -8,6 +8,7 @@ import toast from 'react-hot-toast';
 import {
     DashboardRounded,
     SchoolRounded,
+    SecurityRounded,
     LogoutRounded,
     MenuRounded,
     CloseRounded,
@@ -36,7 +37,8 @@ const TeacherLayout = ({ children, title, userName }) => {
 
     const navigation = [
         { name: 'Dashboard', href: '/teacher-dashboard', icon: DashboardRounded },
-        { name: 'My courses', href: '/teacher-dashboard/instances', icon: SchoolRounded }
+        { name: 'My courses', href: '/teacher-dashboard/instances', icon: SchoolRounded },
+        { name: 'Change Password', href: '/teacher-dashboard/settings', icon: SecurityRounded, section: 'settings' }
     ];
 
     const handleLogout = async () => {
@@ -111,14 +113,24 @@ const TeacherLayout = ({ children, title, userName }) => {
                     </div>
 
                     <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
+                        <p className="px-3 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                            Main
+                        </p>
                         {navigation.map((item) => {
                             const isActive =
                                 item.href === '/teacher-dashboard'
                                     ? pathname === '/teacher-dashboard'
-                                    : pathname.startsWith('/teacher-dashboard/instances');
+                                    : item.href === '/teacher-dashboard/instances'
+                                        ? pathname.startsWith('/teacher-dashboard/instances')
+                                        : pathname === item.href;
                             return (
+                                <React.Fragment key={item.name}>
+                                    {item.section === 'settings' && (
+                                        <p className="px-3 pt-4 pb-1 text-[11px] font-semibold uppercase tracking-wide text-gray-400">
+                                            Settings
+                                        </p>
+                                    )}
                                 <Link
-                                    key={item.name}
                                     href={item.href}
                                     onClick={() => setSidebarOpen(false)}
                                     className={`
@@ -135,6 +147,7 @@ const TeacherLayout = ({ children, title, userName }) => {
                                     />
                                     {item.name}
                                 </Link>
+                                </React.Fragment>
                             );
                         })}
                     </nav>
@@ -171,18 +184,18 @@ const TeacherLayout = ({ children, title, userName }) => {
             </div>
 
             <div className="flex-1 flex flex-col overflow-hidden">
-                <header className="bg-white border-b border-gray-200 px-4 py-4 sm:px-6 lg:px-8">
+                <header className="bg-white border-b border-gray-200 px-4 py-3 sm:py-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
+                        <div className="flex items-center space-x-3 sm:space-x-4 min-w-0">
                             <button
                                 onClick={() => setSidebarOpen(true)}
                                 className="lg:hidden p-2 rounded-lg text-gray-600 hover:bg-gray-100"
                             >
                                 <MenuRounded />
                             </button>
-                            <div>
-                                <h1 className="text-xl font-semibold text-gray-900">{title}</h1>
-                                <p className="text-sm text-gray-600">
+                            <div className="min-w-0">
+                                <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">{title}</h1>
+                                <p className="text-xs sm:text-sm text-gray-600 truncate">
                                     {getWelcomeMessage()}, {userName?.split(' ')[0] || 'Teacher'}!
                                 </p>
                             </div>

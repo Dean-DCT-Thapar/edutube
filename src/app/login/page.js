@@ -8,7 +8,7 @@ import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import AdminLoginHelper from '../component/AdminLoginHelper';
 import AdminDebugHelper from '../component/AdminDebugHelper';
-
+import Link from 'next/link';
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
@@ -157,6 +157,9 @@ export default function Page() {
                 className="w-full px-4 py-3 bg-white border-2 border-red-300 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all duration-200"
                 placeholder="Enter your email"
               />
+              <p className="mt-2 text-xs text-gray-600">
+                Students: use your <code>{'<rollnumber>@thapar.edu'}</code> email to sign in.
+              </p>
             </div>
 
             {/* Password Field */}
@@ -188,6 +191,11 @@ export default function Page() {
                   {showPassword ? <VisibilityIcon /> : <VisibilityOffIcon />}
                 </button>
               </div>
+              <div className="flex justify-end mt-2">
+                {/* <Link href="/forgotPassword" className="text-sm font-medium text-red-600 hover:text-red-500 transition-colors">
+                  Forgot your password?
+                </Link> */}
+              </div>
             </div>
 
             {/* Submit Button */}
@@ -214,7 +222,7 @@ export default function Page() {
         {/* Bottom Text */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-200 drop-shadow">
-            &copy; 2025 Thapar University. All rights reserved.
+            &copy; {new Date().getFullYear()} Thapar University. All rights reserved.
           </p>
         </div>
       </div>

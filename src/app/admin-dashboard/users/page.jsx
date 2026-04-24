@@ -22,6 +22,7 @@ const UsersPage = () => {
         role: 'all',
         search: ''
     });
+    const [searchInput, setSearchInput] = useState('');
     const [showUserModal, setShowUserModal] = useState(false);
     const [editingUser, setEditingUser] = useState(null);
     const [showDeleteDialog, setShowDeleteDialog] = useState(false);
@@ -107,7 +108,8 @@ const UsersPage = () => {
     };
 
     const handleSearch = (searchTerm) => {
-        setFilters(prev => ({ ...prev, search: searchTerm, page: 1 }));
+        const normalizedSearch = (searchTerm || '').trim();
+        setFilters(prev => ({ ...prev, search: normalizedSearch, page: 1 }));
     };
 
     const handleRoleFilter = (role) => {
@@ -145,11 +147,25 @@ const UsersPage = () => {
                                     type="text"
                                     placeholder="Search by name or email..."
                                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                    value={filters.search}
-                                    onChange={(e) => handleSearch(e.target.value)}
+                                    value={searchInput}
+                                    onChange={(e) => setSearchInput(e.target.value)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter') {
+                                            handleSearch(searchInput);
+                                        }
+                                    }}
                                 />
                             </div>
                         </div>
+
+                        <button
+                            type="button"
+                            onClick={() => handleSearch(searchInput)}
+                            className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center"
+                        >
+                            <SearchRounded className="mr-1" />
+                            Search
+                        </button>
 
                         {/* Role Filter */}
                         <div className="sm:w-48">

@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter, useParams, useSearchParams } from 'next/navigation';
 import frontendApi from '@/utils/frontendApiClient';
+import { getSafeExternalUrl } from '@/utils/safeExternalUrl';
 import toast from 'react-hot-toast';
 import AdminLayout from '../../../../component/AdminLayout';
 import {
@@ -28,6 +29,8 @@ export default function CourseInstanceLectures() {
     const [loading, setLoading] = useState(true);
     const [showModal, setShowModal] = useState(false);
     const [editingLecture, setEditingLecture] = useState(null);
+    const [reorderMode, setReorderMode] = useState(false);
+    const [openingLectureId, setOpeningLectureId] = useState(null);
 
     useEffect(() => {
         if (instanceId) {
@@ -136,23 +139,33 @@ export default function CourseInstanceLectures() {
     const [dragOverIndex, setDragOverIndex] = useState(null);
 
     const handleDragStart = (e, lecture, index) => {
+        if (!reorderMode) {
+            e.preventDefault();
+            return;
+        }
         setDraggedLecture({ lecture, index });
         e.dataTransfer.effectAllowed = 'move';
     };
 
     const handleDragOver = (e, index) => {
+        if (!reorderMode) return;
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         setDragOverIndex(index);
     };
 
     const handleDragLeave = () => {
+        if (!reorderMode) return;
         setDragOverIndex(null);
     };
 
     const handleDrop = async (e, dropIndex) => {
         e.preventDefault();
         setDragOverIndex(null);
+
+        if (!reorderMode) {
+            return;
+        }
 
         if (!draggedLecture || draggedLecture.index === dropIndex) {
             setDraggedLecture(null);
@@ -193,6 +206,30 @@ export default function CourseInstanceLectures() {
         setDraggedLecture(null);
     };
 
+    const handleOpenLectureInStudentMode = async (lecture) => {
+        if (reorderMode) return;
+
+        const chapterNumber = chapters.find((chapter) => chapter.id.toString() === selectedChapter)?.number;
+        if (!chapterNumber) {
+            toast.error('Unable to determine chapter number for this lecture');
+            return;
+        }
+
+        try {
+            setOpeningLectureId(lecture.id);
+            await frontendApi.startStudentViewMode();
+
+            const returnTo = `/admin-dashboard/course-instances/${instanceId}/lectures?chapterId=${selectedChapter}`;
+            router.push(
+                `/course_page/${instanceId}?chapter=${chapterNumber}&lecture=${lecture.lecture_number}&returnTo=${encodeURIComponent(returnTo)}`
+            );
+        } catch (error) {
+            toast.error(error?.data?.message || error.message || 'Failed to open lecture in student mode');
+        } finally {
+            setOpeningLectureId(null);
+        }
+    };
+
     const getYouTubeVideoId = (url) => {
         const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
         const match = url.match(regExp);
@@ -230,14 +267,32 @@ export default function CourseInstanceLectures() {
                             </p>
                         )}
                     </div>
-                    <button
-                        onClick={handleCreateLecture}
-                        disabled={!selectedChapter}
-                        className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        <AddRounded className="mr-2" />
-                        Add Lecture
-                    </button>
+                    <div className="flex items-center space-x-3">
+                        <button
+                            onClick={() => {
+                                setReorderMode(prev => !prev);
+                                setDraggedLecture(null);
+                                setDragOverIndex(null);
+                            }}
+                            disabled={!selectedChapter || lectures.length < 2}
+                            className={`flex items-center px-4 py-2 rounded-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+                                reorderMode
+                                    ? 'bg-amber-600 text-white hover:bg-amber-700'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            <DragIndicatorRounded className="mr-2" />
+                            {reorderMode ? 'Done Reordering' : 'Reorder Lectures'}
+                        </button>
+                        <button
+                            onClick={handleCreateLecture}
+                            disabled={!selectedChapter}
+                            className="flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            <AddRounded className="mr-2" />
+                            Add Lecture
+                        </button>
+                    </div>
                 </div>
 
                 {/* Chapter Filter */}
@@ -274,21 +329,34 @@ export default function CourseInstanceLectures() {
                         </div>
                     ) : lectures.length > 0 ? (
                         <div className="space-y-4">
-                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                                <div className="flex items-center">
-                                    <DragIndicatorRounded className="text-blue-600 mr-2" />
-                                    <p className="text-sm text-blue-800">
-                                        <strong>Tip:</strong> Drag and drop lectures to reorder them. The lecture numbers will be automatically updated based on their position.
-                                    </p>
+                            {reorderMode && (
+                                <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                    <div className="flex items-center">
+                                        <DragIndicatorRounded className="text-blue-600 mr-2" />
+                                        <p className="text-sm text-blue-800">
+                                            <strong>Reorder mode:</strong> Drag and drop lectures to reorder them. Lecture numbers update automatically.
+                                        </p>
+                                    </div>
                                 </div>
-                            </div>
+                            )}
                             {lectures.map((lecture, index) => (
                                 <div 
                                     key={lecture.id} 
-                                    className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all cursor-move ${
+                                    className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all ${
+                                        reorderMode ? 'cursor-move' : 'cursor-pointer'
+                                    } ${
                                         dragOverIndex === index ? 'border-primary-500 bg-primary-50' : ''
                                     }`}
-                                    draggable
+                                    role="button"
+                                    tabIndex={0}
+                                    onClick={() => handleOpenLectureInStudentMode(lecture)}
+                                    onKeyDown={(e) => {
+                                        if (e.key === 'Enter' || e.key === ' ') {
+                                            e.preventDefault();
+                                            handleOpenLectureInStudentMode(lecture);
+                                        }
+                                    }}
+                                    draggable={reorderMode}
                                     onDragStart={(e) => handleDragStart(e, lecture, index)}
                                     onDragOver={(e) => handleDragOver(e, index)}
                                     onDragLeave={handleDragLeave}
@@ -297,7 +365,9 @@ export default function CourseInstanceLectures() {
                                     <div className="flex items-start space-x-4">
                                         {/* Drag Handle */}
                                         <div className="flex-shrink-0 flex items-center">
-                                            <DragIndicatorRounded className="text-gray-400 cursor-grab active:cursor-grabbing" />
+                                            {reorderMode && (
+                                                <DragIndicatorRounded className="text-gray-400 cursor-grab active:cursor-grabbing" />
+                                            )}
                                         </div>
 
                                         {/* YouTube Thumbnail */}
@@ -347,15 +417,21 @@ export default function CourseInstanceLectures() {
                                                         </div>
                                                     )}
                                                     <div className="flex items-center space-x-4 text-sm text-gray-500">
+                                                        {(() => {
+                                                            const safeYouTubeUrl = getSafeExternalUrl(lecture.youtube_url);
+                                                            return safeYouTubeUrl ? (
                                                         <a
-                                                            href={lecture.youtube_url}
+                                                            href={safeYouTubeUrl}
                                                             target="_blank"
                                                             rel="noopener noreferrer"
+                                                            onClick={(e) => e.stopPropagation()}
                                                             className="flex items-center text-red-600 hover:text-red-700"
                                                         >
                                                             <PlayCircleOutlineRounded className="mr-1" style={{ fontSize: '16px' }} />
                                                             Watch on YouTube
                                                         </a>
+                                                            ) : null;
+                                                        })()}
                                                         {lecture.duration > 0 && (
                                                             <span>
                                                                 Duration: {Math.floor(lecture.duration / 60)}:{String(lecture.duration % 60).padStart(2, '0')}
@@ -367,13 +443,19 @@ export default function CourseInstanceLectures() {
                                                 {/* Actions */}
                                                 <div className="flex space-x-2">
                                                     <button
-                                                        onClick={() => handleEditLecture(lecture)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleEditLecture(lecture);
+                                                        }}
                                                         className="text-gray-400 hover:text-blue-600"
                                                     >
                                                         <EditRounded style={{ fontSize: '20px' }} />
                                                     </button>
                                                     <button
-                                                        onClick={() => handleDeleteLecture(lecture.id)}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            handleDeleteLecture(lecture.id);
+                                                        }}
                                                         className="text-gray-400 hover:text-red-600"
                                                     >
                                                         <DeleteRounded style={{ fontSize: '20px' }} />
@@ -382,6 +464,9 @@ export default function CourseInstanceLectures() {
                                             </div>
                                         </div>
                                     </div>
+                                    {openingLectureId === lecture.id && !reorderMode && (
+                                        <p className="mt-3 text-sm text-blue-600">Opening in student mode...</p>
+                                    )}
                                 </div>
                             ))}
                         </div>

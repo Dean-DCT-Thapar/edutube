@@ -7,6 +7,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import TopBar from '../../component/TopBar';
 import SideBar from '../../component/SideBar';
+import Footer from '../../component/Footer';
 import {
   PersonRounded,
   EmailRounded,
@@ -95,11 +96,11 @@ export default function TeacherPage() {
                 <h2 className="text-2xl font-bold text-gray-900 mb-2">Teacher Not Found</h2>
                 <p className="text-gray-600 mb-6">{error || 'The teacher you are looking for does not exist.'}</p>
                 <Link 
-                  href="/browse"
+                  href="/teachers"
                   className="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors"
                 >
                   <ArrowBackRounded className="mr-2" />
-                  Back to Browse
+                  Back to Teachers
                 </Link>
               </div>
             </div>
@@ -118,11 +119,11 @@ export default function TeacherPage() {
           <div className="max-w-7xl mx-auto">{/* Back Button */}
       <div className="mb-6">
         <Link 
-          href="/browse"
+          href="/teachers"
           className="inline-flex items-center text-gray-600 hover:text-gray-900 transition-colors"
         >
           <ArrowBackRounded className="mr-2" />
-          Back to Browse
+          Back to Teachers
         </Link>
       </div>
 
@@ -271,6 +272,7 @@ export default function TeacherPage() {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 }

@@ -46,8 +46,7 @@ const AdminLayout = ({ children, title, userName }) => {
     const navigation = [
         { name: 'Dashboard', href: '/admin-dashboard', icon: DashboardRounded },
         { name: 'Users', href: '/admin-dashboard/users', icon: PeopleRounded },
-        { name: 'Course Templates', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
-        { name: 'Course Instances', href: '/admin-dashboard/course-instances', icon: GroupRounded },
+        { name: 'Courses', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
         { name: 'CLI API Keys', href: '/admin-dashboard/cli-keys', icon: VpnKeyRounded },
         { name: 'Settings', href: '/admin-dashboard/settings', icon: SettingsRounded },
     ];

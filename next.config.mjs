@@ -16,6 +16,19 @@ const nextConfig = {
     HOSTNAME: '0.0.0.0',
     PORT: '4000',
   },
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          {
+            key: 'Permissions-Policy',
+            value: 'accelerometer=(), autoplay=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), usb=(), serial=(), bluetooth=(), magnetometer=()'
+          }
+        ]
+      }
+    ];
+  },
 };
 
 export default nextConfig;

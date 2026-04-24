@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useRouter, useParams, notFound } from 'next/navigation';
 import Link from 'next/link';
 import frontendApi from '@/utils/frontendApiClient';
+import { getSafeExternalUrl } from '@/utils/safeExternalUrl';
 import toast from 'react-hot-toast';
 import TeacherLayout from '../../../component/TeacherLayout';
 import TeacherLectureEditModal from '../../../component/TeacherLectureEditModal';
@@ -359,6 +360,7 @@ export default function TeacherInstanceDetailPage() {
                                                     const thumbSrc = ytId
                                                         ? `https://img.youtube.com/vi/${ytId}/mqdefault.jpg`
                                                         : null;
+                                                    const safeWatchUrl = getSafeExternalUrl(lec.youtube_url);
                                                     const upPayload = moveLectureStepPayload(chaptersSorted, lec.id, ch.id, 'up');
                                                     const downPayload = moveLectureStepPayload(chaptersSorted, lec.id, ch.id, 'down');
 
@@ -415,8 +417,8 @@ export default function TeacherInstanceDetailPage() {
                                                                                 ))}
                                                                             </div>
                                                                         )}
-                                                                        {lec.youtube_url && (
-                                                                            <a href={lec.youtube_url} target="_blank" rel="noopener noreferrer"
+                                                                        {safeWatchUrl && (
+                                                                            <a href={safeWatchUrl} target="_blank" rel="noopener noreferrer"
                                                                                 className="inline-flex items-center mt-2 text-xs text-red-600 hover:text-red-700">
                                                                                 <PlayCircleOutlineRounded className="mr-1" style={{ fontSize: 14 }} />
                                                                                 Watch

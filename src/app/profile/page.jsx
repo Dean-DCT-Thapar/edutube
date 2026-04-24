@@ -25,7 +25,6 @@ const page = () => {
 
   useEffect(() => {
     const loadData = async () => {
-      const loadingToast = toast.loading('Loading profile...', { id: 'profile-loading' });
 
       try {
         const [authResponse, userDataResponse] = await Promise.all([
@@ -39,13 +38,12 @@ const page = () => {
           }
           
           setUserData(userDataResponse);
-          toast.success('Profile loaded', { id: 'profile-loading' });
         } else {
           throw new Error('Authentication failed');
         }
       } catch (error) {
         const errorMessage = error.response?.data?.message || error.message || 'Please login to continue';
-        toast.error(errorMessage, { id: 'profile-loading' });
+        toast.error(errorMessage);
         
         if (window.location.pathname !== '/login') {
           router.push('/login');
@@ -175,19 +173,19 @@ const page = () => {
                       <PersonOutlined className="text-primary-600 mr-2 text-lg" />
                       <p className="font-semibold text-gray-900 text-sm sm:text-base">Learning Progress</p>
                     </div>
-                    <div className="flex items-center space-x-4">
-                      <div className="text-center">
-                        <div className="text-lg sm:text-xl font-bold text-primary-600">{userData?.enrolled_courses?.length || 0}</div>
-                        <div className="text-xs sm:text-sm text-gray-600">Courses</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg sm:text-xl font-bold text-green-600">{userData?.videos_watched || 0}</div>
-                        <div className="text-xs sm:text-sm text-gray-600">Videos</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="text-lg sm:text-xl font-bold text-blue-600">{userData?.learning_hours || 0}h</div>
-                        <div className="text-xs sm:text-sm text-gray-600">Hours</div>
-                      </div>
+                    <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 mt-2">
+                      <Link href="/browse" className="bg-white border border-gray-100 rounded-lg p-3 sm:p-2 flex-1 text-center group/stat cursor-pointer shadow-sm flex items-center justify-between sm:block">
+                        <div className="text-xs sm:text-sm text-gray-500 uppercase tracking-tight font-medium">Courses Enrolled</div>
+                        <div className="text-xl font-bold text-primary-600 group-hover/stat:text-primary-800 transition-colors">{userData?.enrolled_courses?.length || 0}</div>
+                      </Link>
+                      <Link href="/watchHistory" className="bg-white border border-gray-100 rounded-lg p-3 sm:p-2 flex-1 text-center group/stat cursor-pointer shadow-sm flex items-center justify-between sm:block">
+                        <div className="text-xs sm:text-sm text-gray-500 uppercase tracking-tight font-medium">Videos Watched</div>
+                        <div className="text-xl font-bold text-green-600 group-hover/stat:text-green-800 transition-colors">{userData?.videos_watched || 0}</div>
+                      </Link>
+                      <Link href="/dashboard" className="bg-white border border-gray-100 rounded-lg p-3 sm:p-2 flex-1 text-center group/stat cursor-pointer shadow-sm flex items-center justify-between sm:block">
+                        <div className="text-xs sm:text-sm text-gray-500 uppercase tracking-tight font-medium">Learning Hours</div>
+                        <div className="text-xl font-bold text-blue-600 group-hover/stat:text-blue-800 transition-colors">{userData?.learning_hours || 0}h</div>
+                      </Link>
                     </div>
                   </div>
                 </div>

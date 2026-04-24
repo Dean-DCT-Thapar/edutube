@@ -1,5 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import AdminLayout from './AdminLayout';
 import {
     AddRounded,
@@ -14,6 +15,7 @@ import {
 import toast from 'react-hot-toast';
 
 const CourseTemplatesPage = () => {
+    const router = useRouter();
     const [templates, setTemplates] = useState([]);
     const [loading, setLoading] = useState(true);
     const [pagination, setPagination] = useState({});
@@ -78,6 +80,10 @@ const CourseTemplatesPage = () => {
         setShowDeleteDialog(true);
     };
 
+    const goToTemplateInstances = (templateId) => {
+        router.push(`/admin-dashboard/course-instances?template=${templateId}`);
+    };
+
     const handleSubmit = async (formData) => {
         try {
             const url = editingTemplate 
@@ -130,14 +136,14 @@ const CourseTemplatesPage = () => {
     };
 
     return (
-        <AdminLayout title="Course Templates">
+        <AdminLayout title="Courses">
             <div className="space-y-6">
                 {/* Header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Course Templates</h1>
+                        <h1 className="text-2xl font-bold text-gray-900">Courses</h1>
                         <p className="mt-1 text-sm text-gray-600">
-                            Master course definitions that teachers can use to create course instances
+                            Master course definitions that teachers can use to create courses
                         </p>
                     </div>
                     <button
@@ -193,7 +199,19 @@ const CourseTemplatesPage = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {templates.map((template) => (
-                            <div key={template.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                            <div
+                                key={template.id}
+                                onClick={() => goToTemplateInstances(template.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        goToTemplateInstances(template.id);
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                            >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center">
                                         <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
@@ -223,21 +241,30 @@ const CourseTemplatesPage = () => {
                                     
                                     <div className="flex space-x-1">
                                         <button
-                                            onClick={() => window.location.href = `/admin-dashboard/course-instances?template=${template.id}`}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                goToTemplateInstances(template.id);
+                                            }}
                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg"
                                             title="View Instances"
                                         >
                                             <VisibilityRounded style={{ fontSize: '18px' }} />
                                         </button>
                                         <button
-                                            onClick={() => handleEdit(template)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEdit(template);
+                                            }}
                                             className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
                                             title="Edit Template"
                                         >
                                             <EditRounded style={{ fontSize: '18px' }} />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(template)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(template);
+                                            }}
                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                                             title="Delete Template"
                                         >

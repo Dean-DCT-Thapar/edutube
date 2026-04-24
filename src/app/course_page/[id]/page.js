@@ -6,7 +6,6 @@ import frontendApi from '@/utils/frontendApiClient';
 import toast from "react-hot-toast";
 import TopBar from "../../component/TopBar";
 import SideBar from "../../component/SideBar";
-import Footer from "../../component/Footer";
 import VideoDisplay from "@/app/component/VideoDisplay";
 import {
   PlayArrowRounded,
@@ -265,31 +264,43 @@ const CoursePage = ({ params }) => {
           {/* Course Header */}
           <div className="bg-white border-b border-gray-200 px-4 sm:px-6 lg:px-8 py-4 flex-shrink-0">
             <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4">
-                <Link
-                  href="/dashboard"
-                  className="inline-flex items-center text-sm text-gray-600 hover:text-primary-700 transition-colors"
-                >
-                  <ArrowBackRounded className="mr-1" />
-                  Back to Dashboard
-                </Link>
-                <div className="hidden sm:block w-px h-4 bg-gray-300"></div>
-                <div className="flex items-center space-x-3">
-                  <h1 className="text-lg sm:text-xl font-semibold text-gray-900 truncate">
+              <div className="flex items-center space-x-2 min-w-0">
+                {/* Breadcrumb Navigation */}
+                <nav className="flex items-center space-x-1 text-sm min-w-0">
+                  <Link
+                    href="/dashboard"
+                    className="text-gray-500 hover:text-primary-700 transition-colors whitespace-nowrap"
+                  >
+                    Dashboard
+                  </Link>
+                  <span className="text-gray-400">/</span>
+                  <Link
+                    href={`/course-overview/${courseId}`}
+                    className="text-gray-500 hover:text-primary-700 transition-colors truncate max-w-[80px] sm:max-w-[200px]"
+                    title={courseOverview?.title}
+                  >
                     {courseOverview?.title}
-                  </h1>
-                  {!checkingEnrollment && (
-                    <span
-                      className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                        isEnrolled
-                          ? "bg-green-100 text-green-800"
-                          : "bg-blue-100 text-blue-800"
-                      }`}
-                    >
-                      {isEnrolled ? "Enrolled" : "Preview Mode"}
-                    </span>
+                  </Link>
+                  {videoDetails && (
+                    <>
+                      <span className="text-gray-400 hidden sm:inline">/</span>
+                      <span className="text-gray-900 font-medium truncate max-w-[200px] hidden sm:inline" title={videoDetails.title}>
+                        Lecture {videoDetails.lectureNumber}
+                      </span>
+                    </>
                   )}
-                </div>
+                </nav>
+                {!checkingEnrollment && (
+                  <span
+                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
+                      isEnrolled
+                        ? "bg-green-100 text-green-800"
+                        : "bg-blue-100 text-blue-800"
+                    }`}
+                  >
+                    {isEnrolled ? "Enrolled" : "Preview Mode"}
+                  </span>
+                )}
               </div>
 
               {/* Sidebar toggle */}
@@ -526,9 +537,9 @@ const CoursePage = ({ params }) => {
               )}
             </div>
 
-            {/* Right Side - Course Content Sidebar (30%) - Conditional visibility */}
+            {/* Right Side - Course Content Sidebar - Conditional visibility */}
             {sidebarOpen && (
-              <div className="w-96 bg-white border-l border-gray-200 flex flex-col fixed lg:relative right-0 top-0 h-full lg:h-auto z-30 lg:z-auto shadow-2xl lg:shadow-none">
+              <div className="w-full sm:w-[400px] bg-white border-l border-gray-200 flex flex-col fixed lg:relative right-0 top-0 h-full lg:h-auto z-40 lg:z-auto shadow-2xl lg:shadow-none">
                 {/* Sidebar Header */}
                 <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gray-50">
                   <div className="flex items-center justify-between mb-3">
@@ -537,9 +548,12 @@ const CoursePage = ({ params }) => {
                     </h2>
                     <button
                       onClick={() => setSidebarOpen(false)}
-                      className="p-1 rounded text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-all"
+                      className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-all focus:outline-none"
+                      aria-label="Close Sidebar"
                     >
-                      ×
+                      <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
                     </button>
                   </div>
                 {courseOverview && (

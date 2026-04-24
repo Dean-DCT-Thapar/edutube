@@ -44,8 +44,8 @@ const Card = ({
   };
 
   return (
-    <Link href={`/course-overview/${course_id}`} className="block">
-      <div className="group bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-2 border border-gray-100 cursor-pointer">
+    <div className="group bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-2 border border-gray-100 flex flex-col h-full">
+      <Link href={`/course-overview/${course_id}`} className="block flex-1 cursor-pointer">
       {/* Course Graphic */}
       <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
         {/* Animated background pattern */}
@@ -170,18 +170,19 @@ const Card = ({
         )}
       </div>
 
+      </Link>
+
       {/* Action Footer - Mobile responsive */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 group-hover:bg-gray-100 transition-colors duration-200">
-        <div className="w-full inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 space-x-1 sm:space-x-2 group/btn shadow-sm">
+      <Link href={progress > 0 ? `/course_page/${course_id}?chapter=1&lecture=1` : `/course-overview/${course_id}`} className="block px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 cursor-pointer border-t border-gray-100 mt-auto group/footer">
+        <div className="w-full inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 space-x-1 sm:space-x-2 group-hover/footer:shadow-sm">
           <PlayArrowRounded className="text-base sm:text-lg" />
-          <span className="truncate">{progress > 0 ? 'Continue Learning' : 'Start Course'}</span>
-          <span className="transform translate-x-0 group-hover/btn:translate-x-1 transition-transform duration-200 hidden sm:inline">
+          <span className="truncate">{progress > 0 ? 'Continue Learning' : 'View Course'}</span>
+          <span className="transform translate-x-0 group-hover/footer:translate-x-1 transition-transform duration-200 hidden sm:inline">
             →
           </span>
         </div>
-      </div>
+      </Link>
     </div>
-    </Link>
   );
 };
 

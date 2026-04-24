@@ -155,8 +155,8 @@ export default function WatchHistory() {
                 
                 {/* Progress Badge */}
                 {progress > 0 && (
-                  <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-black bg-opacity-75 text-white text-xs px-2 py-1 rounded-full flex items-center space-x-1">
-                    <TrendingUpRounded className="text-xs" />
+                  <div className="absolute top-2 sm:top-3 right-2 sm:right-3 bg-black/80 backdrop-blur-sm text-white text-[10px] sm:text-xs font-bold px-2 py-1 rounded-md flex items-center space-x-1 shadow-lg border border-white/10">
+                    <TrendingUpRounded className="text-[10px] sm:text-xs" />
                     <span>{progress}%</span>
                   </div>
                 )}
@@ -209,13 +209,6 @@ export default function WatchHistory() {
                 </div>
               )}
               
-              {/* Continue Watching Button - Mobile responsive */}
-              <div className="mt-4 sm:mt-6">
-                <div className="inline-flex items-center text-xs sm:text-sm font-medium text-primary-700 group-hover:text-primary-800 transition-colors">
-                  <PlayArrowRounded className="mr-1 text-sm sm:text-base" />
-                  {progress > 0 ? 'Continue Watching' : 'Start Watching'}
-                </div>
-              </div>
             </div>
           </div>
         </div>

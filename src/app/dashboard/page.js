@@ -29,8 +29,6 @@ export default function Dashboard() {
 
     useEffect(() => {
         const loadData = async () => {
-            const loadingToast = toast.loading('Loading dashboard...', { id: 'dashboard-loading' });
-
             try {
                 // Use cookie-based authentication - no need to pass token
                 const [authResponse, userDataResponse] = await Promise.all([
@@ -44,7 +42,6 @@ export default function Dashboard() {
                     }
                     
                     setUserData(userDataResponse);
-                    toast.success('Welcome back!', { id: 'dashboard-loading' });
                     
                     // Load recent activity
                     loadRecentActivity();
@@ -53,7 +50,7 @@ export default function Dashboard() {
                 }
             } catch (error) {
                 const errorMessage = error.response?.data?.message || error.message || 'Please login to continue';
-                toast.error(errorMessage, { id: 'dashboard-loading' });
+                toast.error(errorMessage);
                 
                 // Avoid infinite redirect loop
                 if (window.location.pathname !== '/login') {
@@ -81,11 +78,11 @@ export default function Dashboard() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex flex-col bg-gray-50">
+            <div className="min-h-screen flex flex-col bg-gray-50 overflow-x-hidden">
                 <TopBar />
-                <div className="flex flex-1">
+                <div className="flex flex-1 min-w-0">
                     <SideBar />
-                    <main className="flex-1 p-4 sm:p-6 lg:p-8">
+                    <main className="flex-1 min-w-0 p-4 sm:p-6 lg:p-8">
                         <div className="max-w-7xl mx-auto space-y-6">
                             <div className="animate-pulse bg-gray-200 h-32 rounded-xl"></div>
                             <div className="animate-pulse bg-gray-200 h-8 w-64 rounded"></div>
@@ -142,11 +139,11 @@ export default function Dashboard() {
     };
 
     return (
-        <div className="min-h-screen flex flex-col bg-gray-50">
+        <div className="min-h-screen flex flex-col bg-gray-50 overflow-x-hidden">
             <TopBar name={userData?.name} />
-            <div className="flex flex-1">
+            <div className="flex flex-1 min-w-0">
                 <SideBar />
-                <main className="flex-1 transition-all duration-300 ease-in-out">
+                <main className="flex-1 min-w-0 transition-all duration-300 ease-in-out">
                     {/* Hero Section - Mobile Responsive */}
                     <section className="relative overflow-hidden bg-gradient-to-br from-primary-800 via-primary-700 to-primary-900">
                         {/* Background decoration - Responsive sizes */}

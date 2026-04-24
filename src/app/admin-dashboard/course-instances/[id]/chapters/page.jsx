@@ -27,6 +27,7 @@ export default function CourseInstanceChapters() {
     const [showModal, setShowModal] = useState(false);
     const [editingChapter, setEditingChapter] = useState(null);
     const [showPlaylistImport, setShowPlaylistImport] = useState(false);
+    const [reorderMode, setReorderMode] = useState(false);
 
     useEffect(() => {
         if (instanceId) {
@@ -111,23 +112,33 @@ export default function CourseInstanceChapters() {
     const [dragOverIndex, setDragOverIndex] = useState(null);
 
     const handleDragStart = (e, chapter, index) => {
+        if (!reorderMode) {
+            e.preventDefault();
+            return;
+        }
         setDraggedChapter({ chapter, index });
         e.dataTransfer.effectAllowed = 'move';
     };
 
     const handleDragOver = (e, index) => {
+        if (!reorderMode) return;
         e.preventDefault();
         e.dataTransfer.dropEffect = 'move';
         setDragOverIndex(index);
     };
 
     const handleDragLeave = () => {
+        if (!reorderMode) return;
         setDragOverIndex(null);
     };
 
     const handleDrop = async (e, dropIndex) => {
         e.preventDefault();
         setDragOverIndex(null);
+
+        if (!reorderMode) {
+            return;
+        }
 
         if (!draggedChapter || draggedChapter.index === dropIndex) {
             setDraggedChapter(null);
@@ -168,6 +179,11 @@ export default function CourseInstanceChapters() {
         setDraggedChapter(null);
     };
 
+    const handleCardOpen = (chapterId) => {
+        if (reorderMode) return;
+        router.push(`/admin-dashboard/course-instances/${instanceId}/lectures?chapterId=${chapterId}`);
+    };
+
     if (loading) {
         return (
             <AdminLayout title="Course Chapters">
@@ -190,7 +206,7 @@ export default function CourseInstanceChapters() {
                 <div className="flex items-center justify-between">
                     <div>
                         <button
-                            onClick={() => router.back()}
+                            onClick={() => router.push("/admin-dashboard/course-templates")}
                             className="flex items-center text-gray-600 hover:text-gray-800 mb-2"
                         >
                             <ArrowBackRounded className="mr-1" />
@@ -207,6 +223,21 @@ export default function CourseInstanceChapters() {
                         )}
                     </div>
                     <div className="flex space-x-3">
+                        <button
+                            onClick={() => {
+                                setReorderMode(prev => !prev);
+                                setDraggedChapter(null);
+                                setDragOverIndex(null);
+                            }}
+                            className={`flex items-center px-4 py-2 rounded-lg ${
+                                reorderMode
+                                    ? 'bg-amber-600 text-white hover:bg-amber-700'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                            }`}
+                        >
+                            <DragIndicatorRounded className="mr-2" />
+                            {reorderMode ? 'Done Reordering' : 'Reorder Chapters'}
+                        </button>
                         <button
                             onClick={() => setShowPlaylistImport(true)}
                             className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700"
@@ -227,22 +258,35 @@ export default function CourseInstanceChapters() {
                 {/* Chapters Grid */}
                 {chapters.length > 0 ? (
                     <div className="space-y-4">
-                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
-                            <div className="flex items-center">
-                                <DragIndicatorRounded className="text-blue-600 mr-2" />
-                                <p className="text-sm text-blue-800">
-                                    <strong>Tip:</strong> Drag and drop chapters to reorder them. The chapter numbers will be automatically updated based on their position.
-                                </p>
+                        {reorderMode && (
+                            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                <div className="flex items-center">
+                                    <DragIndicatorRounded className="text-blue-600 mr-2" />
+                                    <p className="text-sm text-blue-800">
+                                        <strong>Reorder mode:</strong> Drag and drop chapters to reorder them. Chapter numbers update automatically.
+                                    </p>
+                                </div>
                             </div>
-                        </div>
+                        )}
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             {chapters.map((chapter, index) => (
                             <div 
                                 key={chapter.id} 
-                                className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all cursor-move ${
+                                className={`bg-white rounded-lg border border-gray-200 p-6 hover:shadow-lg transition-all ${
+                                    reorderMode ? 'cursor-move' : 'cursor-pointer'
+                                } ${
                                     dragOverIndex === index ? 'border-primary-500 bg-primary-50' : ''
                                 }`}
-                                draggable
+                                role="button"
+                                tabIndex={0}
+                                onClick={() => handleCardOpen(chapter.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        handleCardOpen(chapter.id);
+                                    }
+                                }}
+                                draggable={reorderMode}
                                 onDragStart={(e) => handleDragStart(e, chapter, index)}
                                 onDragOver={(e) => handleDragOver(e, index)}
                                 onDragLeave={handleDragLeave}
@@ -250,7 +294,9 @@ export default function CourseInstanceChapters() {
                             >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center">
-                                        <DragIndicatorRounded className="text-gray-400 cursor-grab active:cursor-grabbing mr-2" />
+                                        {reorderMode && (
+                                            <DragIndicatorRounded className="text-gray-400 cursor-grab active:cursor-grabbing mr-2" />
+                                        )}
                                         <BookRounded className="text-primary-600 mr-2" />
                                         <span className="text-sm font-medium text-gray-500">
                                             Chapter {chapter.number}
@@ -258,13 +304,19 @@ export default function CourseInstanceChapters() {
                                     </div>
                                     <div className="flex space-x-2">
                                         <button
-                                            onClick={() => handleEditChapter(chapter)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEditChapter(chapter);
+                                            }}
                                             className="text-gray-400 hover:text-blue-600"
                                         >
                                             <EditRounded style={{ fontSize: '18px' }} />
                                         </button>
                                         <button
-                                            onClick={() => handleDeleteChapter(chapter.id)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDeleteChapter(chapter.id);
+                                            }}
                                             className="text-gray-400 hover:text-red-600"
                                         >
                                             <DeleteRounded style={{ fontSize: '18px' }} />
@@ -287,7 +339,10 @@ export default function CourseInstanceChapters() {
                                         {chapter._count?.lectures || 0} lectures
                                     </span>
                                     <button
-                                        onClick={() => router.push(`/admin-dashboard/course-instances/${instanceId}/lectures?chapterId=${chapter.id}`)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            router.push(`/admin-dashboard/course-instances/${instanceId}/lectures?chapterId=${chapter.id}`);
+                                        }}
                                         className="flex items-center text-primary-600 hover:text-primary-700 text-sm font-medium"
                                     >
                                         <PlayCircleOutlineRounded className="mr-1" style={{ fontSize: '16px' }} />

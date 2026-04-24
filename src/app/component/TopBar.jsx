@@ -1,7 +1,7 @@
 'use client'
 import React from 'react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import frontendApi from '@/utils/frontendApiClient'
 import toast from 'react-hot-toast'
 
@@ -13,11 +13,18 @@ const TopBar = ({ name, avatar }) => {
 
   React.useEffect(() => {
     // Listen for sidebar toggle events
-    const handleToggle = () => setSidebarOpen((prev) => !prev);
+    const handleToggle = () => {
+      setSidebarOpen((prev) => {
+        const next = !prev;
+        return next;
+      });
+    };
     window.addEventListener('toggleSidebar', handleToggle);
     // Listen for sidebar open/close from SideBar component
     const handleSidebarState = (e) => {
-      if (typeof e.detail === 'boolean') setSidebarOpen(e.detail);
+      if (typeof e.detail === 'boolean') {
+        setSidebarOpen(e.detail);
+      }
     };
     window.addEventListener('sidebarState', handleSidebarState);
     return () => {
@@ -31,24 +38,23 @@ const TopBar = ({ name, avatar }) => {
       .then((auth) => setAuthContext(auth))
       .catch(() => setAuthContext(null));
   }, []);
-  const pathname = usePathname();
-  
-  // Get page title based on current route
-  const getPageTitle = () => {
-    switch (pathname) {
-      case '/dashboard':
-        return 'Dashboard';
-      case '/browse':
-        return 'Browse';
-      case '/profile':
-        return 'Profile';
-      case '/watchHistory':
-        return 'Watch History';
-      default:
-        return 'Thapar EduTube';
-    }
-  };
 
+  React.useEffect(() => {
+    const syncWithViewport = () => {
+      const isDesktop = window.innerWidth >= 1024;
+      setSidebarOpen((prev) => {
+        // Keep explicit toggle behavior, but ensure first render/resize stays aligned
+        // with desktop/mobile sidebar defaults across route transitions.
+        if (isDesktop && prev === false) return true;
+        if (!isDesktop && prev === true) return false;
+        return prev;
+      });
+    };
+
+    syncWithViewport();
+    window.addEventListener('resize', syncWithViewport);
+    return () => window.removeEventListener('resize', syncWithViewport);
+  }, []);
   const getWelcomeMessage = () => {
     const hour = new Date().getHours();
     if (hour < 12) return 'Good morning';
@@ -57,20 +63,20 @@ const TopBar = ({ name, avatar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 bg-white border-b border-gray-200 shadow-sm">
-      <div className={`flex items-center justify-between px-4 sm:px-6 lg:px-8 py-4 ml-0 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}> 
+    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm">
+      <div className={`w-full flex items-center justify-between px-3 sm:px-6 lg:px-8 py-3 lg:py-4 ml-0 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}> 
         {/* Left section - Logo and Title */}
         <div className="flex items-center space-x-4">
           {/* Sidebar toggle for mobile */}
           <button
-            className="flex items-center justify-center mr-2 lg:hidden p-2 rounded-lg hover:bg-gray-100 focus:outline-none"
+            className="flex items-center justify-center mr-1 sm:mr-2 lg:hidden p-2.5 rounded-lg hover:bg-gray-100 focus:outline-none touch-manipulation"
             onClick={() => {
               const evt = new CustomEvent('toggleSidebar');
               window.dispatchEvent(evt);
             }}
             aria-label="Open sidebar"
           >
-            <svg className="w-6 h-6 text-primary-800" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+            <svg className="w-6 h-6 text-primary-800" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
           </button>
@@ -132,44 +138,43 @@ const TopBar = ({ name, avatar }) => {
           </Link>
         </div>
       </div>
-
-      {/* Mobile page title */}
-      <div className="block md:hidden px-4 sm:px-6 pb-3">
-        <h2 className="text-lg font-semibold text-gray-900">
-          {getPageTitle()}
-        </h2>
-      </div>
-
       {authContext?.viewMode?.active && (
-        <div className="px-4 sm:px-6 lg:px-8 py-2 bg-amber-50 border-t border-amber-200">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-            <p className="text-sm text-amber-900">
-              Signed in as {authContext.actualRole} and viewing as student ({authContext.viewMode.targetUserEmail}).
-            </p>
-            <button
-              onClick={async () => {
-                try {
-                  setExitingMode(true);
-                  const response = await frontendApi.stopStudentViewMode();
-                  toast.success('Exited student view mode');
-                  if (response.actualRole === 'admin') {
-                    router.push('/admin-dashboard');
-                  } else if (response.actualRole === 'teacher') {
-                    router.push('/teacher-dashboard');
-                  } else {
-                    router.push('/dashboard');
+        <div className={`ml-0 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>
+          <div className="px-4 sm:px-6 lg:px-8 py-2 bg-amber-50 border-t border-amber-200">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+              <p className="text-sm text-amber-900">
+                Signed in as {authContext.actualRole} and viewing as student ({authContext.viewMode.targetUserEmail}).
+              </p>
+              <button
+                onClick={async () => {
+                  try {
+                    setExitingMode(true);
+                    const response = await frontendApi.stopStudentViewMode();
+                    toast.success('Exited student view mode');
+                    const returnTo = typeof window !== 'undefined'
+                      ? new URLSearchParams(window.location.search).get('returnTo')
+                      : null;
+                    if (returnTo && returnTo.startsWith('/')) {
+                      router.push(returnTo);
+                    } else if (response.actualRole === 'admin') {
+                      router.push('/admin-dashboard');
+                    } else if (response.actualRole === 'teacher') {
+                      router.push('/teacher-dashboard');
+                    } else {
+                      router.push('/dashboard');
+                    }
+                  } catch (error) {
+                    toast.error(error?.data?.message || error.message || 'Failed to exit student view mode');
+                  } finally {
+                    setExitingMode(false);
                   }
-                } catch (error) {
-                  toast.error(error?.data?.message || error.message || 'Failed to exit student view mode');
-                } finally {
-                  setExitingMode(false);
-                }
-              }}
-              disabled={exitingMode}
-              className="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-amber-700 text-white text-xs font-medium hover:bg-amber-800 disabled:opacity-60"
-            >
-              {exitingMode ? 'Exiting...' : 'Exit Student View'}
-            </button>
+                }}
+                disabled={exitingMode}
+                className="inline-flex items-center justify-center px-3 py-1.5 rounded-md bg-amber-700 text-white text-xs font-medium hover:bg-amber-800 disabled:opacity-60"
+              >
+                {exitingMode ? 'Exiting...' : 'Exit Student View'}
+              </button>
+            </div>
           </div>
         </div>
       )}

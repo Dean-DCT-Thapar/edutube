@@ -103,7 +103,7 @@ export default function TeacherDashboardPage() {
                 {/* Page header */}
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h1 className="text-2xl font-bold text-gray-900">Overview</h1>
+                        <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Overview</h1>
                         <p className="mt-1 text-sm text-gray-600">
                             Monitor your courses and student engagement at a glance.
                         </p>
@@ -118,9 +118,9 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 {/* Stat cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:gap-6">
                     {STAT_CARDS.map((card) => (
-                        <div key={card.key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+                        <div key={card.key} className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-6">
                             <div className="flex items-center">
                                 <div className={`p-3 rounded-lg ${card.bgColor}`}>
                                     <card.icon className={`text-2xl ${card.textColor}`} />
@@ -137,8 +137,8 @@ export default function TeacherDashboardPage() {
                 </div>
 
                 {/* Recent courses */}
-                <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                    <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+                <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+                    <div className="px-4 sm:px-6 py-4 border-b border-gray-200 flex items-center justify-between">
                         <h2 className="text-base font-semibold text-gray-900">Recent Courses</h2>
                         <Link
                             href="/teacher-dashboard/instances"
@@ -160,7 +160,7 @@ export default function TeacherDashboardPage() {
                                 <li key={inst.id}>
                                     <Link
                                         href={`/teacher-dashboard/instances/${inst.id}`}
-                                        className="flex items-center justify-between px-6 py-4 hover:bg-gray-50 transition-colors"
+                                        className="flex items-center justify-between px-4 sm:px-6 py-4 hover:bg-gray-50 transition-colors"
                                     >
                                         <div className="flex items-center min-w-0">
                                             <div className="p-2 rounded-lg bg-primary-50 mr-4 shrink-0">

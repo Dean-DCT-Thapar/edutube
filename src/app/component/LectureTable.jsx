@@ -1,5 +1,6 @@
 'use client';
 import React from 'react';
+import { getSafeExternalUrl } from '@/utils/safeExternalUrl';
 import {
     EditRounded,
     DeleteRounded,
@@ -102,6 +103,9 @@ const LectureTable = ({ lectures, loading, selectedCourse, onEdit, onDelete }) =
                             </tr>
                         ) : (
                             lectures.map((lecture, index) => (
+                                (() => {
+                                    const safeYouTubeUrl = getSafeExternalUrl(lecture.youtube_url);
+                                    return (
                                 <tr key={lecture.id} className="hover:bg-gray-50">
                                     <td className="px-6 py-4">
                                         <div className="flex items-center">
@@ -129,14 +133,14 @@ const LectureTable = ({ lectures, loading, selectedCourse, onEdit, onDelete }) =
                                     </td>
                                     <td className="px-6 py-4 whitespace-nowrap">
                                         <div className="max-w-xs truncate">
-                                            {lecture.youtube_url ? (
+                                            {safeYouTubeUrl ? (
                                                 <a
-                                                    href={lecture.youtube_url}
+                                                    href={safeYouTubeUrl}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-primary-600 hover:text-primary-900 text-sm"
                                                 >
-                                                    {lecture.youtube_url}
+                                                    {safeYouTubeUrl}
                                                 </a>
                                             ) : (
                                                 <span className="text-gray-400 text-sm">No URL provided</span>
@@ -177,6 +181,8 @@ const LectureTable = ({ lectures, loading, selectedCourse, onEdit, onDelete }) =
                                         </div>
                                     </td>
                                 </tr>
+                                    );
+                                })()
                             ))
                         )}
                     </tbody>

@@ -482,7 +482,7 @@ export default function Browse() {
               type="text"
               value={searchQuery}
               onChange={(e) => handleInputChange(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               onFocus={() => suggestions.length > 0 && setShowSuggestions(true)}
               placeholder="Search for courses, teachers, lectures..."
               className="w-full pl-10 sm:pl-12 pr-16 sm:pr-24 py-3 sm:py-4 border border-gray-300 rounded-xl text-sm sm:text-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent transition-all duration-200"
@@ -542,8 +542,8 @@ export default function Browse() {
                         : 'text-gray-600 hover:text-gray-900'
                     }`}
                   >
-                    <Icon className="text-base sm:text-lg" />
-                    <span className="hidden sm:inline">{config.label}</span>
+                    <Icon className="text-base" />
+                    <span className="text-xs uppercase tracking-tight font-medium">{config.label}</span>
                   </button>
                 );
               })}

@@ -6,6 +6,7 @@ import Link from "next/link";
 import toast from "react-hot-toast";
 import TopBar from '../component/TopBar';
 import SideBar from '../component/SideBar';
+import Footer from '../component/Footer';
 import {
   PersonRounded,
   SearchRounded,
@@ -122,7 +123,7 @@ export default function TeachersPage() {
               placeholder="Search teachers by name..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyPress={handleKeyPress}
+              onKeyDown={handleKeyPress}
               className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base"
             />
           </div>
@@ -252,6 +253,7 @@ export default function TeachersPage() {
           </div>
         </main>
       </div>
+      <Footer />
     </div>
   );
 }

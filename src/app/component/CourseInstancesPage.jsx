@@ -17,6 +17,12 @@ import {
 } from '@mui/icons-material';
 import toast from 'react-hot-toast';
 
+const matchesSearch = (value = '', query = '') =>
+    value.toString().toLowerCase().includes(query.trim().toLowerCase());
+
+const getCourseTemplateLabel = (template) => `${template.course_code} - ${template.name}`;
+const getTeacherLabel = (teacher) => `${teacher.user?.name || 'Unknown'} (${teacher.user?.email || 'No email'})`;
+
 const CourseInstancesPage = () => {
     const router = useRouter();
     const searchParams = useSearchParams();
@@ -29,6 +35,8 @@ const CourseInstancesPage = () => {
     const [pagination, setPagination] = useState({});
     const [filters, setFilters] = useState({
         search: '',
+        teacher_search: '',
+        course_search: '',
         teacher_id: '',
         course_template_id: templateId || ''
     });
@@ -85,16 +93,33 @@ const CourseInstancesPage = () => {
 
     const fetchTeachers = async () => {
         try {
-            const response = await fetch('/api/admin/teachers?limit=100', {
-                credentials: 'include'
-            });
+            const allTeachers = [];
+            let page = 1;
+            let totalPages = 1;
 
-            if (response.ok) {
+            do {
+                const response = await fetch(`/api/admin/teachers?page=${page}&limit=100`, {
+                    credentials: 'include'
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to fetch teachers');
+                }
+
                 const data = await response.json();
-                setTeachers(data.teachers || []);
-            }
+                allTeachers.push(...(data.teachers || []));
+                totalPages = data.pagination?.totalPages || 1;
+                page += 1;
+            } while (page <= totalPages);
+
+            const uniqueTeachers = Array.from(
+                new Map(allTeachers.map((teacher) => [teacher.id, teacher])).values()
+            ).sort((a, b) => (a.user?.name || '').localeCompare(b.user?.name || ''));
+
+            setTeachers(uniqueTeachers);
         } catch (error) {
             console.error('Error fetching teachers:', error);
+            toast.error('Failed to load teachers');
         }
     };
 
@@ -111,6 +136,32 @@ const CourseInstancesPage = () => {
         setFilters(prev => ({ ...prev, [key]: value }));
     };
 
+    const handleCourseSearchInput = (value) => {
+        const normalized = value || '';
+        const matchedTemplate = courseTemplates.find((template) =>
+            getCourseTemplateLabel(template).toLowerCase() === normalized.trim().toLowerCase()
+        );
+
+        setFilters((prev) => ({
+            ...prev,
+            course_search: normalized,
+            course_template_id: matchedTemplate ? matchedTemplate.id.toString() : ''
+        }));
+    };
+
+    const handleTeacherSearchInput = (value) => {
+        const normalized = value || '';
+        const matchedTeacher = teachers.find((teacher) =>
+            getTeacherLabel(teacher).toLowerCase() === normalized.trim().toLowerCase()
+        );
+
+        setFilters((prev) => ({
+            ...prev,
+            teacher_search: normalized,
+            teacher_id: matchedTeacher ? matchedTeacher.id.toString() : ''
+        }));
+    };
+
     const handleSearch = (e) => {
         e.preventDefault();
         fetchInstances(1);
@@ -119,6 +170,8 @@ const CourseInstancesPage = () => {
     const clearFilters = () => {
         setFilters({
             search: '',
+            teacher_search: '',
+            course_search: '',
             teacher_id: '',
             course_template_id: ''
         });
@@ -137,6 +190,10 @@ const CourseInstancesPage = () => {
     const handleDelete = (instance) => {
         setDeletingInstance(instance);
         setShowDeleteDialog(true);
+    };
+
+    const goToInstanceContent = (instanceId) => {
+        router.push(`/admin-dashboard/course-instances/${instanceId}/chapters`);
     };
 
     const handleSubmit = async (formData) => {
@@ -198,7 +255,7 @@ const CourseInstancesPage = () => {
                     <div>
                         <h1 className="text-2xl font-bold text-gray-900">Course Instances</h1>
                         <p className="mt-1 text-sm text-gray-600">
-                            Teacher-specific implementations of course templates
+                            Teacher-specific implementations of courses
                         </p>
                     </div>
                     <button
@@ -226,35 +283,45 @@ const CourseInstancesPage = () => {
                             </div>
                             
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Course Template</label>
-                                <select
-                                    value={filters.course_template_id}
-                                    onChange={(e) => handleFilterChange('course_template_id', e.target.value)}
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Course</label>
+                                <input
+                                    type="text"
+                                    placeholder="Type course code or name..."
+                                    list="course-filter-options"
+                                    value={filters.course_search}
+                                    onChange={(e) => handleCourseSearchInput(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                >
-                                    <option value="">All Templates</option>
-                                    {courseTemplates.map(template => (
-                                        <option key={template.id} value={template.id}>
-                                            {template.course_code} - {template.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                />
+                                <datalist id="course-filter-options">
+                                    {courseTemplates
+                                        .filter((template) =>
+                                            matchesSearch(getCourseTemplateLabel(template), filters.course_search)
+                                        )
+                                        .map((template) => (
+                                            <option key={template.id} value={getCourseTemplateLabel(template)} />
+                                        ))}
+                                </datalist>
                             </div>
                             
                             <div>
                                 <label className="block text-sm font-medium text-gray-700 mb-1">Teacher</label>
-                                <select
-                                    value={filters.teacher_id}
-                                    onChange={(e) => handleFilterChange('teacher_id', e.target.value)}
+                                <input
+                                    type="text"
+                                    placeholder="Type teacher name or email..."
+                                    list="teacher-filter-options"
+                                    value={filters.teacher_search}
+                                    onChange={(e) => handleTeacherSearchInput(e.target.value)}
                                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500"
-                                >
-                                    <option value="">All Teachers</option>
-                                    {teachers.map(teacher => (
-                                        <option key={teacher.id} value={teacher.id}>
-                                            {teacher.user?.name}
-                                        </option>
-                                    ))}
-                                </select>
+                                />
+                                <datalist id="teacher-filter-options">
+                                    {teachers
+                                        .filter((teacher) =>
+                                            matchesSearch(getTeacherLabel(teacher), filters.teacher_search)
+                                        )
+                                        .map((teacher) => (
+                                            <option key={teacher.id} value={getTeacherLabel(teacher)} />
+                                        ))}
+                                </datalist>
                             </div>
                         </div>
                         
@@ -277,7 +344,7 @@ const CourseInstancesPage = () => {
                                 </button>
                             </div>
                             
-                            {(filters.search || filters.teacher_id || filters.course_template_id) && (
+                            {(filters.search || filters.teacher_search || filters.course_search || filters.teacher_id || filters.course_template_id) && (
                                 <span className="text-sm text-gray-500">
                                     Filtered results
                                 </span>
@@ -311,7 +378,19 @@ const CourseInstancesPage = () => {
                 ) : (
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         {instances.map((instance) => (
-                            <div key={instance.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
+                            <div
+                                key={instance.id}
+                                onClick={() => goToInstanceContent(instance.id)}
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' || e.key === ' ') {
+                                        e.preventDefault();
+                                        goToInstanceContent(instance.id);
+                                    }
+                                }}
+                                role="button"
+                                tabIndex={0}
+                                className="bg-white p-6 rounded-lg shadow-sm border border-gray-200 hover:shadow-md transition-shadow cursor-pointer"
+                            >
                                 <div className="flex items-start justify-between mb-4">
                                     <div className="flex items-center">
                                         <div className="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center">
@@ -360,7 +439,10 @@ const CourseInstancesPage = () => {
                                 
                                 <div className="flex justify-between items-center">
                                     <button
-                                        onClick={() => router.push(`/admin-dashboard/course-instances/${instance.id}/chapters`)}
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            goToInstanceContent(instance.id);
+                                        }}
                                         className="text-sm text-blue-600 hover:text-blue-800 font-medium"
                                     >
                                         Manage Content →
@@ -368,14 +450,20 @@ const CourseInstancesPage = () => {
                                     
                                     <div className="flex space-x-1">
                                         <button
-                                            onClick={() => handleEdit(instance)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleEdit(instance);
+                                            }}
                                             className="p-2 text-gray-600 hover:bg-gray-50 rounded-lg"
                                             title="Edit Instance"
                                         >
                                             <EditRounded style={{ fontSize: '18px' }} />
                                         </button>
                                         <button
-                                            onClick={() => handleDelete(instance)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleDelete(instance);
+                                            }}
                                             className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
                                             title="Delete Instance"
                                         >
@@ -396,7 +484,7 @@ const CourseInstancesPage = () => {
                         <p className="text-gray-600 mb-4">
                             {Object.values(filters).some(f => f) ? 
                                 'Try adjusting your filters.' : 
-                                'Teachers can create instances from course templates.'}
+                                'Teachers can create instances from courses.'}
                         </p>
                         {!Object.values(filters).some(f => f) && (
                             <button
@@ -463,6 +551,7 @@ const CourseInstancesPage = () => {
                     instance={editingInstance}
                     courseTemplates={courseTemplates}
                     teachers={teachers}
+                    preselectedTemplateId={templateId || filters.course_template_id}
                     isOpen={showModal}
                     onClose={() => setShowModal(false)}
                     onSubmit={handleSubmit}
@@ -487,7 +576,15 @@ const CourseInstancesPage = () => {
 };
 
 // Course Instance Modal Component
-const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onClose, onSubmit }) => {
+const CourseInstanceModal = ({
+    instance,
+    courseTemplates,
+    teachers,
+    preselectedTemplateId,
+    isOpen,
+    onClose,
+    onSubmit
+}) => {
     const [formData, setFormData] = useState({
         course_template_id: '',
         teacher_id: '',
@@ -496,25 +593,73 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
     });
     const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
+    const [templateInputValue, setTemplateInputValue] = useState('');
+    const [teacherInputValue, setTeacherInputValue] = useState('');
 
     useEffect(() => {
+        const selectedTemplateId = preselectedTemplateId ? preselectedTemplateId.toString() : '';
+
         if (instance) {
+            const selectedTemplate = courseTemplates.find((template) => template.id === instance.course_template_id);
+            const selectedTeacher = teachers.find((teacher) => teacher.id === instance.teacher_id);
+
             setFormData({
                 course_template_id: instance.course_template_id || '',
                 teacher_id: instance.teacher_id || '',
                 instance_name: instance.instance_name || '',
                 is_active: instance.is_active ?? true
             });
+
+            setTemplateInputValue(selectedTemplate ? getCourseTemplateLabel(selectedTemplate) : '');
+            setTeacherInputValue(selectedTeacher ? getTeacherLabel(selectedTeacher) : '');
         } else {
+            const selectedTemplate = courseTemplates.find(
+                (template) => template.id?.toString() === selectedTemplateId
+            );
+
             setFormData({
-                course_template_id: '',
+                course_template_id: selectedTemplateId,
                 teacher_id: '',
                 instance_name: '',
                 is_active: true
             });
+            setTemplateInputValue(selectedTemplate ? getCourseTemplateLabel(selectedTemplate) : '');
+            setTeacherInputValue('');
         }
         setErrors({});
-    }, [instance, isOpen]);
+    }, [instance, isOpen, courseTemplates, teachers, preselectedTemplateId]);
+
+    const handleTemplateInputChange = (value) => {
+        const matchedTemplate = courseTemplates.find((template) =>
+            getCourseTemplateLabel(template).toLowerCase() === value.trim().toLowerCase()
+        );
+
+        setTemplateInputValue(value);
+        setFormData((prev) => ({
+            ...prev,
+            course_template_id: matchedTemplate ? matchedTemplate.id.toString() : ''
+        }));
+
+        if (matchedTemplate && errors.course_template_id) {
+            setErrors((prev) => ({ ...prev, course_template_id: '' }));
+        }
+    };
+
+    const handleTeacherInputChange = (value) => {
+        const matchedTeacher = teachers.find((teacher) =>
+            getTeacherLabel(teacher).toLowerCase() === value.trim().toLowerCase()
+        );
+
+        setTeacherInputValue(value);
+        setFormData((prev) => ({
+            ...prev,
+            teacher_id: matchedTeacher ? matchedTeacher.id.toString() : ''
+        }));
+
+        if (matchedTeacher && errors.teacher_id) {
+            setErrors((prev) => ({ ...prev, teacher_id: '' }));
+        }
+    };
 
     const validateForm = () => {
         const newErrors = {};
@@ -582,22 +727,24 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
                         <label htmlFor="course_template_id" className="block text-sm font-medium text-gray-700 mb-1">
                             Course Template
                         </label>
-                        <select
+                        <input
                             id="course_template_id"
-                            name="course_template_id"
-                            value={formData.course_template_id}
-                            onChange={handleChange}
+                            type="text"
+                            list="modal-course-template-options"
+                            placeholder="Type to search templates..."
+                            value={templateInputValue}
+                            onChange={(e) => handleTemplateInputChange(e.target.value)}
                             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
                                 errors.course_template_id ? 'border-red-300' : 'border-gray-300'
                             }`}
-                        >
-                            <option value="">Select a course template...</option>
-                            {courseTemplates.map(template => (
-                                <option key={template.id} value={template.id}>
-                                    {template.course_code} - {template.name}
-                                </option>
-                            ))}
-                        </select>
+                        />
+                        <datalist id="modal-course-template-options">
+                            {courseTemplates
+                                .filter((template) => matchesSearch(getCourseTemplateLabel(template), templateInputValue))
+                                .map((template) => (
+                                    <option key={template.id} value={getCourseTemplateLabel(template)} />
+                                ))}
+                        </datalist>
                         {errors.course_template_id && (
                             <p className="mt-1 text-sm text-red-600">{errors.course_template_id}</p>
                         )}
@@ -607,22 +754,24 @@ const CourseInstanceModal = ({ instance, courseTemplates, teachers, isOpen, onCl
                         <label htmlFor="teacher_id" className="block text-sm font-medium text-gray-700 mb-1">
                             Teacher
                         </label>
-                        <select
+                        <input
                             id="teacher_id"
-                            name="teacher_id"
-                            value={formData.teacher_id}
-                            onChange={handleChange}
+                            type="text"
+                            list="modal-teacher-options"
+                            placeholder="Type to search teachers..."
+                            value={teacherInputValue}
+                            onChange={(e) => handleTeacherInputChange(e.target.value)}
                             className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
                                 errors.teacher_id ? 'border-red-300' : 'border-gray-300'
                             }`}
-                        >
-                            <option value="">Select a teacher...</option>
-                            {teachers.map(teacher => (
-                                <option key={teacher.id} value={teacher.id}>
-                                    {teacher.user?.name} ({teacher.user?.email})
-                                </option>
-                            ))}
-                        </select>
+                        />
+                        <datalist id="modal-teacher-options">
+                            {teachers
+                                .filter((teacher) => matchesSearch(getTeacherLabel(teacher), teacherInputValue))
+                                .map((teacher) => (
+                                    <option key={teacher.id} value={getTeacherLabel(teacher)} />
+                                ))}
+                        </datalist>
                         {errors.teacher_id && (
                             <p className="mt-1 text-sm text-red-600">{errors.teacher_id}</p>
                         )}
