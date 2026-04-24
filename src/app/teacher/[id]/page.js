@@ -153,35 +153,35 @@ export default function TeacherPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
-          <SchoolRounded className="text-primary-600 text-2xl sm:text-3xl mb-2 mx-auto" />
-          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalCourses}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Courses</div>
+      <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 sm:gap-4 mb-5 sm:mb-8">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2.5 sm:p-5 text-center min-w-0">
+          <SchoolRounded className="text-primary-600 text-lg sm:text-3xl mb-1 sm:mb-2 mx-auto" />
+          <div className="text-base sm:text-2xl font-bold text-gray-900 leading-tight">{teacher.stats.totalCourses}</div>
+          <div className="text-[11px] sm:text-sm text-gray-600 leading-tight">Courses</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
-          <GroupRounded className="text-green-600 text-2xl sm:text-3xl mb-2 mx-auto" />
-          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalStudents}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Students</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2.5 sm:p-5 text-center min-w-0">
+          <GroupRounded className="text-green-600 text-lg sm:text-3xl mb-1 sm:mb-2 mx-auto" />
+          <div className="text-base sm:text-2xl font-bold text-gray-900 leading-tight">{teacher.stats.totalStudents}</div>
+          <div className="text-[11px] sm:text-sm text-gray-600 leading-tight">Students</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
-          <BookmarkBorderRounded className="text-blue-600 text-2xl sm:text-3xl mb-2 mx-auto" />
-          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalChapters}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Chapters</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2.5 sm:p-5 text-center min-w-0">
+          <BookmarkBorderRounded className="text-blue-600 text-lg sm:text-3xl mb-1 sm:mb-2 mx-auto" />
+          <div className="text-base sm:text-2xl font-bold text-gray-900 leading-tight">{teacher.stats.totalChapters}</div>
+          <div className="text-[11px] sm:text-sm text-gray-600 leading-tight">Chapters</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
-          <PlayLessonRounded className="text-purple-600 text-2xl sm:text-3xl mb-2 mx-auto" />
-          <div className="text-xl sm:text-2xl font-bold text-gray-900">{teacher.stats.totalLectures}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Lectures</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2.5 sm:p-5 text-center min-w-0">
+          <PlayLessonRounded className="text-purple-600 text-lg sm:text-3xl mb-1 sm:mb-2 mx-auto" />
+          <div className="text-base sm:text-2xl font-bold text-gray-900 leading-tight">{teacher.stats.totalLectures}</div>
+          <div className="text-[11px] sm:text-sm text-gray-600 leading-tight">Lectures</div>
         </div>
         
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 sm:p-5 text-center min-w-0">
-          <TimerRounded className="text-orange-600 text-2xl sm:text-3xl mb-2 mx-auto" />
-          <div className="text-xl sm:text-2xl font-bold text-gray-900 truncate">{formatDuration(teacher.stats.totalDuration)}</div>
-          <div className="text-xs sm:text-sm text-gray-600">Content</div>
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-2.5 sm:p-5 text-center min-w-0">
+          <TimerRounded className="text-orange-600 text-lg sm:text-3xl mb-1 sm:mb-2 mx-auto" />
+          <div className="text-base sm:text-2xl font-bold text-gray-900 truncate leading-tight">{formatDuration(teacher.stats.totalDuration)}</div>
+          <div className="text-[11px] sm:text-sm text-gray-600 leading-tight">Content</div>
         </div>
       </div>
 

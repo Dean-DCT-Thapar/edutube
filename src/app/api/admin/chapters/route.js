@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
 import apiClient from '@/utils/apiClient';;
 
 import { getBackendUrl } from "@/utils/apiConfig";
@@ -9,12 +10,12 @@ export async function GET(request) {
     const courseId = searchParams.get('courseId');
     const instanceId = searchParams.get('instanceId');
     
-    // Get authorization header from the request
-    const authHeader = request.headers.get('authorization');
+    const cookieStore = await cookies();
+    const adminToken = cookieStore.get('adminToken');
     
-    if (!authHeader) {
+    if (!adminToken) {
       return NextResponse.json(
-        { message: 'Authorization header missing' },
+        { message: 'Unauthorized' },
         { status: 401 }
       );
     }
@@ -25,7 +26,7 @@ export async function GET(request) {
     
     const response = await apiClient.get(`/api/admin/chapters/dropdown?${queryParams}`, {
       headers: {
-        'Authorization': authHeader
+        'Authorization': `Bearer ${adminToken.value}`
       }
     });
     
@@ -49,11 +50,12 @@ export async function GET(request) {
 
 export async function POST(request) {
   try {
-    const authHeader = request.headers.get('authorization');
+    const cookieStore = await cookies();
+    const adminToken = cookieStore.get('adminToken');
     
-    if (!authHeader) {
+    if (!adminToken) {
       return NextResponse.json(
-        { message: 'Authorization header missing' },
+        { message: 'Unauthorized' },
         { status: 401 }
       );
     }
@@ -62,7 +64,7 @@ export async function POST(request) {
     
     const response = await apiClient.post(`/api/admin/chapters`, body, {
       headers: {
-        'Authorization': authHeader,
+        'Authorization': `Bearer ${adminToken.value}`,
         'Content-Type': 'application/json'
       }
     });

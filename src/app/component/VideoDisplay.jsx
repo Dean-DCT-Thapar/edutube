@@ -20,6 +20,8 @@ const VideoDisplay = (props) => {
   const lastSentRef = useRef(0);
   const [resumeProgress, setResumeProgress] = useState(0); // Store progress percentage
   const [playerReady, setPlayerReady] = useState(false);
+  const [playerError, setPlayerError] = useState(null);
+  const embedOrigin = typeof window !== 'undefined' ? window.location.origin : undefined;
 
   const sendWatchHistory = async () => {
     if (!player) return;
@@ -141,6 +143,11 @@ const VideoDisplay = (props) => {
     }
   }, [props?.lec_id]);
 
+  // Reset error state when switching videos.
+  useEffect(() => {
+    setPlayerError(null);
+  }, [props?.video_code, props?.lec_id]);
+
   // Handle seeking to the correct position when player is ready
   useEffect(() => {
     console.log('Seek useEffect triggered:', { 
@@ -215,6 +222,19 @@ const VideoDisplay = (props) => {
         console.error('Player instance missing required methods');
         return;
       }
+
+      // Best-effort iframe hardening for embedded YouTube behavior.
+      if (typeof playerInstance.getIframe === 'function') {
+        const iframe = playerInstance.getIframe();
+        if (iframe) {
+          iframe.setAttribute(
+            'allow',
+            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+          );
+          iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
+          iframe.setAttribute('allowfullscreen', 'true');
+        }
+      }
       
       console.log('Player ready and validated');
       setPlayer(playerInstance);
@@ -228,32 +248,70 @@ const VideoDisplay = (props) => {
     <div ref={containerRef} className="w-full h-full">
       <div className="w-full h-full">
         {props.video_code ? (
-          <YouTube 
-            key={`video-${props.video_code}-${props.lec_id || 'no-id'}`}
-            videoId={props.video_code}
-            opts={{
-              height: '100%',
-              width: '100%',
-              playerVars: {
-                rel: 0,
-                autoplay: 0,
-                modestbranding: 1,
-                controls: 1,
-              },
-            }}
-            onReady={onPlayerReady}
-            onError={(error) => {
-              console.error('YouTube player error:', error);
-            }}
-            onStateChange={(event) => {
-              console.log('YouTube player state changed:', event.data);
-            }}
-            style={{
-              width: '100%',
-              height: '100%'
-            }}
-            className="w-full h-full"
-          />
+          <>
+            {!playerError ? (
+              <YouTube 
+                key={`video-${props.video_code}-${props.lec_id || 'no-id'}`}
+                videoId={props.video_code}
+                opts={{
+                  height: '100%',
+                  width: '100%',
+                  host: 'https://www.youtube-nocookie.com',
+                  playerVars: {
+                    rel: 0,
+                    autoplay: 0,
+                    modestbranding: 1,
+                    controls: 1,
+                    playsinline: 1,
+                    iv_load_policy: 3,
+                    enablejsapi: 1,
+                    origin: embedOrigin,
+                  },
+                }}
+                onReady={onPlayerReady}
+                onError={(error) => {
+                  console.error('YouTube player error:', error);
+                  setPlayerError(error?.data || 'embed-error');
+                }}
+                onStateChange={(event) => {
+                  console.log('YouTube player state changed:', event.data);
+                }}
+                style={{
+                  width: '100%',
+                  height: '100%'
+                }}
+                className="w-full h-full"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-100 border border-gray-200 rounded-lg flex items-center justify-center p-4 sm:p-6">
+                <div className="max-w-xl text-center space-y-3">
+                  <h3 className="text-base sm:text-lg font-semibold text-gray-900">
+                    YouTube is blocking playback in embedded mode
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    This can happen when YouTube asks for an account verification check. Open the video directly, complete sign-in there if prompted, then return here.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 justify-center">
+                    <a
+                      href={`https://www.youtube.com/watch?v=${props.video_code}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary-600 text-white text-sm font-medium hover:bg-primary-700 transition-colors"
+                    >
+                      Open Video on YouTube
+                    </a>
+                    <button
+                      type="button"
+                      onClick={() => setPlayerError(null)}
+                      className="inline-flex items-center justify-center px-4 py-2 rounded-lg border border-gray-300 bg-white text-gray-700 text-sm font-medium hover:bg-gray-50 transition-colors"
+                    >
+                      Try Embed Again
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
+          </>
         ) : (
           <div className="w-full h-full bg-gray-200 flex items-center justify-center rounded-lg">
             <p className="text-gray-600">No video available</p>
