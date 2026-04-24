@@ -223,8 +223,8 @@ export default function WatchHistory() {
       <div className="flex flex-1">
         <SideBar />
         
-        <main className="flex-1 transition-all duration-300 ease-in-out">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <main className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
+          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 flex-1">
             {/* Header - Mobile responsive */}
             <div className="mb-6 sm:mb-8">
               <div className="flex items-center space-x-3 mb-2">
@@ -292,10 +292,9 @@ export default function WatchHistory() {
               </div>
             )}
           </div>
+          <Footer />
         </main>
       </div>
-      
-      <Footer />
     </div>
   );
 }

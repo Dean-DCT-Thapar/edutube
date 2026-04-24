@@ -6,19 +6,21 @@ import frontendApi from '@/utils/frontendApiClient'
 import toast from 'react-hot-toast'
 
 const TopBar = ({ name, avatar }) => {
-  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const SIDEBAR_COLLAPSED_KEY = 'studentSidebarCollapsed';
+  const [sidebarOpen, setSidebarOpen] = React.useState(() => {
+    if (typeof window === 'undefined') return false;
+    const isDesktop = window.innerWidth >= 1024;
+    if (!isDesktop) return false;
+    return localStorage.getItem('studentSidebarCollapsed') !== 'true';
+  });
   const [authContext, setAuthContext] = React.useState(null);
   const [exitingMode, setExitingMode] = React.useState(false);
+  const [isReadyForTransitions, setIsReadyForTransitions] = React.useState(false);
   const router = useRouter();
 
   React.useEffect(() => {
     // Listen for sidebar toggle events
-    const handleToggle = () => {
-      setSidebarOpen((prev) => {
-        const next = !prev;
-        return next;
-      });
-    };
+    const handleToggle = () => {};
     window.addEventListener('toggleSidebar', handleToggle);
     // Listen for sidebar open/close from SideBar component
     const handleSidebarState = (e) => {
@@ -42,16 +44,18 @@ const TopBar = ({ name, avatar }) => {
   React.useEffect(() => {
     const syncWithViewport = () => {
       const isDesktop = window.innerWidth >= 1024;
-      setSidebarOpen((prev) => {
-        // Keep explicit toggle behavior, but ensure first render/resize stays aligned
-        // with desktop/mobile sidebar defaults across route transitions.
-        if (isDesktop && prev === false) return true;
-        if (!isDesktop && prev === true) return false;
-        return prev;
-      });
+      if (!isDesktop) {
+        setSidebarOpen(false);
+        return;
+      }
+      const storedCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      setSidebarOpen(storedCollapsed !== 'true');
     };
 
     syncWithViewport();
+    requestAnimationFrame(() => {
+      setIsReadyForTransitions(true);
+    });
     window.addEventListener('resize', syncWithViewport);
     return () => window.removeEventListener('resize', syncWithViewport);
   }, []);
@@ -63,8 +67,8 @@ const TopBar = ({ name, avatar }) => {
   };
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm">
-      <div className={`w-full flex items-center justify-between px-3 sm:px-6 lg:px-8 py-3 lg:py-4 ml-0 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}> 
+    <header className={`sticky top-0 z-30 w-full bg-white border-b border-gray-200 shadow-sm ${isReadyForTransitions ? 'transition-all duration-300' : ''} ${sidebarOpen ? 'lg:pl-64' : 'lg:pl-16'}`}>
+      <div className="w-full flex items-center justify-between px-3 sm:px-6 lg:px-8 py-3 lg:py-4"> 
         {/* Left section - Logo and Title */}
         <div className="flex items-center space-x-4">
           {/* Sidebar toggle for mobile */}
@@ -139,7 +143,7 @@ const TopBar = ({ name, avatar }) => {
         </div>
       </div>
       {authContext?.viewMode?.active && (
-        <div className={`ml-0 transition-all duration-300 ${sidebarOpen ? 'lg:ml-64' : 'lg:ml-16'}`}>
+        <div>
           <div className="px-4 sm:px-6 lg:px-8 py-2 bg-amber-50 border-t border-amber-200">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
               <p className="text-sm text-amber-900">

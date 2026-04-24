@@ -95,7 +95,7 @@ const SettingsPage = () => {
         }
         if (!passwordData.newPassword) {
             newErrors.newPassword = 'New password is required';
-        } else if (passwordData.newPassword.length < 6) {
+        } else if (passwordData.newPassword.length < 5) {
             newErrors.newPassword = 'Password must be at least 6 characters';
         }
         if (passwordData.newPassword !== passwordData.confirmPassword) {

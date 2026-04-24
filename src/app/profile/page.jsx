@@ -92,8 +92,8 @@ const page = () => {
       <div className="flex flex-1">
         <SideBar />
         
-        <main className="flex-1 transition-all duration-300 ease-in-out">
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
+        <main className="flex-1 flex flex-col transition-all duration-300 ease-in-out">
+          <div className="max-w-4xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8 flex-1">
             
             {/* Profile Header - Mobile responsive */}
             <div className="bg-gradient-to-r from-primary-600 to-primary-800 rounded-xl shadow-lg p-6 sm:p-8 text-white">
@@ -210,10 +210,9 @@ const page = () => {
               </button>
             </div>
           </div>
+          <Footer />
         </main>
       </div>
-      
-      <Footer />
     </div>
   )
 }

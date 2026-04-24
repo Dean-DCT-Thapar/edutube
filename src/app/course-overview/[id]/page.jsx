@@ -425,7 +425,7 @@ export default function CourseOverview() {
                                 <div className="lg:sticky lg:top-8">
                                     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-4 sm:p-6">
                                         {/* Always show Start Learning button */}
-                                        <div className="mb-6">
+                                        <div className="hidden lg:block mb-6">
                                             <button
                                                 onClick={handleStartLearning}
                                                 className="w-full bg-primary-600 text-white py-3 px-4 rounded-lg hover:bg-primary-700 transition-colors flex items-center justify-center font-medium"
@@ -437,7 +437,7 @@ export default function CourseOverview() {
 
                                         {/* Enrollment section */}
                                         {isEnrolled ? (
-                                            <div className="border-t border-gray-200 pt-6">
+                                            <div className="hidden lg:block border-t border-gray-200 pt-6">
                                                 <div className="flex items-center justify-center w-12 h-12 bg-green-100 rounded-full mx-auto mb-4">
                                                     <CheckCircleRounded className="w-6 h-6 text-green-600" />
                                                 </div>
@@ -473,7 +473,7 @@ export default function CourseOverview() {
                                                 </button>
                                             </div>
                                         ) : (
-                                            <div className="border-t border-gray-200 pt-6">
+                                            <div className="hidden lg:block border-t border-gray-200 pt-6">
                                                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                                                     Add to Dashboard
                                                 </h3>

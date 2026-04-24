@@ -268,45 +268,33 @@ const CoursePage = ({ params }) => {
                 {/* Breadcrumb Navigation */}
                 <nav className="flex items-center space-x-1 text-sm min-w-0">
                   <Link
-                    href="/dashboard"
-                    className="text-gray-500 hover:text-primary-700 transition-colors whitespace-nowrap"
-                  >
-                    Dashboard
-                  </Link>
-                  <span className="text-gray-400">/</span>
-                  <Link
                     href={`/course-overview/${courseId}`}
-                    className="text-gray-500 hover:text-primary-700 transition-colors truncate max-w-[80px] sm:max-w-[200px]"
+                    className="text-gray-500 hover:text-primary-700 transition-colors truncate max-w-[140px] sm:max-w-[240px]"
                     title={courseOverview?.title}
                   >
                     {courseOverview?.title}
                   </Link>
                   {videoDetails && (
                     <>
-                      <span className="text-gray-400 hidden sm:inline">/</span>
-                      <span className="text-gray-900 font-medium truncate max-w-[200px] hidden sm:inline" title={videoDetails.title}>
-                        Lecture {videoDetails.lectureNumber}
+                      <span className="text-gray-400">/</span>
+                      <span className="text-gray-900 font-medium truncate max-w-[150px] sm:max-w-[280px]" title={videoDetails.title}>
+                        {videoDetails.title}
                       </span>
                     </>
                   )}
                 </nav>
-                {!checkingEnrollment && (
-                  <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium flex-shrink-0 ${
-                      isEnrolled
-                        ? "bg-green-100 text-green-800"
-                        : "bg-blue-100 text-blue-800"
-                    }`}
-                  >
-                    {isEnrolled ? "Enrolled" : "Preview Mode"}
-                  </span>
-                )}
               </div>
 
               {/* Sidebar toggle */}
               <button
                 onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-lg text-gray-600 hover:bg-gray-100 transition-colors"
+                className={`inline-flex items-center justify-center p-2 rounded-lg transition-colors ${
+                  sidebarOpen
+                    ? "text-primary-700 bg-primary-50 hover:bg-primary-100"
+                    : "text-gray-600 hover:bg-gray-100"
+                }`}
+                aria-label={sidebarOpen ? "Hide course content" : "Show course content"}
+                title={sidebarOpen ? "Hide course content" : "Show course content"}
               >
                 <MenuBookRounded />
               </button>
@@ -537,9 +525,17 @@ const CoursePage = ({ params }) => {
               )}
             </div>
 
-            {/* Right Side - Course Content Sidebar - Conditional visibility */}
-            {sidebarOpen && (
-              <div className="w-full sm:w-[400px] bg-white border-l border-gray-200 flex flex-col fixed lg:relative right-0 top-0 h-full lg:h-auto z-40 lg:z-auto shadow-2xl lg:shadow-none">
+            {/* Right Side - Course Content Sidebar */}
+            <div
+              className={`
+                bg-white border-l border-gray-200 flex flex-col
+                fixed lg:relative inset-y-0 right-0 z-40 lg:z-auto
+                w-[88vw] max-w-sm sm:max-w-md lg:w-[360px]
+                shadow-2xl lg:shadow-none
+                transform transition-transform duration-300 ease-in-out
+                ${sidebarOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
+              `}
+            >
                 {/* Sidebar Header */}
                 <div className="p-4 border-b border-gray-200 flex-shrink-0 bg-gray-50">
                   <div className="flex items-center justify-between mb-3">
@@ -548,8 +544,9 @@ const CoursePage = ({ params }) => {
                     </h2>
                     <button
                       onClick={() => setSidebarOpen(false)}
-                      className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-all focus:outline-none"
+                      className="p-2 rounded-lg text-gray-500 hover:text-gray-700 hover:bg-gray-200 transition-all focus:outline-none lg:hidden"
                       aria-label="Close Sidebar"
+                      title="Close course content"
                     >
                       <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
@@ -586,7 +583,9 @@ const CoursePage = ({ params }) => {
                     >
                       <div className="flex-1">
                         <h3 className="font-medium text-gray-900 text-sm group-hover:text-primary-700 transition-colors">
-                          Chapter {chapter.chapter_number}:{" "}
+                          <span className="text-primary-700 mr-1">
+                            {chapter.chapter_number}.
+                          </span>
                           {chapter.chapter_name}
                         </h3>
                         <p className="text-xs text-gray-500 mt-1">
@@ -644,6 +643,9 @@ const CoursePage = ({ params }) => {
                                         : "text-gray-800 group-hover:text-primary-700"
                                     }`}
                                   >
+                                    <span className="text-gray-500 mr-2">
+                                      {chapter.chapter_number}.{lecture.lecture_number}
+                                    </span>
                                     {lecture.lecture_title}
                                   </p>
                                   {isActive && (
@@ -664,7 +666,6 @@ const CoursePage = ({ params }) => {
                 ))}
               </div>
             </div>
-            )}
           </div>
 
           {/* Overlay for sidebar */}

@@ -20,6 +20,9 @@ import {
   SortRounded
 } from "@mui/icons-material";
 
+const SEARCH_STATE_STORAGE_KEY = 'edutube:browse-search-state:v1';
+const SEARCH_STATE_TTL_MS = 2 * 60 * 1000;
+
 const SEARCH_TYPES = {
   all: { label: 'All', icon: SearchRounded },
   courses: { label: 'Courses', icon: SchoolRounded },
@@ -32,6 +35,23 @@ const SORT_OPTIONS = [
   { value: 'name', label: 'Name' },
   { value: 'date', label: 'Date' }
 ];
+
+const hasTeacherCourses = (teacher) => {
+  const count = teacher?.course_count ?? teacher?.courseCount ?? teacher?.courses_count;
+  return typeof count === 'number' ? count > 0 : true;
+};
+
+const normalizeTeacherResults = (payload) => {
+  const teachers = (payload?.teachers || []).filter(hasTeacherCourses);
+  const courses = payload?.courses || [];
+  const lectures = payload?.lectures || [];
+
+  return {
+    ...payload,
+    teachers,
+    totalCount: teachers.length + courses.length + lectures.length
+  };
+};
 
 export default function Browse() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -65,6 +85,82 @@ export default function Browse() {
   
   const searchInputRef = useRef(null);
   const debounceRef = useRef(null);
+  const hasHydratedStateRef = useRef(false);
+
+  const persistSearchState = useCallback((scrollYOverride) => {
+    if (typeof window === 'undefined') return;
+    try {
+      const payload = {
+        savedAt: Date.now(),
+        searchQuery,
+        searchType,
+        results,
+        searchInitiated,
+        filters,
+        sortBy,
+        sortOrder,
+        scrollY: typeof scrollYOverride === 'number' ? scrollYOverride : window.scrollY
+      };
+      sessionStorage.setItem(SEARCH_STATE_STORAGE_KEY, JSON.stringify(payload));
+    } catch (error) {
+      // Ignore storage failures safely.
+    }
+  }, [searchQuery, searchType, results, searchInitiated, filters, sortBy, sortOrder]);
+
+  // Restore previous search state when user navigates back to browse/search page.
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const rawState = sessionStorage.getItem(SEARCH_STATE_STORAGE_KEY);
+      if (!rawState) {
+        hasHydratedStateRef.current = true;
+        return;
+      }
+
+      const parsed = JSON.parse(rawState);
+      if (!parsed?.savedAt || (Date.now() - parsed.savedAt) > SEARCH_STATE_TTL_MS) {
+        sessionStorage.removeItem(SEARCH_STATE_STORAGE_KEY);
+        hasHydratedStateRef.current = true;
+        return;
+      }
+      setSearchQuery(parsed.searchQuery || "");
+      setSearchType(parsed.searchType || "all");
+      setResults(parsed.results || {
+        teachers: [],
+        courses: [],
+        lectures: [],
+        totalCount: 0,
+        hasMore: false,
+        page: 1,
+        limit: 10
+      });
+      setSearchInitiated(Boolean(parsed.searchInitiated));
+      setFilters(parsed.filters || {
+        courseCode: '',
+        teacherName: '',
+        chapterName: '',
+        tags: '',
+        isActive: true
+      });
+      setSortBy(parsed.sortBy || 'relevance');
+      setSortOrder(parsed.sortOrder || 'desc');
+
+      const restoredScrollY = typeof parsed.scrollY === 'number' ? parsed.scrollY : 0;
+      requestAnimationFrame(() => {
+        window.scrollTo(0, restoredScrollY);
+      });
+    } catch (error) {
+      // Ignore malformed state and continue with defaults.
+    } finally {
+      hasHydratedStateRef.current = true;
+    }
+  }, []);
+
+  // Persist state whenever search-related values change after initial hydration.
+  useEffect(() => {
+    if (!hasHydratedStateRef.current) return;
+    persistSearchState();
+  }, [persistSearchState]);
 
   // Check authentication and get user role
   useEffect(() => {
@@ -108,7 +204,11 @@ export default function Browse() {
 
     try {
       const response = await frontendApi.get(`/api/quick-search?q=${encodeURIComponent(query)}&limit=8`);
-      setSuggestions(response.suggestions || []);
+      const filteredSuggestions = (response.suggestions || []).filter((suggestion) => {
+        if (suggestion.type !== 'teacher') return true;
+        return hasTeacherCourses(suggestion);
+      });
+      setSuggestions(filteredSuggestions);
     } catch (error) {
       console.error('Suggestions error:', error);
       setSuggestions([]);
@@ -170,14 +270,19 @@ export default function Browse() {
         });
 
         if (replace || page === 1) {
-          setResults(response);
+          setResults(normalizeTeacherResults(response));
         } else {
+          const normalized = normalizeTeacherResults(response);
           // Append results for pagination
           setResults(prev => ({
-            ...response,
-            teachers: [...prev.teachers, ...response.teachers],
-            courses: [...prev.courses, ...response.courses],
-            lectures: [...prev.lectures, ...response.lectures]
+            ...normalized,
+            teachers: [...prev.teachers, ...normalized.teachers],
+            courses: [...prev.courses, ...normalized.courses],
+            lectures: [...prev.lectures, ...normalized.lectures],
+            totalCount:
+              [...prev.teachers, ...normalized.teachers].length +
+              [...prev.courses, ...normalized.courses].length +
+              [...prev.lectures, ...normalized.lectures].length
           }));
         }
       } catch (authError) {
@@ -222,14 +327,18 @@ export default function Browse() {
       
       // Transform legacy response to new format
       const transformedResults = {
-        teachers: response.filter(r => r.type === 'teacher'),
+        teachers: response.filter(r => r.type === 'teacher').filter(hasTeacherCourses),
         courses: response.filter(r => r.type === 'course'),
         lectures: response.filter(r => r.type === 'lecture'),
-        totalCount: response.length,
+        totalCount: 0,
         hasMore: false,
         page: 1,
         limit: response.length
       };
+      transformedResults.totalCount =
+        transformedResults.teachers.length +
+        transformedResults.courses.length +
+        transformedResults.lectures.length;
       
       setResults(transformedResults);
       setShowSuggestions(false);
@@ -264,6 +373,10 @@ export default function Browse() {
     setSearchType(newType);
     setShowSuggestions(false);
     handleAdvancedSearch(suggestion.title, newType);
+  };
+
+  const handleResultNavigation = () => {
+    persistSearchState();
   };
 
   // Clear search and filters
@@ -366,6 +479,7 @@ export default function Browse() {
                 <Link 
                   key={course.id} 
                   href={handleResultClick(course)}
+                  onClick={handleResultNavigation}
                   className="block"
                 >
                   <SearchCard 
@@ -398,6 +512,7 @@ export default function Browse() {
                 <Link 
                   key={lecture.id} 
                   href={handleResultClick(lecture)}
+                  onClick={handleResultNavigation}
                   className="block"
                 >
                   <SearchCard 
@@ -429,6 +544,7 @@ export default function Browse() {
                 <Link 
                   key={teacher.id} 
                   href={`/teacher/${teacher.id}`}
+                  onClick={handleResultNavigation}
                   className="block"
                 >
                   <SearchCard 
@@ -520,78 +636,53 @@ export default function Browse() {
 
         {/* Search Controls - Mobile responsive */}
         <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
-          {/* Search Type Tabs - Horizontal scroll on mobile */}
-          <div className="overflow-x-auto">
-            <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 min-w-max">
-              {Object.entries(SEARCH_TYPES).map(([key, config]) => {
-                const Icon = config.icon;
-                const isActive = searchType === key;
+          {/* Show search type tabs only after user has searched */}
+          {searchInitiated && (
+            <div className="overflow-x-auto">
+              <div className="flex space-x-1 bg-gray-100 rounded-lg p-1 min-w-max">
+                {Object.entries(SEARCH_TYPES).map(([key, config]) => {
+                  const Icon = config.icon;
+                  const isActive = searchType === key;
 
-                return (
-                  <button
-                    key={key}
-                    onClick={() => {
-                      setSearchType(key);
-                      if (searchQuery) {
-                        handleAdvancedSearch(searchQuery, key);
-                      }
-                    }}
-                    className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
-                      isActive 
-                        ? 'bg-white text-primary-600 shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-900'
-                    }`}
-                  >
-                    <Icon className="text-base" />
-                    <span className="text-xs uppercase tracking-tight font-medium">{config.label}</span>
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={key}
+                      onClick={() => {
+                        setSearchType(key);
+                        if (searchQuery) {
+                          handleAdvancedSearch(searchQuery, key);
+                        }
+                      }}
+                      className={`flex items-center space-x-2 px-3 sm:px-4 py-2 rounded-md text-xs sm:text-sm font-medium transition-all duration-200 whitespace-nowrap ${
+                        isActive 
+                          ? 'bg-white text-primary-600 shadow-sm' 
+                          : 'text-gray-600 hover:text-gray-900'
+                      }`}
+                    >
+                      <Icon className="text-base" />
+                      <span className="text-xs uppercase tracking-tight font-medium">{config.label}</span>
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
 
-          {/* Filter and Sort Controls - Stack on mobile */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 sm:space-x-4">
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="flex items-center justify-center space-x-2 px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-all duration-200 text-sm"
-            >
-              <TuneRounded />
-              <span>Filters</span>
-              {showFilters ? <ExpandLessRounded /> : <ExpandMoreRounded />}
-            </button>
-
-            <select
-              value={sortBy}
-              onChange={(e) => {
-                setSortBy(e.target.value);
-                if (searchQuery) {
-                  handleAdvancedSearch(searchQuery, searchType, filters, e.target.value, sortOrder);
-                }
-              }}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm"
-            >
-              {SORT_OPTIONS.map(option => (
-                <option key={option.value} value={option.value}>
-                  Sort by {option.label}
-                </option>
-              ))}
-            </select>
-
             {(searchQuery || searchInitiated) && (
               <button
                 onClick={clearSearch}
-                className="flex items-center justify-center space-x-1 px-4 py-2 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-all duration-200 text-sm"
+                className="inline-flex items-center justify-center gap-1.5 px-3 py-1.5 bg-white border border-gray-300 text-gray-700 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-all duration-200 text-xs sm:text-sm font-medium"
               >
-                <ClearRounded />
+                <ClearRounded className="text-sm" />
                 <span>Clear</span>
               </button>
             )}
           </div>
         </div>
 
-        {/* Advanced Filters - Mobile responsive */}
-        {showFilters && (
+        {/* Filters/sort are temporarily disabled */}
+        {false && showFilters && (
           <div className="bg-gray-50 rounded-lg p-4 sm:p-6 mt-4 space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-2 sm:space-y-0">
               <h3 className="text-base sm:text-lg font-semibold text-gray-900">Advanced Filters</h3>

@@ -26,6 +26,7 @@ export default function Dashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [recentActivity, setRecentActivity] = useState([]);
     const [activityLoading, setActivityLoading] = useState(true);
+    const [showAllCourses, setShowAllCourses] = useState(false);
 
     useEffect(() => {
         const loadData = async () => {
@@ -137,6 +138,10 @@ export default function Dashboard() {
             }
         ];
     };
+
+    const enrolledCourses = userData?.enrolled_courses || [];
+    const visibleCourses = showAllCourses ? enrolledCourses : enrolledCourses.slice(0, 8);
+    const hasMoreCourses = enrolledCourses.length > 8;
 
     return (
         <div className="min-h-screen flex flex-col bg-gray-50 overflow-x-hidden">
@@ -252,19 +257,20 @@ export default function Dashboard() {
 
                         {/* Your Courses */}
                         <section>
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                            <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
                                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Your Courses</h2>
                                 <button 
                                     onClick={() => router.push('/browse')}
-                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200 self-start sm:self-auto"
+                                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200 whitespace-nowrap"
                                 >
                                     Browse More
                                 </button>
                             </div>
 
-                            {userData?.enrolled_courses?.length > 0 ? (
-                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-                                    {userData.enrolled_courses.map((course, index) => (
+                            {enrolledCourses.length > 0 ? (
+                                <>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+                                    {visibleCourses.map((course, index) => (
                                         <Card 
                                             key={course.course_instance_id || index}
                                             title={course.course_name}
@@ -278,6 +284,17 @@ export default function Dashboard() {
                                         />
                                     ))}
                                 </div>
+                                {hasMoreCourses && (
+                                    <div className="mt-4 sm:mt-6 flex justify-center">
+                                        <button
+                                            onClick={() => setShowAllCourses((prev) => !prev)}
+                                            className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200"
+                                        >
+                                            {showAllCourses ? 'Show Less' : `Show All (${enrolledCourses.length})`}
+                                        </button>
+                                    </div>
+                                )}
+                                </>
                             ) : (
                                 <div className="bg-white rounded-lg shadow-md overflow-hidden transition-all duration-200 hover:shadow-lg border border-gray-200">
                                     <div className="px-6 py-12 text-center">

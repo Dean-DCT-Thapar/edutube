@@ -20,9 +20,17 @@ const debugLog = (payload) => {
 };
 
 const SideBar = () => {
-  // Use consistent initial state for SSR
-  const [isOpen, setIsOpen] = useState(false);
-  const [isMobile, setIsMobile] = useState(true);
+  const SIDEBAR_COLLAPSED_KEY = 'studentSidebarCollapsed';
+  const [isOpen, setIsOpen] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const mobile = window.innerWidth < 1024;
+    if (mobile) return false;
+    return localStorage.getItem(SIDEBAR_COLLAPSED_KEY) !== 'true';
+  });
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return true;
+    return window.innerWidth < 1024;
+  });
   const [isHydrated, setIsHydrated] = useState(false);
   const pathname = usePathname();
   const router = useRouter();
@@ -34,7 +42,13 @@ const SideBar = () => {
     const checkMobile = () => {
       const mobile = window.innerWidth < 1024;
       setIsMobile(mobile);
-      setIsOpen(!mobile); // Open by default on desktop, closed on mobile
+      if (mobile) {
+        setIsOpen((prev) => (prev ? false : prev));
+        return;
+      }
+      const storedCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      const nextOpenState = storedCollapsed !== 'true';
+      setIsOpen((prev) => (prev === nextOpenState ? prev : nextOpenState));
       // #region agent log
       debugLog({
         hypothesisId: 'H1',
@@ -85,6 +99,9 @@ const SideBar = () => {
     if (!isHydrated) return;
     setIsOpen((prev) => {
       const newState = !prev;
+      if (!isMobile) {
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(!newState));
+      }
       // defer dispatch to avoid conflicts
       const evt = new CustomEvent('sidebarState', { detail: newState });
       setTimeout(() => window.dispatchEvent(evt), 0);
@@ -146,7 +163,7 @@ const SideBar = () => {
   return (
     <>
       {/* Mobile overlay */}
-      {isHydrated && isMobile && isOpen && (
+      {isMobile && isOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden transition-opacity duration-300"
           onClick={closeSidebar}
@@ -158,8 +175,8 @@ const SideBar = () => {
       <aside className={`
         fixed top-0 left-0 z-50 h-full bg-primary-800 text-white
         transition-all duration-300 ease-in-out
-        ${isHydrated && isOpen ? 'w-64' : 'w-16'}
-        ${isHydrated && isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0'}
+        ${isOpen ? 'w-64' : 'w-16'}
+        ${isMobile && !isOpen ? '-translate-x-full' : 'translate-x-0'}
         lg:translate-x-0
         shadow-xl border-r border-primary-700
       `}>
@@ -171,12 +188,12 @@ const SideBar = () => {
               flex items-center justify-center w-10 h-10 lg:w-8 lg:h-8 rounded-lg
               hover:bg-primary-700 bg-primary-800 text-white focus:outline-none
               transition-colors duration-200 border border-primary-600
-              ${!isHydrated || !isOpen ? 'mx-auto' : 'ml-auto mx-2 lg:mx-0'}
+              ${!isOpen ? 'mx-auto' : 'ml-auto mx-2 lg:mx-0'}
             `}
-            aria-label={isHydrated && isOpen ? 'Close sidebar' : 'Open sidebar'}
-            title={isHydrated && isOpen ? 'Close Menu' : 'Open Menu'}
+            aria-label={isOpen ? 'Close sidebar' : 'Open sidebar'}
+            title={isOpen ? 'Close Menu' : 'Open Menu'}
           >
-            {isHydrated && isOpen ? (
+            {isOpen ? (
               <ChevronLeftRounded className="w-6 h-6" />
             ) : (
               <ChevronRightRounded className="w-6 h-6" />
@@ -204,9 +221,9 @@ const SideBar = () => {
                         ? 'bg-primary-700 text-white shadow-lg' 
                         : 'text-primary-200 hover:bg-primary-700 hover:text-white'
                       }
-                      ${!isHydrated || !isOpen ? 'justify-center' : ''}
+                      ${!isOpen ? 'justify-center' : ''}
                     `}
-                    title={!isHydrated || !isOpen ? item.label : undefined}
+                    title={!isOpen ? item.label : undefined}
                   >
                     <Icon className={`
                       w-5 h-5 flex-shrink-0
@@ -214,7 +231,7 @@ const SideBar = () => {
                       transition-colors duration-200
                     `} />
                     
-                    {isHydrated && isOpen && (
+                    {isOpen && (
                       <div className="ml-3 opacity-0 animate-[fadeIn_0.5s_ease-in-out_forwards]">
                         <div className="font-medium text-sm">{item.label}</div>
                         <div className="text-xs text-primary-300 group-hover:text-primary-200">
@@ -230,7 +247,7 @@ const SideBar = () => {
         </nav>
 
         {/* Footer */}
-        {isHydrated && isOpen && (
+        {isOpen && (
           <div className="p-4 border-t border-solid border-primary-700 opacity-0 animate-[fadeIn_0.5s_ease-in-out_forwards]">
             <button
               onClick={async () => {
@@ -256,7 +273,7 @@ const SideBar = () => {
             </div>
           </div>
         )}
-        {isHydrated && !isOpen && (
+        {!isOpen && (
           <div className="p-2 border-t border-solid border-primary-700">
             <button
               onClick={async () => {
@@ -280,8 +297,8 @@ const SideBar = () => {
 
       {/* Spacer for main content */}
       <div className={`
-        ${isHydrated && isOpen ? 'lg:w-64' : 'lg:w-16'} 
-        ${isHydrated && isMobile ? 'w-0' : 'w-16'}
+        ${isOpen ? 'lg:w-64' : 'lg:w-16'} 
+        ${isMobile ? 'w-0' : 'w-16'}
         flex-shrink-0 transition-all duration-300
       `} />
     </>

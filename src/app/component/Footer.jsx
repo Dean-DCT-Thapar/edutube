@@ -30,10 +30,10 @@ const Footer = () => {
   ];
 
   return (
-    <footer className="bg-white border-t border-gray-200 mt-auto">
+    <footer className="bg-white border-t border-gray-200 mt-auto w-full overflow-x-hidden">
       {/* Main footer content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-12">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
           {/* Brand section */}
           <div className="lg:col-span-1">
             <div className="flex items-center space-x-3 mb-4">
@@ -50,7 +50,7 @@ const Footer = () => {
                 <p className="text-sm text-gray-600">Digital Learning</p>
               </div>
             </div>
-            <p className="text-gray-600 text-sm mb-6 leading-relaxed">
+            <p className="text-gray-600 text-sm mb-6 leading-relaxed break-words">
               Empowering Thapar University students with cutting-edge digital learning experiences. 
               Access courses, track progress, and excel in your academic journey.
             </p>
@@ -83,7 +83,7 @@ const Footer = () => {
                 <li key={link.label}>
                   <Link 
                     href={link.href}
-                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200 flex items-center"
+                    className="text-gray-600 hover:text-primary-700 text-sm transition-colors duration-200 flex items-center break-words"
                   >
                     <span className="w-2 h-2 bg-primary-400 rounded-full mr-3"></span>
                     {link.label}
@@ -108,7 +108,7 @@ const Footer = () => {
               </div>
               <div className="flex items-center space-x-3 text-sm text-gray-600">
                 <EmailOutlined className="text-base text-primary-600" />
-                <a href="mailto:support@edutube.thapar.edu" className="hover:text-primary-700 transition-colors">
+                <a href="mailto:support@edutube.thapar.edu" className="hover:text-primary-700 transition-colors break-all">
                   support@edutube.thapar.edu
                 </a>
               </div>
@@ -128,13 +128,13 @@ const Footer = () => {
       {/* Bottom bar */}
       <div className="border-t border-gray-200 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex flex-col sm:flex-row justify-between items-center space-y-2 sm:space-y-0">
-            <div className="text-sm text-gray-600">
+          <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-2 md:gap-4">
+            <div className="text-sm text-gray-600 text-center md:text-left">
               © {currentYear} Thapar University. All rights reserved.
             </div>
-            <div className="flex items-center space-x-6 text-sm text-gray-600">
-              <span>Made with ❤️ for Thapar Students</span>
-              <div className="flex items-center space-x-1">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-center md:justify-end gap-2 sm:gap-6 text-sm text-gray-600 text-center md:text-right">
+              <span className="break-words">Made with ❤️ for Thapar Students</span>
+              <div className="flex items-center justify-center md:justify-end space-x-1">
                 <span>Powered by</span>
                 <span className="font-semibold text-primary-700">DCMS</span>
               </div>

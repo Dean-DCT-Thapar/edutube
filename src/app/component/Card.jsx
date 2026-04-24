@@ -1,5 +1,6 @@
 import React from 'react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import frontendApi from '@/utils/frontendApiClient';
 import { PlayArrowRounded, PersonOutline, AccessTimeRounded, SchoolRounded } from '@mui/icons-material';
 
 const Card = ({ 
@@ -11,6 +12,8 @@ const Card = ({
   enrolledCount,
   lastAccessed
 }) => {
+  const router = useRouter();
+
   const formatDuration = (minutes) => {
     if (!minutes) return 'N/A';
     const hours = Math.floor(minutes / 60);
@@ -43,11 +46,29 @@ const Card = ({
     }
   };
 
+  const openLatestLecture = async () => {
+    try {
+      const history = await frontendApi.get('/api/watch-history');
+      const latestInCourse = (history || [])
+        .filter((entry) => entry.course_instance_id === course_id)
+        .sort((a, b) => new Date(b.last_watched) - new Date(a.last_watched))[0];
+
+      if (latestInCourse?.chapter_number && latestInCourse?.lecture_number) {
+        router.push(`/course_page/${course_id}?chapter=${latestInCourse.chapter_number}&lecture=${latestInCourse.lecture_number}`);
+        return;
+      }
+    } catch (error) {
+      // Fall through to safe fallback route when history lookup fails.
+    }
+
+    router.push(`/course-overview/${course_id}`);
+  };
+
   return (
     <div className="group bg-white rounded-xl shadow-md overflow-hidden transition-all duration-300 hover:shadow-xl transform hover:-translate-y-2 border border-gray-100 flex flex-col h-full">
-      <Link href={`/course-overview/${course_id}`} className="block flex-1 cursor-pointer">
+      <button type="button" onClick={openLatestLecture} className="block flex-1 cursor-pointer text-left">
       {/* Course Graphic */}
-      <div className="relative aspect-video overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
+      <div className="relative h-32 sm:aspect-video sm:h-auto overflow-hidden bg-gradient-to-br from-primary-600 via-primary-700 to-primary-800">
         {/* Animated background pattern */}
         <div className="absolute inset-0">
           {/* Geometric background */}
@@ -73,8 +94,8 @@ const Card = ({
             {/* Main icon with glow effect */}
             <div className="relative">
               <div className="absolute inset-0 bg-white rounded-full blur-xl opacity-20 scale-150"></div>
-              <div className="relative w-16 h-16 bg-white bg-opacity-20 rounded-2xl backdrop-blur-sm border border-white border-opacity-30 flex items-center justify-center">
-                <SchoolRounded className="text-3xl text-white" />
+            <div className="relative w-12 h-12 sm:w-16 sm:h-16 bg-white bg-opacity-20 rounded-xl sm:rounded-2xl backdrop-blur-sm border border-white border-opacity-30 flex items-center justify-center">
+                <SchoolRounded className="text-2xl sm:text-3xl text-white" />
               </div>
             </div>
             
@@ -129,9 +150,9 @@ const Card = ({
       </div>
 
       {/* Course Info - Mobile responsive padding */}
-      <div className="px-4 sm:px-6 py-3 sm:py-4 space-y-2 sm:space-y-3">
+      <div className="px-3 sm:px-6 py-3 sm:py-4 space-y-2 sm:space-y-3">
         {/* Title */}
-        <h3 className="font-semibold text-base sm:text-lg text-gray-900 line-clamp-2 group-hover:text-primary-800 transition-colors duration-200 leading-tight">
+        <h3 className="font-semibold text-sm sm:text-lg text-gray-900 line-clamp-2 group-hover:text-primary-800 transition-colors duration-200 leading-tight">
           {title}
         </h3>
 
@@ -170,10 +191,10 @@ const Card = ({
         )}
       </div>
 
-      </Link>
+      </button>
 
       {/* Action Footer - Mobile responsive */}
-      <Link href={progress > 0 ? `/course_page/${course_id}?chapter=1&lecture=1` : `/course-overview/${course_id}`} className="block px-4 sm:px-6 py-3 sm:py-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 cursor-pointer border-t border-gray-100 mt-auto group/footer">
+      <button type="button" onClick={openLatestLecture} className="block w-full text-left px-3 sm:px-6 py-3 sm:py-4 bg-gray-50 hover:bg-gray-100 transition-colors duration-200 cursor-pointer border-t border-gray-100 mt-auto group/footer">
         <div className="w-full inline-flex items-center justify-center px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-medium rounded-lg bg-primary-800 text-white hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-all duration-200 space-x-1 sm:space-x-2 group-hover/footer:shadow-sm">
           <PlayArrowRounded className="text-base sm:text-lg" />
           <span className="truncate">{progress > 0 ? 'Continue Learning' : 'View Course'}</span>
@@ -181,7 +202,7 @@ const Card = ({
             →
           </span>
         </div>
-      </Link>
+      </button>
     </div>
   );
 };
