@@ -142,11 +142,12 @@ export default function Dashboard() {
 
     const handleStatClick = (label) => {
         if (label === 'Enrolled Courses') {
-            // Use scrollMarginTop in target and scroll to 'nearest', extra fallback with setTimeout for stubborn browsers
-            yourCoursesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            setTimeout(() => {
-                yourCoursesRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-            }, 300);
+            const target = yourCoursesRef.current;
+            if (target) {
+                const topOffset = 96;
+                const targetY = target.getBoundingClientRect().top + window.scrollY - topOffset;
+                window.scrollTo({ top: Math.max(targetY, 0), behavior: 'smooth' });
+            }
             return;
         }
 
@@ -231,12 +232,12 @@ export default function Dashboard() {
                     {/* Main content */}
                     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 space-y-6 sm:space-y-8">
                         {/* Recent Activity */}
-                        <section ref={yourCoursesRef}>
-                            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 sm:mb-6 space-y-3 sm:space-y-0">
+                        <section>
+                            <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
                                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Recent Activity</h2>
                                 <button 
                                     onClick={() => router.push('/watchHistory')}
-                                    className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200 self-start sm:self-auto"
+                                    className="inline-flex items-center justify-center px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-all duration-200 whitespace-nowrap"
                                 >
                                     View All
                                 </button>
@@ -277,7 +278,7 @@ export default function Dashboard() {
                         </section>
 
                         {/* Your Courses */}
-                        <section>
+                        <section ref={yourCoursesRef}>
                             <div className="flex items-center justify-between mb-4 sm:mb-6 gap-3">
                                 <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900">Your Courses</h2>
                                 <button 
