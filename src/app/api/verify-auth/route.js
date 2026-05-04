@@ -3,9 +3,6 @@ import { cookies } from 'next/headers';
 import apiClient from '@/utils/apiClient';;
 
 
-const WINDOWS_HOST = process.env.WINDOWS_HOST;
-const MODE = process.env.MODE;
-
 export async function GET(request) {
     try {
         const cookieStore = await cookies();

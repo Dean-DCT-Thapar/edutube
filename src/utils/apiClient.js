@@ -13,7 +13,9 @@ const apiClient = axios.create({
 });
 
 // Add request interceptor for debugging in development
-if (process.env.NODE_ENV === 'development') {
+// Note: Check is done at module load time on server-side only
+const isDevelopment = typeof window === 'undefined' && process.env.NODE_ENV === 'development';
+if (isDevelopment) {
     apiClient.interceptors.request.use(
         (config) => {
             console.log(`API Request: ${config.method?.toUpperCase()} ${config.baseURL}${config.url}`);

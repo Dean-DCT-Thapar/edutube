@@ -2,9 +2,6 @@
 import { NextResponse } from "next/server";
 import apiClient from '@/utils/apiClient';;
 
-const WINDOWS_HOST = process.env.WINDOWS_HOST;
-const MODE = process.env.MODE;
-
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") || "";

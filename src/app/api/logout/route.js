@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server';
 import apiClient from '@/utils/apiClient';;
 
-const WINDOWS_HOST = process.env.WINDOWS_HOST;
-const MODE = process.env.MODE;
-
 export async function POST(request) {
     try {
         // Get tokens from cookies

@@ -2,9 +2,6 @@ import { cookies } from 'next/headers';
 import apiClient from '@/utils/apiClient';;
 import { NextResponse } from 'next/server';
 
-const WINDOWS_HOST = process.env.WINDOWS_HOST;
-const MODE = process.env.MODE;
-
 async function updateProgress(request) {
     try {
         const body = await request.json();
