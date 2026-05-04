@@ -16,10 +16,18 @@ export async function POST(request) {
         }
 
         const body = await request.json();
+        const oldPassword = body.oldPassword || body.currentPassword;
 
-    const response = await apiClient.post(`${getBackendUrl()}/change-password`, 
+        if (!oldPassword || !body.newPassword) {
+            return NextResponse.json(
+                { status: 400, message: 'Current and new password are required' },
+                { status: 400 }
+            );
+        }
+
+        await apiClient.post(`${getBackendUrl()}/change-password`, 
             {
-                oldPassword: body.oldPassword,
+                oldPassword,
                 newPassword: body.newPassword,
             },
             {

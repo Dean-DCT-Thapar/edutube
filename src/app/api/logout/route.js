@@ -43,6 +43,7 @@ export async function POST(request) {
 
         response.cookies.set('accessToken', '', cookieOptions);
         response.cookies.set('adminToken', '', cookieOptions);
+        response.cookies.set('refreshToken', '', cookieOptions);
 
         return response;
     } catch (error) {

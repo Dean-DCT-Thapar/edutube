@@ -10,8 +10,32 @@ class FrontendApiClient {
     this.baseURL = getApiBaseUrl();
   }
 
+  async refreshAccessToken() {
+    const refreshUrl = `${this.baseURL}/api/refresh-token`;
+    const response = await fetch(refreshUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+    });
+
+    if (!response.ok) {
+      const contentType = response.headers.get('content-type');
+      let message = 'Unable to refresh session';
+      if (contentType && contentType.includes('application/json')) {
+        const data = await response.json();
+        message = data?.message || message;
+      }
+      const err = new Error(message);
+      err.status = response.status;
+      throw err;
+    }
+
+    return true;
+  }
+
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    const canRetryWithRefresh = endpoint !== '/api/refresh-token' && !options._retryAfterRefresh;
     
     const config = {
       headers: {
@@ -49,6 +73,16 @@ class FrontendApiClient {
       }
 
       if (!response.ok) {
+        if (response.status === 401 && canRetryWithRefresh) {
+          try {
+            await this.refreshAccessToken();
+            return this.request(endpoint, { ...options, _retryAfterRefresh: true });
+          } catch (refreshError) {
+            // Fall through and throw original request error below.
+            console.warn('Session refresh failed:', refreshError?.message || refreshError);
+          }
+        }
+
         const err = new Error(
           typeof data === 'object' && data?.message
             ? data.message

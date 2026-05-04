@@ -1,6 +1,18 @@
 import { NextResponse } from 'next/server';
 import apiClient from '@/utils/apiClient';
 
+const extractCookie = (setCookieHeader, name) => {
+    if (!setCookieHeader) return null;
+    const values = Array.isArray(setCookieHeader) ? setCookieHeader : [setCookieHeader];
+    const prefix = `${name}=`;
+    for (const raw of values) {
+        if (!raw || !raw.startsWith(prefix)) continue;
+        const firstPart = raw.split(';')[0] || '';
+        return firstPart.slice(prefix.length);
+    }
+    return null;
+};
+
 export async function POST(request) {
     try {
         const body = await request.json();
@@ -13,6 +25,7 @@ export async function POST(request) {
         });
 
         const { accessToken, user } = response.data;
+        const refreshToken = extractCookie(response.headers?.['set-cookie'], 'refreshToken');
 
         // Response object for frontend usage
         const responseData = { 
@@ -40,6 +53,12 @@ export async function POST(request) {
             res.cookies.set('adminToken', accessToken, cookieOptions);
         } else {
             res.cookies.set('accessToken', accessToken, cookieOptions);
+        }
+        if (refreshToken) {
+            res.cookies.set('refreshToken', refreshToken, {
+                ...cookieOptions,
+                maxAge: 60 * 60 * 24 * 30
+            });
         }
 
         return res;

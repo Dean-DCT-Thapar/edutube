@@ -5,20 +5,13 @@ import toast from 'react-hot-toast';
 import AdminLayout from '../../component/AdminLayout';
 import {
     SettingsRounded,
-    PersonRounded,
     SecurityRounded,
-    NotificationsRounded,
-    SaveRounded,
     VisibilityRounded,
     VisibilityOffRounded
 } from '@mui/icons-material';
 
 const SettingsPage = () => {
     const [userData, setUserData] = useState(null);
-    const [profileData, setProfileData] = useState({
-        name: '',
-        email: ''
-    });
     const [passwordData, setPasswordData] = useState({
         currentPassword: '',
         newPassword: '',
@@ -30,7 +23,6 @@ const SettingsPage = () => {
         confirm: false
     });
     const [loading, setLoading] = useState({
-        profile: false,
         password: false
     });
     const [errors, setErrors] = useState({});
@@ -44,45 +36,10 @@ const SettingsPage = () => {
             const data = await frontendApi.get('/api/verify-auth');
             if (data?.status === 200) {
                 setUserData(data);
-                setProfileData({
-                    name: data.name || '',
-                    email: data.email || ''
-                });
             }
         } catch (error) {
             const message = error?.message || 'Failed to load user data';
             toast.error(message);
-        }
-    };
-
-    const handleProfileUpdate = async (e) => {
-        e.preventDefault();
-        
-        const newErrors = {};
-        if (!profileData.name.trim()) {
-            newErrors.name = 'Name is required';
-        }
-        if (!profileData.email.trim()) {
-            newErrors.email = 'Email is required';
-        } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(profileData.email)) {
-            newErrors.email = 'Please enter a valid email address';
-        }
-
-        if (Object.keys(newErrors).length > 0) {
-            setErrors(newErrors);
-            return;
-        }
-
-        setLoading(prev => ({ ...prev, profile: true }));
-        try {
-            await frontendApi.put(`/api/admin/users/${userData.id}`, profileData);
-            toast.success('Profile updated successfully');
-            setErrors({});
-        } catch (error) {
-            const message = error?.message || 'Failed to update profile';
-            toast.error(message);
-        } finally {
-            setLoading(prev => ({ ...prev, profile: false }));
         }
     };
 
@@ -95,7 +52,7 @@ const SettingsPage = () => {
         }
         if (!passwordData.newPassword) {
             newErrors.newPassword = 'New password is required';
-        } else if (passwordData.newPassword.length < 5) {
+        } else if (passwordData.newPassword.length < 6) {
             newErrors.newPassword = 'Password must be at least 6 characters';
         }
         if (passwordData.newPassword !== passwordData.confirmPassword) {
@@ -128,14 +85,6 @@ const SettingsPage = () => {
         }
     };
 
-    const handleProfileChange = (e) => {
-        const { name, value } = e.target;
-        setProfileData(prev => ({ ...prev, [name]: value }));
-        if (errors[name]) {
-            setErrors(prev => ({ ...prev, [name]: '' }));
-        }
-    };
-
     const handlePasswordChange = (e) => {
         const { name, value } = e.target;
         setPasswordData(prev => ({ ...prev, [name]: value }));
@@ -159,89 +108,9 @@ const SettingsPage = () => {
                     </p>
                 </div>
 
-                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    {/* Profile Settings */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-                        <div className="p-6 border-b border-gray-200">
-                            <div className="flex items-center space-x-3">
-                                <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                                    <PersonRounded className="text-blue-600" />
-                                </div>
-                                <div>
-                                    <h3 className="text-lg font-semibold text-gray-900">Profile Information</h3>
-                                    <p className="text-sm text-gray-600">Update your account details</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <form onSubmit={handleProfileUpdate} className="p-6 space-y-4">
-                            {/* Name */}
-                            <div>
-                                <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Full Name
-                                </label>
-                                <input
-                                    type="text"
-                                    id="name"
-                                    name="name"
-                                    value={profileData.name}
-                                    onChange={handleProfileChange}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                        errors.name ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                    placeholder="Enter your full name"
-                                />
-                                {errors.name && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.name}</p>
-                                )}
-                            </div>
-
-                            {/* Email */}
-                            <div>
-                                <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                                    Email Address
-                                </label>
-                                <input
-                                    type="email"
-                                    id="email"
-                                    name="email"
-                                    value={profileData.email}
-                                    onChange={handleProfileChange}
-                                    className={`w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                        errors.email ? 'border-red-300' : 'border-gray-300'
-                                    }`}
-                                    placeholder="Enter your email address"
-                                />
-                                {errors.email && (
-                                    <p className="mt-1 text-sm text-red-600">{errors.email}</p>
-                                )}
-                            </div>
-
-                            {/* Role (read-only) */}
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Role
-                                </label>
-                                <div className="px-3 py-2 bg-gray-50 border border-gray-300 rounded-lg">
-                                    <span className="text-sm text-gray-600 capitalize">
-                                        {userData?.role || 'Administrator'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <button
-                                type="submit"
-                                disabled={loading.profile}
-                                className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 disabled:opacity-50 disabled:cursor-not-allowed"
-                            >
-                                <SaveRounded className="mr-2" />
-                                {loading.profile ? 'Updating...' : 'Update Profile'}
-                            </button>
-                        </form>
-                    </div>
-
+                <div className="grid grid-cols-1 gap-6">
                     {/* Password Settings */}
-                    <div className="bg-white rounded-lg shadow-sm border border-gray-200">
+                    <div className="bg-white rounded-xl shadow-sm border border-gray-200 max-w-2xl w-full mx-auto">
                         <div className="p-6 border-b border-gray-200">
                             <div className="flex items-center space-x-3">
                                 <div className="w-10 h-10 bg-red-100 rounded-lg flex items-center justify-center">
@@ -254,7 +123,7 @@ const SettingsPage = () => {
                             </div>
                         </div>
 
-                        <form onSubmit={handlePasswordUpdate} className="p-6 space-y-4">
+                        <form onSubmit={handlePasswordUpdate} className="p-6 space-y-5">
                             {/* Current Password */}
                             <div>
                                 <label htmlFor="currentPassword" className="block text-sm font-medium text-gray-700 mb-1">
@@ -267,15 +136,15 @@ const SettingsPage = () => {
                                         name="currentPassword"
                                         value={passwordData.currentPassword}
                                         onChange={handlePasswordChange}
-                                        className={`w-full pr-10 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                            errors.currentPassword ? 'border-red-300' : 'border-gray-300'
+                                        className={`w-full h-11 pr-11 px-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                                            errors.currentPassword ? 'border-red-300 bg-red-50/40' : 'border-gray-300'
                                         }`}
                                         placeholder="Enter current password"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility('current')}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                                     >
                                         {showPasswords.current ? <VisibilityOffRounded /> : <VisibilityRounded />}
                                     </button>
@@ -297,15 +166,15 @@ const SettingsPage = () => {
                                         name="newPassword"
                                         value={passwordData.newPassword}
                                         onChange={handlePasswordChange}
-                                        className={`w-full pr-10 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                            errors.newPassword ? 'border-red-300' : 'border-gray-300'
+                                        className={`w-full h-11 pr-11 px-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                                            errors.newPassword ? 'border-red-300 bg-red-50/40' : 'border-gray-300'
                                         }`}
                                         placeholder="Enter new password"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility('new')}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                                     >
                                         {showPasswords.new ? <VisibilityOffRounded /> : <VisibilityRounded />}
                                     </button>
@@ -327,15 +196,15 @@ const SettingsPage = () => {
                                         name="confirmPassword"
                                         value={passwordData.confirmPassword}
                                         onChange={handlePasswordChange}
-                                        className={`w-full pr-10 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 ${
-                                            errors.confirmPassword ? 'border-red-300' : 'border-gray-300'
+                                        className={`w-full h-11 pr-11 px-3 border rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-colors ${
+                                            errors.confirmPassword ? 'border-red-300 bg-red-50/40' : 'border-gray-300'
                                         }`}
                                         placeholder="Confirm new password"
                                     />
                                     <button
                                         type="button"
                                         onClick={() => togglePasswordVisibility('confirm')}
-                                        className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-2 top-1/2 -translate-y-1/2 h-8 w-8 rounded-md text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition-colors"
                                     >
                                         {showPasswords.confirm ? <VisibilityOffRounded /> : <VisibilityRounded />}
                                     </button>
@@ -348,7 +217,7 @@ const SettingsPage = () => {
                             <button
                                 type="submit"
                                 disabled={loading.password}
-                                className="w-full flex items-center justify-center px-4 py-2 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                                className="w-full h-11 flex items-center justify-center px-4 text-sm font-medium text-white bg-red-600 border border-transparent rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                             >
                                 <SecurityRounded className="mr-2" />
                                 {loading.password ? 'Updating...' : 'Update Password'}
