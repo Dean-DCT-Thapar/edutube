@@ -13,12 +13,6 @@ import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
-const debugLog = (payload) => {
-  // #region agent log
-  fetch('http://localhost:7921/ingest/827b3ddb-567d-4b3e-975a-5acd118ec4c4',{method:'POST',headers:{'Content-Type':'application/json','X-Debug-Session-Id':'9a2b90'},body:JSON.stringify({sessionId:'9a2b90',runId:'baseline',timestamp:Date.now(),...payload})}).catch(()=>{});
-  // #endregion
-};
-
 const SideBar = () => {
   const SIDEBAR_COLLAPSED_KEY = 'studentSidebarCollapsed';
   const [isOpen, setIsOpen] = useState(() => {
@@ -49,14 +43,6 @@ const SideBar = () => {
       const storedCollapsed = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
       const nextOpenState = storedCollapsed !== 'true';
       setIsOpen((prev) => (prev === nextOpenState ? prev : nextOpenState));
-      // #region agent log
-      debugLog({
-        hypothesisId: 'H1',
-        location: 'SideBar.jsx:checkMobile',
-        message: 'Viewport breakpoint evaluated',
-        data: { pathname, innerWidth: window.innerWidth, mobile, nextOpenState: !mobile }
-      });
-      // #endregion
     };
     checkMobile();
     window.addEventListener('resize', checkMobile);
@@ -69,14 +55,6 @@ const SideBar = () => {
     // defer dispatch to avoid updating during render
     const evt = new CustomEvent('sidebarState', { detail: isOpen });
     setTimeout(() => window.dispatchEvent(evt), 0);
-    // #region agent log
-    debugLog({
-      hypothesisId: 'H2',
-      location: 'SideBar.jsx:sidebarStateEffect',
-      message: 'Sidebar state dispatched',
-      data: { pathname, isOpen, isMobile, isHydrated }
-    });
-    // #endregion
   }, [isOpen, isHydrated]);
 
   // Listen for toggle event from TopBar
@@ -113,14 +91,6 @@ const SideBar = () => {
     if (!isHydrated || !isMobile) return;
     setIsOpen(false);
     window.dispatchEvent(new CustomEvent('sidebarState', { detail: false }));
-    // #region agent log
-    debugLog({
-      hypothesisId: 'H3',
-      location: 'SideBar.jsx:closeSidebar',
-      message: 'Sidebar closed from overlay/nav click',
-      data: { pathname, isOpenBeforeClose: isOpen, isMobile }
-    });
-    // #endregion
   };
 
   const navItems = [

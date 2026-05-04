@@ -24,8 +24,8 @@ export default function RootLayout({ children }) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
-              // Suppress console output in production mode
-              if (process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost') {
+              // Suppress console output in production (non-localhost environments)
+              if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1' && window.location.hostname !== '[::1]') {
                 const noop = () => {};
                 window.console = {
                   ...window.console,
@@ -37,7 +37,7 @@ export default function RootLayout({ children }) {
                 };
               }
               
-              // Suppress YouTube postMessage errors in development
+              // Suppress YouTube postMessage errors
               window.addEventListener('error', function(e) {
                 if (e.message && e.message.includes('postMessage') && e.message.includes('youtube.com')) {
                   e.preventDefault();
