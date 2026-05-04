@@ -1,5 +1,6 @@
 import "./globals.css";
 import { Toaster } from 'react-hot-toast';
+import ConsoleSuppressionWrapper from './providers';
 
 export const metadata = {
   title: "Thapar EduTube",
@@ -23,6 +24,19 @@ export default function RootLayout({ children }) {
         <script
           dangerouslySetInnerHTML={{
             __html: `
+              // Suppress console output in production mode
+              if (process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost') {
+                const noop = () => {};
+                window.console = {
+                  ...window.console,
+                  log: noop,
+                  error: noop,
+                  warn: noop,
+                  info: noop,
+                  debug: noop,
+                };
+              }
+              
               // Suppress YouTube postMessage errors in development
               window.addEventListener('error', function(e) {
                 if (e.message && e.message.includes('postMessage') && e.message.includes('youtube.com')) {
@@ -35,9 +49,11 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="antialiased bg-gray-50 text-gray-900">
-        <div id="root" className="page-layout">
-          {children}
-        </div>
+        <ConsoleSuppressionWrapper>
+          <div id="root" className="page-layout">
+            {children}
+          </div>
+        </ConsoleSuppressionWrapper>
         <Toaster 
           position="top-center"
           toastOptions={{
