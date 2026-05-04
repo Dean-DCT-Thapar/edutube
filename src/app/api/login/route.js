@@ -38,8 +38,7 @@ export async function POST(request) {
 
         // Set httpOnly cookie for production
         const isHttps = request.headers.get('x-forwarded-proto') === 'https' || 
-                       request.url.startsWith('https://') ||
-                       process.env.NODE_ENV === 'production';
+                   request.url.startsWith('https://');
                        
         const cookieOptions = {
             httpOnly: true,
