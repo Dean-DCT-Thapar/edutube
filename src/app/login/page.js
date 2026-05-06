@@ -12,8 +12,10 @@ import Link from 'next/link';
 
 export default function Page() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isForgotModalOpen, setIsForgotModalOpen] = useState(false);
   const [formValues, setFormValues] = useState({ email: '', password: '' });
   const router = useRouter();
+  const supportEmail = 'dct.office@thapar.edu';
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -59,6 +61,22 @@ export default function Page() {
       checkAuth();
     }
   }, [router]);
+
+  useEffect(() => {
+    const handleEscape = (event) => {
+      if (event.key === 'Escape') {
+        setIsForgotModalOpen(false);
+      }
+    };
+
+    if (isForgotModalOpen) {
+      window.addEventListener('keydown', handleEscape);
+    }
+
+    return () => {
+      window.removeEventListener('keydown', handleEscape);
+    };
+  }, [isForgotModalOpen]);
 
   const togglePasswordVisibility = (event) => {
     event.preventDefault();
@@ -192,9 +210,13 @@ export default function Page() {
                 </button>
               </div>
               <div className="flex justify-end mt-2">
-                {/* <Link href="/forgotPassword" className="text-sm font-medium text-red-600 hover:text-red-500 transition-colors">
+                <button
+                  type="button"
+                  onClick={() => setIsForgotModalOpen(true)}
+                  className="text-sm font-medium text-red-600 hover:text-red-700 transition-colors"
+                >
                   Forgot your password?
-                </Link> */}
+                </button>
               </div>
             </div>
 
@@ -232,6 +254,52 @@ export default function Page() {
       
       {/* Debug Helper for Troubleshooting */}
       {/* <AdminDebugHelper /> */}
+
+      {isForgotModalOpen && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center px-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="forgot-password-title"
+          onClick={() => setIsForgotModalOpen(false)}
+        >
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-2xl"
+            onClick={(event) => event.stopPropagation()}
+          >
+            <div className="flex items-start justify-between gap-4">
+              <h2 id="forgot-password-title" className="text-xl font-semibold text-gray-900">
+                Forgot password?
+              </h2>
+              <button
+                type="button"
+                onClick={() => setIsForgotModalOpen(false)}
+                className="rounded-md px-2 py-1 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+                aria-label="Close forgot password dialog"
+              >
+                Close
+              </button>
+            </div>
+
+            <p className="mt-3 text-sm leading-6 text-gray-700">
+              No worries - we can help you reset access. Please email us at{' '}
+              <span className="font-semibold text-gray-900">{supportEmail}</span> with your details:
+            </p>
+            <ul className="mt-3 space-y-1 text-sm text-gray-700">
+              <li>Students: include your roll number.</li>
+              <li>Teachers: your official email is enough.</li>
+            </ul>
+
+            <a
+              href={`mailto:${supportEmail}?subject=Password%20Reset%20Request`}
+              className="mt-5 inline-flex w-full items-center justify-center rounded-lg bg-red-600 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+            >
+              Email Support
+            </a>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
