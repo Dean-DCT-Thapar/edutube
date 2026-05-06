@@ -47,6 +47,7 @@ const AdminLayout = ({ children, title, userName }) => {
         { name: 'Dashboard', href: '/admin-dashboard', icon: DashboardRounded },
         { name: 'Users', href: '/admin-dashboard/users', icon: PeopleRounded },
         { name: 'Courses', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
+        { name: 'Course Requests', href: '/admin-dashboard/course-requests', icon: MenuBookRounded },
         { name: 'CLI API Keys', href: '/admin-dashboard/cli-keys', icon: VpnKeyRounded },
         { name: 'Settings', href: '/admin-dashboard/settings', icon: SettingsRounded },
     ];
@@ -131,7 +132,10 @@ const AdminLayout = ({ children, title, userName }) => {
                     {/* Navigation */}
                     <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
                         {navigation.map((item) => {
-                            const isActive = pathname === item.href;
+                            const isActive = 
+                                item.href === '/admin-dashboard' 
+                                    ? pathname === '/admin-dashboard'
+                                    : pathname.startsWith(item.href);
                             return (
                                 <Link
                                     key={item.name}

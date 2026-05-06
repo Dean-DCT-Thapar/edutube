@@ -38,6 +38,7 @@ const TeacherLayout = ({ children, title, userName }) => {
     const navigation = [
         { name: 'Dashboard', href: '/teacher-dashboard', icon: DashboardRounded },
         { name: 'My courses', href: '/teacher-dashboard/instances', icon: SchoolRounded },
+        { name: 'Course Requests', href: '/teacher-dashboard/course-requests', icon: MenuBookRounded },
         { name: 'Change Password', href: '/teacher-dashboard/settings', icon: SecurityRounded, section: 'settings' }
     ];
 
@@ -122,7 +123,9 @@ const TeacherLayout = ({ children, title, userName }) => {
                                     ? pathname === '/teacher-dashboard'
                                     : item.href === '/teacher-dashboard/instances'
                                         ? pathname.startsWith('/teacher-dashboard/instances')
-                                        : pathname === item.href;
+                                        : item.href === '/teacher-dashboard/course-requests'
+                                            ? pathname.startsWith('/teacher-dashboard/course-requests')
+                                            : pathname === item.href;
                             return (
                                 <React.Fragment key={item.name}>
                                     {item.section === 'settings' && (

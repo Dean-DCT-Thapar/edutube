@@ -11,6 +11,7 @@ import {
     PeopleRounded,
     TrendingUpRounded,
     VideoLibraryRounded,
+    MenuBookRounded,
     ChevronRightRounded
 } from '@mui/icons-material';
 
@@ -108,13 +109,22 @@ export default function TeacherDashboardPage() {
                             Monitor your courses and student engagement at a glance.
                         </p>
                     </div>
-                    <Link
-                        href="/teacher-dashboard/instances"
-                        className="mt-4 sm:mt-0 inline-flex items-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
-                    >
-                        <SchoolRounded className="mr-2 text-base" />
-                        My Courses
-                    </Link>
+                    <div className="mt-4 sm:mt-0 flex flex-col sm:flex-row gap-3">
+                        <Link
+                            href="/teacher-dashboard/course-requests/new"
+                            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-primary-700 bg-primary-100 hover:bg-primary-200"
+                        >
+                            <MenuBookRounded className="mr-2 text-base" />
+                            New Request
+                        </Link>
+                        <Link
+                            href="/teacher-dashboard/instances"
+                            className="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700"
+                        >
+                            <SchoolRounded className="mr-2 text-base" />
+                            My Courses
+                        </Link>
+                    </div>
                 </div>
 
                 {/* Stat cards */}
