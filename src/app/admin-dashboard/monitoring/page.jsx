@@ -31,7 +31,7 @@ export default function AdminMonitoringPage() {
           </p>
           <div className="mt-4 flex flex-wrap gap-3">
             <a
-              href="http://localhost:3001/d/edutube-starter/edutube-starter-monitoring"
+              href="/monitoring/grafana/d/edutube-starter/edutube-starter-monitoring"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-700"
@@ -39,7 +39,7 @@ export default function AdminMonitoringPage() {
               Open Starter Dashboard
             </a>
             <a
-              href="http://localhost:3001"
+              href="/monitoring/grafana/"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center rounded-md border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
@@ -56,13 +56,13 @@ export default function AdminMonitoringPage() {
           <h3 className="text-md font-semibold text-gray-900">Other Monitoring Endpoints</h3>
           <ul className="mt-3 text-sm text-gray-700 space-y-1">
             <li>
-              Prometheus: <a className="text-blue-600 hover:underline" href="http://localhost:9090" target="_blank" rel="noreferrer">http://localhost:9090</a>
+              Prometheus: <a className="text-blue-600 hover:underline" href="/monitoring/prometheus/" target="_blank" rel="noreferrer">/monitoring/prometheus/</a>
             </li>
             <li>
-              Loki: <a className="text-blue-600 hover:underline" href="http://localhost:3100" target="_blank" rel="noreferrer">http://localhost:3100</a>
+              Loki: <a className="text-blue-600 hover:underline" href="/monitoring/loki/" target="_blank" rel="noreferrer">/monitoring/loki/</a>
             </li>
             <li>
-              Alertmanager: <a className="text-blue-600 hover:underline" href="http://localhost:9093" target="_blank" rel="noreferrer">http://localhost:9093</a>
+              Alertmanager: <a className="text-blue-600 hover:underline" href="/monitoring/alertmanager/" target="_blank" rel="noreferrer">/monitoring/alertmanager/</a>
             </li>
           </ul>
         </div>
