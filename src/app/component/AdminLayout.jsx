@@ -20,8 +20,7 @@ import {
     AutoStoriesRounded,
     AccountTreeRounded,
     GroupRounded,
-    VpnKeyRounded,
-    MonitoringRounded
+    VpnKeyRounded
 } from '@mui/icons-material';
 
 
@@ -50,7 +49,7 @@ const AdminLayout = ({ children, title, userName }) => {
         { name: 'Courses', href: '/admin-dashboard/course-templates', icon: AccountTreeRounded },
         { name: 'Course Requests', href: '/admin-dashboard/course-requests', icon: MenuBookRounded },
         { name: 'CLI API Keys', href: '/admin-dashboard/cli-keys', icon: VpnKeyRounded },
-        { name: 'Monitoring', href: '/admin-dashboard/monitoring', icon: MonitoringRounded },
+        { name: 'Monitoring', href: '/admin-dashboard/monitoring', icon: TuneRounded },
         { name: 'Settings', href: '/admin-dashboard/settings', icon: SettingsRounded },
     ];
 
