@@ -223,15 +223,14 @@ const VideoDisplay = (props) => {
         return;
       }
 
-      // Best-effort iframe hardening for embedded YouTube behavior.
+      // iframe allow list; parent Permissions-Policy must delegate to YouTube (see next.config.mjs).
       if (typeof playerInstance.getIframe === 'function') {
         const iframe = playerInstance.getIframe();
         if (iframe) {
           iframe.setAttribute(
             'allow',
-            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share'
+            'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen'
           );
-          iframe.setAttribute('referrerpolicy', 'strict-origin-when-cross-origin');
           iframe.setAttribute('allowfullscreen', 'true');
         }
       }
@@ -256,7 +255,9 @@ const VideoDisplay = (props) => {
                 opts={{
                   height: '100%',
                   width: '100%',
-                  host: 'https://www.youtube-nocookie.com',
+                  // Standard youtube.com embed (not youtube-nocookie): nocookie isolates cookies, so users often
+                  // appear logged out in the player and YouTube shows "Sign in" for many videos even when embed is allowed.
+                  host: 'https://www.youtube.com',
                   playerVars: {
                     rel: 0,
                     autoplay: 0,

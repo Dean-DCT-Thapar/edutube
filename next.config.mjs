@@ -1,3 +1,13 @@
+/** Delegates media-related features to YouTube iframes (Permissions-Policy on all routes). */
+const PERMISSIONS_POLICY =
+  'accelerometer=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), ' +
+  'autoplay=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), ' +
+  'camera=(), display-capture=(), geolocation=(), ' +
+  'gyroscope=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), ' +
+  'microphone=(), midi=(), payment=(), publickey-credentials-get=(), usb=(), serial=(), bluetooth=(), magnetometer=(), ' +
+  'encrypted-media=(self "https://www.youtube.com" "https://www.youtube-nocookie.com"), ' +
+  'picture-in-picture=(self "https://www.youtube.com" "https://www.youtube-nocookie.com")';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Remove standalone output to test if that's causing the issue
@@ -18,7 +28,7 @@ const nextConfig = {
         headers: [
           {
             key: 'Permissions-Policy',
-            value: 'accelerometer=(), autoplay=(), camera=(), display-capture=(), geolocation=(), gyroscope=(), microphone=(), midi=(), payment=(), publickey-credentials-get=(), usb=(), serial=(), bluetooth=(), magnetometer=()'
+            value: PERMISSIONS_POLICY
           },
           {
             key: 'Content-Security-Policy',
